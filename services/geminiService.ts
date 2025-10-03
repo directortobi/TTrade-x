@@ -261,7 +261,7 @@ export const getMarketAnalystPrediction = async (input: MarketAnalystInput): Pro
         **Your Persona & Trading Style:** ${styleSpecificInstructions}
 
         **Task:**
-        Analyze the provided multi-timeframe data according to your trading style. Determine the trend, key support/resistance, and indicator states, then issue a single, actionable trade prediction.
+        Analyze the provided multi-timeframe data according to your trading style. Determine the trend, key support/resistance, and indicator states (RSI, MACD, and Bollinger Bands), then issue a single, actionable trade prediction.
 
         **Prediction Requirements (Your output MUST be this JSON object):**
         1.  **trend**: Determine the overall trend direction ('Bullish', 'Bearish', 'Sideways').
@@ -272,7 +272,7 @@ export const getMarketAnalystPrediction = async (input: MarketAnalystInput): Pro
         6.  **takeProfit**: The target price to exit with a profit.
         7.  **stopLoss**: The price to exit if the trade moves against you. The risk-to-reward ratio (distance to TP vs. distance to SL) must be at least 1:1.5.
         8.  **confidenceLevel**: Your certainty in this prediction, from 0 to 100.
-        9.  **rationale**: A detailed step-by-step justification for your decision, directly referencing your trading style's concepts (e.g., FVGs for ICT, major S/R for swing) and incorporating your findings on trend, S/R, and indicators.
+        9.  **rationale**: A detailed step-by-step justification for your decision, directly referencing your trading style's concepts (e.g., FVGs for ICT, major S/R for swing) and incorporating your findings on trend, S/R, and indicators (RSI, MACD, and Bollinger Bands analysis).
         10. **pips**: Calculate TP and SL distance in pips. For most pairs, 1 pip = 0.0001. For JPY pairs (e.g., USD/JPY), 1 pip = 0.01. For XAU/USD, 1 pip = 0.1. For BTC/USD, 1 pip = 1.0.
         11. **riskRewardRatio**: Calculate the risk/reward ratio as "1:X".
         12. **pair**: The pair being analyzed (${pair}).
@@ -328,10 +328,11 @@ export const getTimeframeAnalysis = async (input: TimeframeAnalysisInput): Promi
         1.  **Technical Analysis:** Based on the provided candlestick data, infer signals from technical indicators:
             *   **RSI (Relative Strength Index):** Is the asset overbought, oversold, or showing divergence? Determine its numerical value and interpretation.
             *   **MACD (Moving Average Convergence Divergence):** Is there a bullish or bearish crossover? Determine the signal.
+            *   **Bollinger Bands:** Is the price trading near the upper or lower band? Is there a "squeeze" indicating potential volatility?
             *   **Candlestick Patterns:** Identify key patterns (e.g., Doji, Engulfing, Hammer).
             *   **Market Structure:** Identify the immediate trend, support, and resistance levels on this timeframe. Determine the trend direction ('Bullish', 'Bearish', 'Sideways').
         2.  **Decision and Levels:** Decide on a BUY or SELL signal. If no high-probability setup is found, you must still choose the most likely direction and indicate low confidence.
-        3.  **Rationale:** Provide a clear, concise explanation for your decision, referencing your analysis of RSI, MACD, patterns, and structure.
+        3.  **Rationale:** Provide a clear, concise explanation for your decision, referencing your analysis of RSI, MACD, Bollinger Bands, patterns, and structure.
         4.  **Confidence & Risk:**
             *   Provide a 'confidenceLevel' (0-100).
             *   Calculate 'takeProfit' and 'stopLoss' distance in pips appropriate for the timeframe.

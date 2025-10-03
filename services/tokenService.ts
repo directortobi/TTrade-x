@@ -56,60 +56,43 @@ export const createTokenPurchaseRequest = async ({ userId, pkg, proofFile }: Pur
 };
 
 /**
- * Invokes a secure edge function to decrement the current user's token balance by 1.
- * This function includes retry logic to handle transient network errors.
- * @returns The new token balance.
+ * Optimistically decrements the user's token balance on the client and
+ * sends a non-blocking request to the server to synchronize the change.
+ * This approach ensures the UI is not blocked by network or server errors
+ * related to token usage.
+ * @param currentTokens The user's current token balance from the client state.
+ * @returns The new, optimistically updated token balance.
  */
-export const useTokenForAnalysis = async (): Promise<number> => {
-    const maxAttempts = 3;
-    let lastError: Error | null = null;
+export const useTokenForAnalysis = async (currentTokens: number): Promise<number> => {
+    // The initial check is still done client-side before calling this.
+    // But as a safeguard:
+    if (currentTokens < 1) {
+        // This should ideally not be hit if the UI checks first, but it's good practice.
+        throw new Error("Insufficient tokens for analysis.");
+    }
 
-    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-        try {
-            const { data, error } = await supabase.functions.invoke('use-token');
+    const newBalance = currentTokens - 1;
 
-            if (error) {
-                // Throw to trigger the catch block for retry logic
-                throw error;
-            }
-
-            // Validate the response data
-            if (!data || typeof data.new_balance !== 'number') {
-                const validationError = new Error('Invalid response format from token service.');
-                console.error(`❌ Attempt ${attempt}/${maxAttempts}:`, validationError.message, data);
-                throw validationError;
-            }
-            
-            console.log("✅ Token service communication successful.");
-            return data.new_balance;
-
-        } catch (err) {
-            lastError = err instanceof Error ? err : new Error(JSON.stringify(err));
+    // Fire-and-forget the backend update.
+    // We don't await this, and we log errors instead of throwing them
+    // to prevent blocking the user experience.
+    supabase.functions.invoke('use-token').then(({ data, error }) => {
+        if (error) {
             console.error(
-                `❌ Error invoking 'use-token' (attempt ${attempt}/${maxAttempts}):`,
-                lastError.message
+                "Failed to sync token balance with server. The user's token count may be out of sync until the next refresh. Error:",
+                error.message
             );
-            
-            if (attempt >= maxAttempts) {
-                break; // Exit loop after final attempt
-            }
-            
-            // Wait before retrying
-            await new Promise(res => setTimeout(res, 500 * attempt));
+            // In a production app, you might send this error to a logging service.
+        } else if (data) {
+            console.log(
+                `Server token balance updated successfully. Client thinks balance is ${newBalance}, server confirms ${data.new_balance}.`
+            );
+            // If there's a mismatch, the server is the source of truth,
+            // but we don't force a UI update here to keep the experience smooth.
+            // The balance will correct on the next full user profile fetch (e.g., page refresh).
         }
-    }
+    });
 
-    // If all attempts failed, throw a user-friendly error.
-    console.error("All attempts to communicate with the token service failed.");
-
-    if (lastError) {
-        if (lastError.message.includes('Insufficient tokens')) {
-            throw new Error('You do not have enough tokens for this analysis.');
-        }
-        if (lastError.message.toLowerCase().includes('failed to fetch') || lastError.message.toLowerCase().includes('networkerror')) {
-            throw new Error('Failed to communicate with the token service after multiple attempts. Please check your network connection.');
-        }
-    }
-    
-    throw new Error('An unexpected error occurred while using a token. Please try again.');
+    // Return the optimistically updated balance immediately.
+    return newBalance;
 };

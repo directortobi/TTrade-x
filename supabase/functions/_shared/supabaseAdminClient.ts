@@ -1,6 +1,6 @@
 // supabase/functions/_shared/supabaseAdminClient.ts
-// Fix: Use correct types for Supabase Edge Functions to resolve Deno namespace errors.
-/// <reference types="npm:@supabase/functions-js@2.4.1/src/edge-runtime.d.ts" />
+// Standardized the type reference to ensure consistency across all edge functions.
+/// <reference types="https://esm.sh/@supabase/functions-js@2" />
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import type { Database } from '../_shared/database.types.ts'

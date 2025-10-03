@@ -95,7 +95,7 @@ const MainApp: React.FC<MainAppProps> = ({ user, onLogout, setUser }) => {
       await logService.createLog(result, user.auth.email!, tokensUsed);
 
       if (tokensUsed > 0) {
-          const newBalance = await useTokenForAnalysis();
+          const newBalance = await useTokenForAnalysis(user.profile.tokens);
           handleTokenUsed(newBalance);
       } else {
           const originalRationale = result.rationale;

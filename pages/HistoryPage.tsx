@@ -48,7 +48,7 @@ const HistoryPage: React.FC<HistoryPageProps> = ({ user }) => {
             const data = await logService.getLogs();
             setLogs(data);
         } catch (err) {
-            setError(err instanceof Error ? err.message : 'Failed to load history');
+            setError((err as any)?.message || 'Failed to load history');
         } finally {
             setIsLoading(false);
         }
@@ -76,8 +76,11 @@ const HistoryPage: React.FC<HistoryPageProps> = ({ user }) => {
         if (isLoading) {
             return <div className="flex justify-center items-center h-64"><LoadingSpinner /></div>;
         }
-        if (logs.length === 0) {
+        if (logs.length === 0 && !error) {
             return <p className="text-center text-gray-400 py-16">You have no analysis history yet. Perform an analysis to get started!</p>;
+        }
+        if (error) {
+             return <div className="py-16"><ErrorAlert message={error} /></div>;
         }
         return (
             <div className="overflow-x-auto">
@@ -135,7 +138,7 @@ const HistoryPage: React.FC<HistoryPageProps> = ({ user }) => {
                 </button>
             </div>
              
-             {error && <ErrorAlert message={error} />}
+             {error && !isLoading && <ErrorAlert message={error} />}
 
             <div className="bg-blue-900/50 p-4 sm:p-6 rounded-2xl border border-blue-800">
                 {renderContent()}

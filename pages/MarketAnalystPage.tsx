@@ -100,7 +100,7 @@ const MarketAnalystPage: React.FC<MarketAnalystPageProps> = ({ user, onTokenUsed
             await logService.createLog(result, user.auth.email!, tokensUsed);
             
             if (tokensUsed > 0) {
-                const newBalance = await useTokenForAnalysis();
+                const newBalance = await useTokenForAnalysis(user.profile.tokens);
                 onTokenUsed(newBalance);
             } else {
                 const originalRationale = result.rationale;
