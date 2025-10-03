@@ -1,4 +1,4 @@
-// supabase/functions/get-pending-referral-withdrawals/index.ts
+// supabase/functions/get-pending-withdrawals/index.ts
 // Fix: Use correct types for Supabase Edge Functions to resolve Deno namespace errors.
 /// <reference types="npm:@supabase/functions-js@2.4.1/src/edge-runtime.d.ts" />
 
@@ -13,7 +13,7 @@ serve(async (_req) => {
 
   try {
     const { data, error } = await supabaseAdmin
-      .from('referral_withdrawals')
+      .from('withdrawals')
       .select(`
           *,
           profiles (

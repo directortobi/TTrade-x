@@ -1,4 +1,6 @@
 // supabase/functions/approve-withdrawal/index.ts
+// Fix: Use correct types for Supabase Edge Functions to resolve Deno namespace errors.
+/// <reference types="npm:@supabase/functions-js@2.4.1/src/edge-runtime.d.ts" />
 
 import { serve } from 'https://deno.land/std@0.177.0/http/server.ts'
 import { corsHeaders } from '../_shared/cors.ts'

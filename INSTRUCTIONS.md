@@ -249,6 +249,7 @@ SECURITY DEFINER AS $$
 DECLARE
   v_purchase record;
   v_referrer_id uuid;
+  v_buyer_referral_code text;
   v_commission_amount numeric;
 BEGIN
   -- 1. Get purchase details and lock the row
@@ -262,15 +263,20 @@ BEGIN
   UPDATE public.token_purchases SET status = 'approved' WHERE id = p_purchase_id;
 
   -- 4. Check if the buyer was referred
-  SELECT referred_by INTO v_referrer_id
+  SELECT referred_by INTO v_buyer_referral_code
   FROM public.profiles
-  WHERE id = v_purchase.user_id AND referred_by IS NOT NULL;
+  WHERE id = v_purchase.user_id;
   
-  -- 5. If referred, calculate and insert the commission
-  IF v_referrer_id IS NOT NULL THEN
-    v_commission_amount := v_purchase.price_usd * 0.20; -- 20% commission
-    INSERT INTO public.referral_earnings (referrer_id, referred_user_id, purchase_id, purchase_amount, commission_amount, status)
-    VALUES (v_referrer_id, v_purchase.user_id, v_purchase.id, v_purchase.price_usd, v_commission_amount, 'pending');
+  -- 5. If they have a referral code, find the referrer and create the commission
+  IF v_buyer_referral_code IS NOT NULL THEN
+    -- Find the referrer's ID using the referral code
+    SELECT id INTO v_referrer_id FROM public.profiles WHERE referral_code = v_buyer_referral_code;
+
+    IF v_referrer_id IS NOT NULL THEN
+      v_commission_amount := v_purchase.price_usd * 0.20; -- 20% commission
+      INSERT INTO public.referral_earnings (referrer_id, referred_user_id, purchase_id, purchase_amount, commission_amount, status)
+      VALUES (v_referrer_id, v_purchase.user_id, v_purchase.id, v_purchase.price_usd, v_commission_amount, 'pending');
+    END IF;
   END IF;
   
 END;

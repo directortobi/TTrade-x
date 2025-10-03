@@ -55,19 +55,61 @@ export const createTokenPurchaseRequest = async ({ userId, pkg, proofFile }: Pur
     }
 };
 
-export const useTokenForAnalysis = async (userId: string): Promise<number> => {
-    const { data, error } = await supabase.rpc('decrement_user_tokens', {
-        p_user_id: userId,
-        p_amount: 1
-    });
+/**
+ * Invokes a secure edge function to decrement the current user's token balance by 1.
+ * This function includes retry logic to handle transient network errors.
+ * @returns The new token balance.
+ */
+export const useTokenForAnalysis = async (): Promise<number> => {
+    const maxAttempts = 3;
+    let lastError: Error | null = null;
 
-    if (error) {
-        console.error('Error decrementing tokens:', error);
-        if (error.message.includes('Insufficient tokens')) {
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+        try {
+            const { data, error } = await supabase.functions.invoke('use-token');
+
+            if (error) {
+                // Throw to trigger the catch block for retry logic
+                throw error;
+            }
+
+            // Validate the response data
+            if (!data || typeof data.new_balance !== 'number') {
+                const validationError = new Error('Invalid response format from token service.');
+                console.error(`❌ Attempt ${attempt}/${maxAttempts}:`, validationError.message, data);
+                throw validationError;
+            }
+            
+            console.log("✅ Token service communication successful.");
+            return data.new_balance;
+
+        } catch (err) {
+            lastError = err instanceof Error ? err : new Error(JSON.stringify(err));
+            console.error(
+                `❌ Error invoking 'use-token' (attempt ${attempt}/${maxAttempts}):`,
+                lastError.message
+            );
+            
+            if (attempt >= maxAttempts) {
+                break; // Exit loop after final attempt
+            }
+            
+            // Wait before retrying
+            await new Promise(res => setTimeout(res, 500 * attempt));
+        }
+    }
+
+    // If all attempts failed, throw a user-friendly error.
+    console.error("All attempts to communicate with the token service failed.");
+
+    if (lastError) {
+        if (lastError.message.includes('Insufficient tokens')) {
             throw new Error('You do not have enough tokens for this analysis.');
         }
-        throw new Error('Could not use a token for analysis. Please try again.');
+        if (lastError.message.toLowerCase().includes('failed to fetch') || lastError.message.toLowerCase().includes('networkerror')) {
+            throw new Error('Failed to communicate with the token service after multiple attempts. Please check your network connection.');
+        }
     }
     
-    return data;
+    throw new Error('An unexpected error occurred while using a token. Please try again.');
 };

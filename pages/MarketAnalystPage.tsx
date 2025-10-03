@@ -5,6 +5,7 @@ import { ResultsPage } from './ResultsPage';
 import { getMarketAnalystPrediction, getTimeframeAnalysis } from '../services/geminiService';
 import { fetchCandlestickData } from '../services/marketDataService';
 import { useTokenForAnalysis } from '../services/tokenService';
+import { logService } from '../services/logService';
 import { AnalysisResult, AppUser, Asset, TradingStyle, Timeframe, Signal } from '../types';
 import { AVAILABLE_ASSETS, TRADING_STYLES } from '../constants';
 import { CandlestickSpinner } from '../components/CandlestickSpinner';
@@ -95,8 +96,11 @@ const MarketAnalystPage: React.FC<MarketAnalystPageProps> = ({ user, onTokenUsed
                 });
             }
             
-            if (result.confidenceLevel > 50) {
-                const newBalance = await useTokenForAnalysis(user.auth.id);
+            const tokensUsed = result.confidenceLevel > 50 ? 1 : 0;
+            await logService.createLog(result, user.auth.email!, tokensUsed);
+            
+            if (tokensUsed > 0) {
+                const newBalance = await useTokenForAnalysis();
                 onTokenUsed(newBalance);
             } else {
                 const originalRationale = result.rationale;

@@ -208,3 +208,33 @@ export interface ReferralWithdrawalWithEmail extends ReferralWithdrawal {
         email: string;
     } | null;
 }
+
+// New types for Trading History
+export type AnalysisOutcome = 'Pending' | 'TP Hit' | 'SL Hit' | 'Cancelled';
+
+export interface AnalysisLog {
+    id: number;
+    created_at: string;
+    user_email: string;
+    symbol: string;
+    signal: Signal;
+    entry_price: number | null;
+    stop_loss: number | null;
+    take_profit_1: number | null;
+    confidence: number | null;
+    analysis_notes: string | null;
+    outcome: AnalysisOutcome;
+    tokens_used: number;
+}
+
+// New types for Referral Page
+export interface ReferredUser {
+    id: string;
+    email: string;
+}
+
+export interface ReferralEarningWithEmail extends ReferralEarning {
+    referred_user_profile: {
+        email: string;
+    } | null;
+}

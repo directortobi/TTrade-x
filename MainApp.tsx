@@ -12,11 +12,14 @@ import AboutUsPage from './pages/AboutUsPage';
 import AdminPage from './pages/AdminPage';
 import DashboardPage from './pages/DashboardPage';
 import ComingSoonPage from './pages/ComingSoonPage';
+import HistoryPage from './pages/HistoryPage';
+import ReferralPage from './pages/ReferralPage';
 import TradingViewWidget from './components/TradingViewWidget';
 import { CandlestickSpinner } from './components/CandlestickSpinner';
 import { getTradingSignal, getSignalFromImage, isGeminiConfigured } from './services/geminiService';
 import { fetchCandlestickData, fetchNewsSentiment } from './services/marketDataService';
 import { useTokenForAnalysis } from './services/tokenService';
+import { logService } from './services/logService';
 import { AnalysisResult, Asset, ImageData, AppUser, Signal } from './types';
 import { AVAILABLE_ASSETS } from './constants';
 import { ConfigurationErrorPage } from './pages/ConfigurationErrorPage';
@@ -88,8 +91,11 @@ const MainApp: React.FC<MainAppProps> = ({ user, onLogout, setUser }) => {
         });
       }
       
-      if (result.confidenceLevel > 50) {
-          const newBalance = await useTokenForAnalysis(user.auth.id);
+      const tokensUsed = result.confidenceLevel > 50 ? 1 : 0;
+      await logService.createLog(result, user.auth.email!, tokensUsed);
+
+      if (tokensUsed > 0) {
+          const newBalance = await useTokenForAnalysis();
           handleTokenUsed(newBalance);
       } else {
           const originalRationale = result.rationale;
@@ -197,9 +203,9 @@ const MainApp: React.FC<MainAppProps> = ({ user, onLogout, setUser }) => {
       case 'strategies':
          return <ComingSoonPage title="Strategies" description="Create, backtest, and manage your custom AI-powered trading strategies." />;
       case 'history':
-         return <ComingSoonPage title="Analysis History" description="Review your past analysis results, track outcomes, and export your data." />;
+         return <HistoryPage user={user} />;
       case 'referralProgram':
-        return <ComingSoonPage title="Referral Program" description="Track your referrals, manage earnings, and request withdrawals." />;
+        return <ReferralPage user={user} />;
       case 'buyTokens':
         return <BuyTokensPage user={user} onPurchaseSuccess={() => { /* Can add a user profile refresh logic here */ }} />;
       case 'withdraw':
