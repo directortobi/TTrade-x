@@ -83,14 +83,20 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ user, onLogout, onNavigate })
 
             {/* Profile Information Card */}
             <div className="bg-gray-800/50 p-6 rounded-2xl border border-gray-700">
-                <div className="flex flex-col sm:flex-row justify-between items-center mb-4 gap-4">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-4">
                     <h2 className="text-xl font-semibold text-green-400">Account Information</h2>
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 flex-wrap justify-center sm:justify-end">
                         <button
                             onClick={() => onNavigate('buyTokens')}
                             className="px-4 py-2 text-sm font-semibold text-white bg-green-600 rounded-lg hover:bg-green-700 transition-colors"
                         >
                             Buy More Tokens
+                        </button>
+                        <button
+                            onClick={() => onNavigate('purchaseHistory')}
+                            className="px-4 py-2 text-sm font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
+                        >
+                            Purchase History
                         </button>
                         <button
                             onClick={() => onNavigate('withdraw')}

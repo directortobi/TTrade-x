@@ -1,5 +1,5 @@
 import { supabase } from './supabase';
-import { TokenPackage } from '../types';
+import { TokenPackage, TokenPurchase } from '../types';
 
 interface PurchaseRequest {
     userId: string;
@@ -54,6 +54,25 @@ export const createTokenPurchaseRequest = async ({ userId, pkg, proofFile }: Pur
         throw new Error('Failed to submit purchase request. Please try again.');
     }
 };
+
+export const getPurchaseHistory = async (userId: string): Promise<TokenPurchase[]> => {
+    const { data, error } = await supabase
+        .from('token_purchases')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false });
+
+    if (error) {
+        console.error("Error fetching purchase history:", error);
+        if (error.message.includes('relation "public.token_purchases" does not exist')) {
+            throw new Error('The token_purchases table is missing. Please run the setup script in INSTRUCTIONS.md.');
+        }
+        throw new Error(error.message);
+    }
+
+    return data;
+};
+
 
 /**
  * Optimistically decrements the user's token balance on the client and

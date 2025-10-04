@@ -1,6 +1,7 @@
 // supabase/functions/handle-purchase-approval/index.ts
 // Standardized the type reference to ensure consistency across all edge functions.
-/// <reference types="https://esm.sh/@supabase/functions-js@2" />
+// FIX: Use a more specific type reference for Supabase functions to assist local TypeScript environments.
+/// <reference types="https://esm.sh/@supabase/functions-js/src/edge-functions.d.ts" />
 
 import { serve } from 'https://deno.land/std@0.177.0/http/server.ts'
 import { corsHeaders } from '../_shared/cors.ts'

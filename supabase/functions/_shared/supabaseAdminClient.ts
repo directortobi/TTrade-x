@@ -1,6 +1,7 @@
 // supabase/functions/_shared/supabaseAdminClient.ts
 // Standardized the type reference to ensure consistency across all edge functions.
-/// <reference types="https://esm.sh/@supabase/functions-js@2" />
+// FIX: Use a more specific type reference for Supabase functions to assist local TypeScript environments.
+/// <reference types="https://esm.sh/@supabase/functions-js/src/edge-functions.d.ts" />
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import type { Database } from '../_shared/database.types.ts'

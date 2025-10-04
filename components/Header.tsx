@@ -44,6 +44,7 @@ export const Header: React.FC<HeaderProps> = ({ activeView, onNavigate, user, on
         { label: 'Trading History', view: 'history' },
         { label: 'Strategies', view: 'strategies' },
         { label: 'Buy Tokens', view: 'buyTokens' },
+        { label: 'Purchase History', view: 'purchaseHistory' },
         { label: 'Withdraw', view: 'withdraw' },
         { label: 'Referrals', view: 'referralProgram' },
         { label: 'Admin', view: 'adminDashboard', adminOnly: true },

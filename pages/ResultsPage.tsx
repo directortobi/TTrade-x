@@ -56,6 +56,19 @@ const ResistanceIcon: React.FC = () => (<svg xmlns="http://www.w3.org/2000/svg" 
 const RsiIcon: React.FC = () => (<svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>);
 const MacdIcon: React.FC = () => (<svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M7 16V4m0 12L3 8m4 8l4-8m4 8V4m0 12l4-8m-4 8l-4-8m-2 14h12" /></svg>);
 
+const KeyLevelsIcon: React.FC = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25H12" />
+    </svg>
+);
+
+const RationaleIcon: React.FC = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+    </svg>
+);
+
+
 const TechnicalCard: React.FC<{ title: string; value: React.ReactNode; subValue?: string; icon: React.ReactNode; }> = ({ title, value, subValue, icon }) => (
     <div className="bg-gray-900/50 p-4 rounded-lg flex items-center space-x-4">
         <div className="flex-shrink-0 text-cyan-400">{icon}</div>
@@ -64,6 +77,13 @@ const TechnicalCard: React.FC<{ title: string; value: React.ReactNode; subValue?
             <p className="text-lg font-semibold text-white">{value}</p>
             {subValue && <p className="text-xs text-gray-500">{subValue}</p>}
         </div>
+    </div>
+);
+
+const RationaleItem: React.FC<{ icon: React.ReactNode; children: React.ReactNode }> = ({ icon, children }) => (
+    <div className="flex items-start gap-4 p-4 bg-gray-900/50 rounded-lg">
+        <div className="flex-shrink-0 text-cyan-400 mt-1">{icon}</div>
+        <div className="text-gray-300">{children}</div>
     </div>
 );
 
@@ -127,12 +147,12 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({ result, onGoBack }) =>
                     />
                     <TechnicalCard 
                         title="Support"
-                        value={isTradeSignal ? support.toFixed(5) : 'N/A'}
+                        value={support.toFixed(5)}
                         icon={<SupportIcon />}
                     />
                     <TechnicalCard 
                         title="Resistance"
-                        value={isTradeSignal ? resistance.toFixed(5) : 'N/A'}
+                        value={resistance.toFixed(5)}
                         icon={<ResistanceIcon />}
                     />
                     <TechnicalCard 
@@ -155,9 +175,29 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({ result, onGoBack }) =>
                  <MetricCard title="Stop Loss Level" value={isTradeSignal ? stopLoss.toFixed(5) : 'N/A'} className="!text-red-400" />
             </div>
 
-            <div className="bg-gray-800/70 p-6 rounded-lg border border-gray-700">
-                <h3 className="text-lg font-semibold text-cyan-400 mb-3">AI Rationale</h3>
-                <p className="text-gray-300 leading-relaxed whitespace-pre-wrap">{rationale}</p>
+             <div className="bg-gray-800/70 p-6 rounded-lg border border-gray-700 space-y-4">
+                <h3 className="text-xl font-semibold text-cyan-400">AI Rationale Breakdown</h3>
+                <div className="space-y-4">
+                    <RationaleItem icon={<div className={trendInfo.color}>{trendInfo.icon}</div>}>
+                        <p dangerouslySetInnerHTML={{ __html: `<strong>Trend:</strong> The analysis indicates a clear <strong>${trend}</strong> market trend. The general direction of price action supports this momentum.` }} />
+                    </RationaleItem>
+                    <RationaleItem icon={<KeyLevelsIcon />}>
+                        <p dangerouslySetInnerHTML={{ __html: `<strong>Support & Resistance:</strong> Key levels have been identified. Immediate support is at <strong>${support.toFixed(5)}</strong>, with resistance at <strong>${resistance.toFixed(5)}</strong>. These levels are critical for defining trade boundaries.` }} />
+                    </RationaleItem>
+                    <RationaleItem icon={<RsiIcon />}>
+                        <p dangerouslySetInnerHTML={{ __html: `<strong>RSI Analysis:</strong> The Relative Strength Index (RSI) is at <strong>${indicators.rsi.value.toFixed(1)}</strong>, which suggests the market is in a <strong>${indicators.rsi.interpretation}</strong> state.` }} />
+                    </RationaleItem>
+                    <RationaleItem icon={<MacdIcon />}>
+                        <p dangerouslySetInnerHTML={{ __html: `<strong>MACD Analysis:</strong> The MACD indicator is showing a <strong>${indicators.macd.signal}</strong>, confirming momentum in the direction of the trend.` }} />
+                    </RationaleItem>
+                    <div className="border-t border-gray-700 !my-6"></div>
+                    <RationaleItem icon={<RationaleIcon />}>
+                        <div>
+                            <p className="font-semibold text-gray-200 mb-2">Full AI Commentary</p>
+                            <p className="leading-relaxed whitespace-pre-wrap text-gray-400">{rationale}</p>
+                        </div>
+                    </RationaleItem>
+                </div>
             </div>
 
             <div className="mt-8 text-center">

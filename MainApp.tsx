@@ -6,6 +6,7 @@ import { ImageAnalyzer } from './components/ImageAnalyzer';
 import { ResultsPage } from './pages/ResultsPage';
 import MarketAnalystPage from './pages/MarketAnalystPage';
 import ProfilePage from './pages/ProfilePage';
+import PurchaseHistoryPage from './pages/PurchaseHistoryPage';
 import BuyTokensPage from './pages/BuyTokensPage';
 import WithdrawPage from './pages/WithdrawPage';
 import AboutUsPage from './pages/AboutUsPage';
@@ -30,7 +31,7 @@ interface MainAppProps {
     setUser: React.Dispatch<React.SetStateAction<AppUser | null>>;
 }
 
-export type View = 'dashboard' | 'marketScan' | 'forexScanner' | 'strategies' | 'buyTokens' | 'history' | 'referralProgram' | 'about' | 'adminDashboard' | 'profile' | 'withdraw';
+export type View = 'dashboard' | 'marketScan' | 'forexScanner' | 'strategies' | 'buyTokens' | 'purchaseHistory' | 'history' | 'referralProgram' | 'about' | 'adminDashboard' | 'profile' | 'withdraw';
 
 // NOTE: This is a temporary, insecure way to identify an admin.
 // In a real application, this should be a role-based system in your database.
@@ -206,6 +207,8 @@ const MainApp: React.FC<MainAppProps> = ({ user, onLogout, setUser }) => {
          return <HistoryPage user={user} />;
       case 'referralProgram':
         return <ReferralPage user={user} />;
+      case 'purchaseHistory':
+        return <PurchaseHistoryPage user={user} onNavigate={setActiveView} />;
       case 'buyTokens':
         return <BuyTokensPage user={user} onPurchaseSuccess={() => { /* Can add a user profile refresh logic here */ }} />;
       case 'withdraw':
