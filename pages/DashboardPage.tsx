@@ -2,6 +2,7 @@ import React from 'react';
 import { AppUser } from '../types';
 import { View } from '../MainApp';
 import TradingViewMarketOverviewWidget from '../components/TradingViewMarketOverviewWidget';
+import RecentSignals from '../components/dashboard/RecentSignals';
 
 interface DashboardPageProps {
     user: AppUser;
@@ -56,6 +57,7 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ user, onNavigate }) => {
                             </button>
                         </div>
                     </div>
+                     <RecentSignals onNavigate={onNavigate} />
                 </div>
 
                 {/* Right Column */}

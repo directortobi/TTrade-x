@@ -111,7 +111,11 @@ const responseSchema = {
 
 export const getTradingSignal = async (input: AnalysisInput): Promise<AnalysisResult> => {
     initializeAi();
-    const { pair, data1m, data15m, data1h, newsSentiment } = input;
+    const { pair, data1m, data15m, data1h, newsSentiment, userAnnotations } = input;
+
+    const userNotesPrompt = userAnnotations
+        ? `\n**User's Analysis & Notes (Consider these insights):**\n${userAnnotations}\n`
+        : '';
 
     const prompt = `
         You are an expert Forex market analyst. Your task is to provide a trading signal (BUY, SELL, or HOLD) for the ${pair} pair.
@@ -122,19 +126,19 @@ export const getTradingSignal = async (input: AnalysisInput): Promise<AnalysisRe
         *   15-Minute Chart (Last 100 Candles): Latest Price: ${data15m[data15m.length - 1].close}
         *   1-Hour Chart (Last 100 Candles): Latest Price: ${data1h[data1h.length - 1].close}
         *   News Sentiment (Last 24 hours): Score: ${newsSentiment.score}, Summary: ${newsSentiment.rationale}
-
+        ${userNotesPrompt}
         **Analysis Instructions:**
         1.  **Technical Indicator Analysis:** Based on the provided candlestick data, infer the state of and signals from the following technical indicators:
             *   **RSI (Relative Strength Index):** Is the asset overbought, oversold, or showing divergence? Determine its numerical value and interpretation.
             *   **MACD (Moving Average Convergence Divergence):** Is there a bullish or bearish crossover? What is the histogram momentum? Determine the signal.
             *   **Bollinger Bands:** Is the price trading near the upper or lower band? Is there a "squeeze" indicating potential volatility?
-            *   **Candlestick Patterns:** Identify key patterns (e.g., Doji, Engulfing, Hammer).
+            *   **Candlestick Pattern Analysis:** Scrutinize the chart for significant candlestick patterns such as Doji, Engulfing patterns (Bullish/Bearish), Hammer, Shooting Star, or Morning/Evening Star formations, especially near key support and resistance levels. These patterns are crucial for confirming potential reversals or continuations.
             *   **Market Structure:** Identify the current trend and look for any 'break of structure' (BoS) that might signal a trend reversal or continuation. Determine the overall trend direction ('Bullish', 'Bearish', 'Sideways').
         2.  **Multi-Timeframe Confirmation:** Correlate findings from the technical indicators across the 1m, 15m, and 1h charts to establish a confluence of signals.
         3.  **Support and Resistance:** Identify the most significant and nearest support and resistance price levels from the 15m and 1h charts.
         4.  **Sentiment Integration:** How does the news sentiment support or contradict the technical analysis?
         5.  **Decision and Levels:** Decide on a BUY, SELL, or HOLD signal. If BUY or SELL, provide a precise Entry Price, Take Profit, and Stop Loss. If HOLD, set price levels to 0.
-        6.  **Rationale:** Provide a clear, concise explanation for your decision. **Your rationale must explicitly reference the technical indicators (RSI, MACD, Bollinger Bands, candlestick patterns, market structure) you analyzed.**
+        6.  **Rationale:** Provide a clear, concise explanation for your decision. **Crucially, your rationale must begin by stating any identified candlestick patterns and their implications.** Then, integrate this with your analysis of technical indicators (RSI, MACD, Bollinger Bands) and market structure to build a cohesive argument for the trade.
         7.  **Confidence & Risk:**
             *   Provide a 'confidenceLevel' (0-100) for this signal.
             *   Calculate the 'takeProfit' and 'stopLoss' distance in pips. For most pairs, 1 pip = 0.0001. For JPY pairs (e.g., USD/JPY), 1 pip = 0.01.
@@ -173,7 +177,7 @@ export const getTradingSignal = async (input: AnalysisInput): Promise<AnalysisRe
     }
 };
 
-export const getSignalFromImage = async (imageData: ImageData): Promise<AnalysisResult> => {
+export const getSignalFromImage = async (imageData: ImageData, userAnnotations?: string): Promise<AnalysisResult> => {
     initializeAi();
     const imagePart = {
         inlineData: {
@@ -182,22 +186,26 @@ export const getSignalFromImage = async (imageData: ImageData): Promise<Analysis
         },
     };
 
+    const userNotesPrompt = userAnnotations
+        ? `\n**User's Analysis & Notes (Consider these insights):**\n${userAnnotations}\n`
+        : '';
+
     const textPart = {
         text: `
           You are an expert financial chart analyst. Your task is to analyze the provided chart image and determine a trading signal.
-
+          ${userNotesPrompt}
           **Analysis Instructions:**
           1.  **Identify Asset:** Identify the asset from labels (e.g., EUR/USD, BTC, AAPL) and put it in the 'pair' field. If not possible, use 'UNKNOWN/USD'.
           2.  **Technical Analysis from Chart:**
               *   **Identify Key Indicators:** Look for visible indicators on the chart like **RSI, MACD, and Bollinger Bands**. Analyze their readings (e.g., RSI overbought/oversold, MACD crossover, price interaction with bands). Provide the RSI value and interpretation, and the MACD signal.
               *   **Analyze Market Structure:** Identify the trend, key horizontal and trend-line support/resistance levels, and any **'break of structure' (BoS)**. Determine the most significant support and resistance levels and the overall trend direction.
-              *   **Identify Candlestick Patterns:** Look for significant patterns like Doji, Engulfing, Hammer, etc., especially near key levels.
+              *   **Identify Candlestick Patterns:** This is a critical step. Search for powerful candlestick patterns like Doji, Engulfing, Hammer, or Shooting Star. Note where they appear (e.g., at a resistance level) as this heavily influences their meaning.
           3.  **Synthesize Findings:** Combine the analysis of price action, market structure, and all visible indicators to form a cohesive view.
           4.  **Decision and Levels:**
               *   Decide on a **BUY, SELL, or HOLD** signal.
               *   If BUY or SELL, provide a precise **Entry Price**, **Take Profit**, and **Stop Loss** based on your analysis. Entry should be near the last visible price.
               *   If HOLD, set price levels to 0.
-          5.  **Rationale:** Provide a step-by-step explanation for your decision. **Your rationale must reference the specific technical indicators (RSI, MACD, Bollinger Bands), candlestick patterns, and market structure you identified in the chart.**
+          5.  **Rationale:** Provide a step-by-step explanation. **Start by describing any candlestick patterns you found and what they signal in the current context.** Then, connect this to your analysis of market structure and other visible indicators to justify your signal.
           6.  **Confidence & Risk:**
               *   Provide a 'confidenceLevel' (0-100) for the signal.
               *   Calculate 'takeProfit' and 'stopLoss' distance in **pips**. Use standard definitions (0.0001 for 4-decimal prices, 0.01 for 2-decimal prices).
@@ -261,7 +269,7 @@ export const getMarketAnalystPrediction = async (input: MarketAnalystInput): Pro
         **Your Persona & Trading Style:** ${styleSpecificInstructions}
 
         **Task:**
-        Analyze the provided multi-timeframe data according to your trading style. Determine the trend, key support/resistance, and indicator states (RSI, MACD, and Bollinger Bands), then issue a single, actionable trade prediction.
+        Analyze the provided multi-timeframe data according to your trading style. Determine the trend, key support/resistance, significant candlestick patterns, and indicator states (RSI, MACD, and Bollinger Bands), then issue a single, actionable trade prediction.
 
         **Prediction Requirements (Your output MUST be this JSON object):**
         1.  **trend**: Determine the overall trend direction ('Bullish', 'Bearish', 'Sideways').
@@ -272,7 +280,7 @@ export const getMarketAnalystPrediction = async (input: MarketAnalystInput): Pro
         6.  **takeProfit**: The target price to exit with a profit.
         7.  **stopLoss**: The price to exit if the trade moves against you. The risk-to-reward ratio (distance to TP vs. distance to SL) must be at least 1:1.5.
         8.  **confidenceLevel**: Your certainty in this prediction, from 0 to 100.
-        9.  **rationale**: A detailed step-by-step justification for your decision, directly referencing your trading style's concepts (e.g., FVGs for ICT, major S/R for swing) and incorporating your findings on trend, S/R, and indicators (RSI, MACD, and Bollinger Bands analysis).
+        9.  **rationale**: A detailed step-by-step justification for your decision, directly referencing your trading style's concepts (e.g., FVGs for ICT, major S/R for swing) and incorporating your findings on trend, S/R, candlestick patterns, and indicators (RSI, MACD, and Bollinger Bands analysis).
         10. **pips**: Calculate TP and SL distance in pips. For most pairs, 1 pip = 0.0001. For JPY pairs (e.g., USD/JPY), 1 pip = 0.01. For XAU/USD, 1 pip = 0.1. For BTC/USD, 1 pip = 1.0.
         11. **riskRewardRatio**: Calculate the risk/reward ratio as "1:X".
         12. **pair**: The pair being analyzed (${pair}).
@@ -329,10 +337,10 @@ export const getTimeframeAnalysis = async (input: TimeframeAnalysisInput): Promi
             *   **RSI (Relative Strength Index):** Is the asset overbought, oversold, or showing divergence? Determine its numerical value and interpretation.
             *   **MACD (Moving Average Convergence Divergence):** Is there a bullish or bearish crossover? Determine the signal.
             *   **Bollinger Bands:** Is the price trading near the upper or lower band? Is there a "squeeze" indicating potential volatility?
-            *   **Candlestick Patterns:** Identify key patterns (e.g., Doji, Engulfing, Hammer).
+            *   **Candlestick Patterns:** Identify influential candlestick patterns (Doji, Engulfing, Hammer, etc.) and explain their significance at the current price level.
             *   **Market Structure:** Identify the immediate trend, support, and resistance levels on this timeframe. Determine the trend direction ('Bullish', 'Bearish', 'Sideways').
         2.  **Decision and Levels:** Decide on a BUY or SELL signal. If no high-probability setup is found, you must still choose the most likely direction and indicate low confidence.
-        3.  **Rationale:** Provide a clear, concise explanation for your decision, referencing your analysis of RSI, MACD, Bollinger Bands, patterns, and structure.
+        3.  **Rationale:** Provide a clear, concise explanation for your decision. **Start your rationale by discussing the candlestick patterns you've identified.** Then, explain how these patterns, in conjunction with RSI, MACD, Bollinger Bands, and market structure, lead to your final signal.
         4.  **Confidence & Risk:**
             *   Provide a 'confidenceLevel' (0-100).
             *   Calculate 'takeProfit' and 'stopLoss' distance in pips appropriate for the timeframe.

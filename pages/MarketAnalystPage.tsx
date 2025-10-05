@@ -97,7 +97,7 @@ const MarketAnalystPage: React.FC<MarketAnalystPageProps> = ({ user, onTokenUsed
             }
             
             const tokensUsed = result.confidenceLevel > 50 ? 1 : 0;
-            await logService.createLog(result, user.auth.email!, tokensUsed);
+            await logService.createLog(result, user.auth.email!, tokensUsed, user.auth.id);
             
             if (tokensUsed > 0) {
                 const newBalance = await useTokenForAnalysis(user.profile.tokens);

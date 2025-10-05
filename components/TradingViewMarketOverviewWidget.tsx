@@ -6,10 +6,12 @@ const TradingViewMarketOverviewWidget: React.FC = () => {
     const { theme } = useTheme();
 
     useEffect(() => {
-        if (!container.current) return;
-        
-        // Clear previous widget to ensure a clean slate on re-render (e.g., theme change)
-        container.current.innerHTML = '';
+        if (!container.current || container.current.querySelector('script')) {
+            // If the script is already there, don't add another one.
+            // The widget itself should handle theme updates if configured correctly.
+            // A full re-init is safer though.
+            if (container.current) container.current.innerHTML = '';
+        }
 
         const script = document.createElement('script');
         script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-market-overview.js';
@@ -30,34 +32,64 @@ const TradingViewMarketOverviewWidget: React.FC = () => {
             {
               "title": "Forex",
               "symbols": [
-                { "s": "OANDA:EURUSD", "d": "EUR/USD" },
-                { "s": "OANDA:GBPUSD", "d": "GBP/USD" },
-                { "s": "OANDA:USDJPY", "d": "USD/JPY" },
-                { "s": "OANDA:XAUUSD", "d": "Gold/USD" },
-                { "s": "OANDA:USDCHF", "d": "USD/CHF" },
-                { "s": "OANDA:AUDUSD", "d": "AUD/USD" },
+                { "s": "FX:EURUSD", "d": "EUR/USD" },
+                { "s": "FX:GBPUSD", "d": "GBP/USD" },
+                { "s": "FX:USDJPY", "d": "USD/JPY" },
+                { "s": "FX:USDCHF", "d": "USD/CHF" },
+                { "s": "FX:AUDUSD", "d": "AUD/USD" },
+                { "s": "FX:USDCAD", "d": "USD/CAD" },
+                { "s": "FX:NZDUSD", "d": "NZD/USD" }
               ],
               "originalTitle": "Forex"
+            },
+            {
+              "title": "Indices",
+              "symbols": [
+                { "s": "FOREXCOM:SPXUSD", "d": "S&P 500" },
+                { "s": "FOREXCOM:NSXUSD", "d": "US 100" },
+                { "s": "FOREXCOM:DJI", "d": "Dow 30" },
+                { "s": "INDEX:DEU40", "d": "DAX 40" },
+                { "s": "FOREXCOM:UKXGBP", "d": "UK 100" },
+                { "s": "FOREXCOM:JPN225", "d": "Nikkei 225" }
+              ],
+              "originalTitle": "Indices"
+            },
+            {
+              "title": "Commodities",
+              "symbols": [
+                { "s": "OANDA:XAUUSD", "d": "Gold" },
+                { "s": "OANDA:XAGUSD", "d": "Silver" },
+                { "s": "TVC:USOIL", "d": "Crude Oil" },
+                { "s": "TVC:UKOIL", "d": "Brent Oil" },
+                { "s": "COMEX:GC1!", "d": "Gold Futures" }
+              ],
+              "originalTitle": "Commodities"
             },
             {
               "title": "Crypto",
               "symbols": [
                 { "s": "COINBASE:BTCUSD", "d": "Bitcoin" },
                 { "s": "COINBASE:ETHUSD", "d": "Ethereum" },
+                { "s": "BINANCE:SOLUSDT", "d": "Solana" },
+                { "s": "BINANCE:BNBUSDT", "d": "BNB" },
+                { "s": "BINANCE:XRPUSDT", "d": "Ripple" },
+                { "s": "BINANCE:DOGEUSDT", "d": "Dogecoin" }
               ],
               "originalTitle": "Crypto"
             }
           ]
         });
-        container.current.appendChild(script);
 
-        // Cleanup script on component unmount
+        if (container.current) {
+            container.current.appendChild(script);
+        }
+
         return () => {
             if (container.current) {
                 container.current.innerHTML = '';
             }
         };
-    }, [theme]); // Rerun effect if theme changes
+    }, [theme]);
 
     return (
         <div 

@@ -1,7 +1,7 @@
 // supabase/functions/handle-purchase-approval/index.ts
-// Standardized the type reference to ensure consistency across all edge functions.
-// FIX: Use a more specific type reference for Supabase functions to assist local TypeScript environments.
-/// <reference types="https://esm.sh/@supabase/functions-js/src/edge-functions.d.ts" />
+// FIX: Use a more reliable CDN for Supabase edge function type definitions to resolve Deno type errors.
+// [FIX] Use a more reliable CDN for Supabase edge function type definitions to resolve Deno type errors.
+/// <reference types="https://esm.sh/@supabase/functions-js@2.4.1/src/edge-runtime.d.ts" />
 
 import { serve } from 'https://deno.land/std@0.177.0/http/server.ts'
 import { corsHeaders } from '../_shared/cors.ts'
@@ -31,6 +31,24 @@ serve(async (req) => {
         })
       }
       throw rpcError
+    }
+
+    if (!rpcError) {
+      // On success, create a notification for the user
+      const { data: purchaseData } = await supabaseAdmin
+        .from('token_purchases')
+        .select('user_id, tokens_purchased')
+        .eq('id', purchase_id)
+        .single();
+  
+      if (purchaseData) {
+        await supabaseAdmin.from('notifications').insert({
+          user_id: purchaseData.user_id,
+          type: 'purchase_approved',
+          message: `Your purchase of ${purchaseData.tokens_purchased} tokens has been approved!`,
+          link: 'purchaseHistory'
+        });
+      }
     }
 
     return new Response(JSON.stringify({ message: 'Purchase approved and tokens/commission processed successfully.' }), {

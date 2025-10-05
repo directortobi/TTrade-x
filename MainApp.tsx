@@ -12,18 +12,19 @@ import WithdrawPage from './pages/WithdrawPage';
 import AboutUsPage from './pages/AboutUsPage';
 import AdminPage from './pages/AdminPage';
 import DashboardPage from './pages/DashboardPage';
-import ComingSoonPage from './pages/ComingSoonPage';
+import CompoundingAgentPage from './pages/CompoundingAgentPage';
 import HistoryPage from './pages/HistoryPage';
 import ReferralPage from './pages/ReferralPage';
-import TradingViewWidget from './components/TradingViewWidget';
+import ContactUsPage from './pages/ContactUsPage'; // New Import
 import { CandlestickSpinner } from './components/CandlestickSpinner';
-import { getTradingSignal, getSignalFromImage, isGeminiConfigured } from './services/geminiService';
-import { fetchCandlestickData, fetchNewsSentiment } from './services/marketDataService';
+import TradingViewAdvancedChartWidget from './components/TradingViewAdvancedChartWidget';
+import { getSignalFromImage, isGeminiConfigured } from './services/geminiService';
 import { useTokenForAnalysis } from './services/tokenService';
 import { logService } from './services/logService';
-import { AnalysisResult, Asset, ImageData, AppUser, Signal } from './types';
+import { AnalysisResult, Asset, ImageData, AppUser, Signal, Notification } from './types';
 import { AVAILABLE_ASSETS } from './constants';
 import { ConfigurationErrorPage } from './pages/ConfigurationErrorPage';
+import { notificationService } from './services/notificationService';
 
 interface MainAppProps {
     user: AppUser;
@@ -31,7 +32,7 @@ interface MainAppProps {
     setUser: React.Dispatch<React.SetStateAction<AppUser | null>>;
 }
 
-export type View = 'dashboard' | 'marketScan' | 'forexScanner' | 'strategies' | 'buyTokens' | 'purchaseHistory' | 'history' | 'referralProgram' | 'about' | 'adminDashboard' | 'profile' | 'withdraw';
+export type View = 'dashboard' | 'marketScan' | 'forexScanner' | 'compoundingAgent' | 'buyTokens' | 'purchaseHistory' | 'history' | 'referralProgram' | 'about' | 'adminDashboard' | 'profile' | 'withdraw' | 'contact';
 
 // NOTE: This is a temporary, insecure way to identify an admin.
 // In a real application, this should be a role-based system in your database.
@@ -45,8 +46,24 @@ const MainApp: React.FC<MainAppProps> = ({ user, onLogout, setUser }) => {
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
 
   const isAdmin = user.auth.email === ADMIN_EMAIL;
+  
+  const fetchNotifications = useCallback(async () => {
+      try {
+          const data = await notificationService.getNotifications();
+          setNotifications(data);
+      } catch (error) {
+          console.error("Failed to fetch notifications:", (error as Error).message || error);
+      }
+  }, []);
+
+  useEffect(() => {
+      fetchNotifications();
+      const interval = setInterval(fetchNotifications, 30000); // Poll every 30 seconds
+      return () => clearInterval(interval);
+  }, [fetchNotifications]);
   
   const handleTokenUsed = useCallback((newBalance: number) => {
     setUser(currentUser => {
@@ -62,6 +79,10 @@ const MainApp: React.FC<MainAppProps> = ({ user, onLogout, setUser }) => {
   }, [setUser]);
 
   const handleAnalysis = useCallback(async () => {
+    if (!imageData) {
+        setError("Please upload an image to analyze.");
+        return;
+    }
     if (user.profile.tokens < 1) {
         setError("You have 0 tokens. Please buy more to perform a new analysis.");
         return;
@@ -73,29 +94,13 @@ const MainApp: React.FC<MainAppProps> = ({ user, onLogout, setUser }) => {
 
     try {
       let result: AnalysisResult;
-      if (imageData) {
-        result = await getSignalFromImage(imageData);
-      } else {
-        const [data1m, data15m, data1h, newsSentiment] = await Promise.all([
-          fetchCandlestickData(selectedAsset.ticker, '1min'),
-          fetchCandlestickData(selectedAsset.ticker, '15min'),
-          fetchCandlestickData(selectedAsset.ticker, '1hour'),
-          fetchNewsSentiment(selectedAsset.ticker)
-        ]);
-
-        result = await getTradingSignal({
-          pair: selectedAsset.ticker,
-          data1m,
-          data15m,
-          data1h,
-          newsSentiment
-        });
-      }
+      result = await getSignalFromImage(imageData);
       
       const tokensUsed = result.confidenceLevel > 50 ? 1 : 0;
-      await logService.createLog(result, user.auth.email!, tokensUsed);
-
+      await logService.createLog(result, user.auth.email!, tokensUsed, user.auth.id);
+      
       if (tokensUsed > 0) {
+          fetchNotifications(); // Refresh notifications after analysis might have created one
           const newBalance = await useTokenForAnalysis(user.profile.tokens);
           handleTokenUsed(newBalance);
       } else {
@@ -124,7 +129,7 @@ const MainApp: React.FC<MainAppProps> = ({ user, onLogout, setUser }) => {
     } finally {
       setIsLoading(false);
     }
-  }, [selectedAsset, imageData, user, handleTokenUsed]);
+  }, [imageData, user, handleTokenUsed, fetchNotifications]);
 
   const handleGoHome = useCallback(() => {
     setCurrentPage('home');
@@ -145,53 +150,52 @@ const MainApp: React.FC<MainAppProps> = ({ user, onLogout, setUser }) => {
         return (
           <>
             {currentPage === 'home' && (
-              <>
-                <div className="max-w-3xl mx-auto bg-blue-900/50 backdrop-blur-sm p-6 sm:p-8 rounded-2xl shadow-lg border border-blue-800">
-                  <div className={`space-y-4 transition-opacity duration-300 ${imageData ? 'opacity-40 pointer-events-none' : 'opacity-100'}`}>
-                    <AssetSelector
-                      assets={AVAILABLE_ASSETS}
-                      selectedAsset={selectedAsset}
-                      onSelectAsset={setSelectedAsset}
-                    />
-                    
-                    <div className="h-[60vh] bg-gray-900/30 rounded-lg border border-gray-700 flex items-center justify-center">
-                        <TradingViewWidget ticker={selectedAsset.ticker} />
-                    </div>
+              <div className="space-y-8">
+                  <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+                      {/* Left Column: Controls */}
+                      <div className="lg:col-span-1 space-y-6">
+                           <div className="bg-blue-900/50 p-6 rounded-2xl border border-blue-800">
+                                <h2 className="text-xl font-bold text-white mb-4">Live Chart</h2>
+                                <p className="text-gray-400 text-sm mb-4">Select an asset to view the full-featured TradingView chart.</p>
+                                <AssetSelector
+                                  assets={AVAILABLE_ASSETS}
+                                  selectedAsset={selectedAsset}
+                                  onSelectAsset={setSelectedAsset}
+                                />
+                           </div>
+                           <div className="bg-blue-900/50 p-6 rounded-2xl border border-blue-800">
+                                <h2 className="text-xl font-bold text-white mb-4">AI Image Analysis</h2>
+                                <p className="text-gray-400 text-sm mb-4">Alternatively, upload a chart screenshot for an AI-powered analysis.</p>
+                                <ImageAnalyzer
+                                  imageData={imageData}
+                                  onImageDataChange={setImageData}
+                                  disabled={isLoading}
+                                />
+                                <div className="mt-6">
+                                    <button
+                                      onClick={handleAnalysis}
+                                      disabled={isLoading || !imageData}
+                                      className="w-full h-14 px-6 text-lg text-white font-semibold bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-blue-950 transition-all duration-300 disabled:opacity-50 disabled:bg-gray-600 disabled:cursor-not-allowed flex items-center justify-center"
+                                    >
+                                      {isLoading ? <CandlestickSpinner /> : 'Analyze Image (1 Token)'}
+                                    </button>
+                                </div>
+                            </div>
+                      </div>
+                      
+                      {/* Right Column: Chart */}
+                      <div className="lg:col-span-3 h-[80vh] bg-blue-950/50 rounded-xl border border-blue-800 p-1">
+                          <TradingViewAdvancedChartWidget 
+                              symbol={selectedAsset.tradingViewTicker}
+                              key={selectedAsset.tradingViewTicker} // Force re-mount on symbol change
+                           />
+                      </div>
                   </div>
 
-                  <div className="my-6 flex items-center">
-                    <div className="flex-grow border-t border-gray-600"></div>
-                    <span className="flex-shrink mx-4 text-gray-400 font-semibold">OR</span>
-                    <div className="flex-grow border-t border-gray-600"></div>
+                  <div className="mt-6 max-w-3xl mx-auto">
+                    {error && <ErrorAlert message={error} />}
                   </div>
-
-                  <ImageAnalyzer
-                    imageData={imageData}
-                    onImageDataChange={setImageData}
-                    disabled={isLoading}
-                  />
-
-                  <div className="mt-8">
-                    <button
-                      onClick={handleAnalysis}
-                      disabled={isLoading}
-                      className="w-full h-14 px-6 text-lg text-white font-semibold bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-blue-950 transition-all duration-300 disabled:bg-gray-600 disabled:cursor-not-allowed flex items-center justify-center"
-                    >
-                      {isLoading ? <CandlestickSpinner /> : 'Analyze Now (1 Token)'}
-                    </button>
-                  </div>
-                </div>
-
-                <div className="mt-10 max-w-3xl mx-auto">
-                  {error && <ErrorAlert message={error} />}
-                  {isLoading && (
-                    <div className="text-center p-8 flex flex-col items-center justify-center">
-                        <CandlestickSpinner />
-                        <p className="text-lg text-gray-300 mt-4">AI is analyzing the market...</p>
-                    </div>
-                  )}
-                </div>
-              </>
+              </div>
             )}
             
             {currentPage === 'results' && analysisResult && (
@@ -201,8 +205,8 @@ const MainApp: React.FC<MainAppProps> = ({ user, onLogout, setUser }) => {
         );
       case 'marketScan':
         return <MarketAnalystPage user={user} onTokenUsed={handleTokenUsed} />;
-      case 'strategies':
-         return <ComingSoonPage title="Strategies" description="Create, backtest, and manage your custom AI-powered trading strategies." />;
+      case 'compoundingAgent':
+         return <CompoundingAgentPage />;
       case 'history':
          return <HistoryPage user={user} />;
       case 'referralProgram':
@@ -217,6 +221,8 @@ const MainApp: React.FC<MainAppProps> = ({ user, onLogout, setUser }) => {
         return <ProfilePage user={user} onLogout={onLogout} onNavigate={setActiveView} />;
       case 'about':
         return <AboutUsPage />;
+      case 'contact':
+        return <ContactUsPage user={user} />;
       case 'adminDashboard':
         return isAdmin ? <AdminPage /> : <p>Access Denied.</p>;
       default:
@@ -226,7 +232,15 @@ const MainApp: React.FC<MainAppProps> = ({ user, onLogout, setUser }) => {
 
   return (
     <div className="min-h-screen text-gray-200 font-sans">
-      <Header activeView={activeView} onNavigate={setActiveView} user={user} onLogout={onLogout} isAdmin={isAdmin} />
+      <Header 
+        activeView={activeView} 
+        onNavigate={setActiveView} 
+        user={user} 
+        onLogout={onLogout} 
+        isAdmin={isAdmin}
+        notifications={notifications}
+        setNotifications={setNotifications} 
+      />
       <main className="container mx-auto px-4 py-8">
         {renderActiveView()}
       </main>

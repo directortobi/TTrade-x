@@ -1,16 +1,42 @@
 import { Asset, CompoundingLevel, TokenPackage } from './types';
 
 export const AVAILABLE_ASSETS: Asset[] = [
-    { ticker: 'EUR/USD', name: 'Euro / US Dollar' },
-    { ticker: 'USD/JPY', name: 'US Dollar / Japanese Yen' },
-    { ticker: 'GBP/USD', name: 'British Pound / US Dollar' },
-    { ticker: 'XAU/USD', name: 'Gold / US Dollar' },
-    { ticker: 'BTC/USD', name: 'Bitcoin / US Dollar' },
-    { ticker: 'USD/CHF', name: 'US Dollar / Swiss Franc' },
-    { ticker: 'AUD/USD', name: 'Australian Dollar / US Dollar' },
-    { ticker: 'USD/CAD', name: 'US Dollar / Canadian Dollar' },
-    { ticker: 'NZD/USD', name: 'New Zealand Dollar / US Dollar' },
+    // Forex Majors
+    { ticker: 'EUR/USD', name: 'Euro / US Dollar', tradingViewTicker: 'FX:EURUSD' },
+    { ticker: 'USD/JPY', name: 'US Dollar / Japanese Yen', tradingViewTicker: 'FX:USDJPY' },
+    { ticker: 'GBP/USD', name: 'British Pound / US Dollar', tradingViewTicker: 'FX:GBPUSD' },
+    { ticker: 'USD/CHF', name: 'US Dollar / Swiss Franc', tradingViewTicker: 'FX:USDCHF' },
+    { ticker: 'AUD/USD', name: 'Australian Dollar / US Dollar', tradingViewTicker: 'FX:AUDUSD' },
+    { ticker: 'USD/CAD', name: 'US Dollar / Canadian Dollar', tradingViewTicker: 'FX:USDCAD' },
+    { ticker: 'NZD/USD', name: 'New Zealand Dollar / US Dollar', tradingViewTicker: 'FX:NZDUSD' },
+    
+    // Forex Minors
+    { ticker: 'EUR/GBP', name: 'Euro / British Pound', tradingViewTicker: 'FX:EURGBP' },
+    { ticker: 'EUR/JPY', name: 'Euro / Japanese Yen', tradingViewTicker: 'FX:EURJPY' },
+    { ticker: 'GBP/JPY', name: 'British Pound / Japanese Yen', tradingViewTicker: 'FX:GBPJPY' },
+    { ticker: 'AUD/JPY', name: 'Australian Dollar / Japanese Yen', tradingViewTicker: 'FX:AUDJPY' },
+
+    // Commodities
+    { ticker: 'XAU/USD', name: 'Gold / US Dollar', tradingViewTicker: 'OANDA:XAUUSD' },
+    { ticker: 'XAG/USD', name: 'Silver / US Dollar', tradingViewTicker: 'OANDA:XAGUSD' },
+    { ticker: 'USOIL', name: 'WTI Crude Oil', tradingViewTicker: 'TVC:USOIL' },
+    { ticker: 'UKOIL', name: 'Brent Crude Oil', tradingViewTicker: 'TVC:UKOIL' },
+
+    // Crypto
+    { ticker: 'BTC/USD', name: 'Bitcoin / US Dollar', tradingViewTicker: 'COINBASE:BTCUSD' },
+    { ticker: 'ETH/USD', name: 'Ethereum / US Dollar', tradingViewTicker: 'COINBASE:ETHUSD' },
+    { ticker: 'SOL/USD', name: 'Solana / US Dollar', tradingViewTicker: 'COINBASE:SOLUSD' },
+    { ticker: 'XRP/USD', name: 'Ripple / US Dollar', tradingViewTicker: 'COINBASE:XRPUSD' },
+    { ticker: 'DOGE/USD', name: 'Dogecoin / US Dollar', tradingViewTicker: 'COINBASE:DOGEUSD' },
+    
+    // Indices
+    { ticker: 'US500', name: 'S&P 500', tradingViewTicker: 'TVC:SPX' },
+    { ticker: 'US100', name: 'Nasdaq 100', tradingViewTicker: 'TVC:NDX' },
+    { ticker: 'US30', name: 'Dow Jones 30', tradingViewTicker: 'TVC:DJI' },
+    { ticker: 'DE40', name: 'DAX 40 (Germany)', tradingViewTicker: 'INDEX:DEU40' },
+    { ticker: 'UK100', name: 'FTSE 100 (UK)', tradingViewTicker: 'TVC:UKX' },
 ];
+
 
 export const TRADING_STYLES = [
     { id: 'ict', name: 'ICT Day Trader' },

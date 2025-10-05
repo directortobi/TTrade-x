@@ -1,7 +1,7 @@
 // supabase/functions/get-pending-referral-withdrawals/index.ts
-// Standardized the type reference to ensure consistency across all edge functions.
-// FIX: Use a more specific type reference for Supabase functions to assist local TypeScript environments.
-/// <reference types="https://esm.sh/@supabase/functions-js/src/edge-functions.d.ts" />
+// FIX: Use a more reliable CDN for Supabase edge function type definitions to resolve Deno type errors.
+// [FIX] Use a more reliable CDN for Supabase edge function type definitions to resolve Deno type errors.
+/// <reference types="https://esm.sh/@supabase/functions-js@2.4.1/src/edge-runtime.d.ts" />
 
 import { serve } from 'https://deno.land/std@0.177.0/http/server.ts'
 import { corsHeaders } from '../_shared/cors.ts'

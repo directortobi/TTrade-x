@@ -40,6 +40,7 @@ const HistoryPage: React.FC<HistoryPageProps> = ({ user }) => {
     const [logs, setLogs] = useState<AnalysisLog[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [expandedLogRowId, setExpandedLogRowId] = useState<number | null>(null);
 
     const fetchLogs = useCallback(async () => {
         setIsLoading(true);
@@ -59,28 +60,27 @@ const HistoryPage: React.FC<HistoryPageProps> = ({ user }) => {
     }, [fetchLogs]);
 
     const handleUpdateOutcome = async (logId: number, outcome: AnalysisOutcome) => {
-        // Optimistic UI update
         const originalLogs = [...logs];
         setLogs(currentLogs => currentLogs.map(log => log.id === logId ? { ...log, outcome } : log));
 
         try {
             await logService.updateLogOutcome(logId, outcome);
         } catch (err) {
-            // Revert on failure
             setLogs(originalLogs);
             setError(err instanceof Error ? `Failed to update: ${err.message}` : 'Update failed');
         }
     };
     
+    const toggleExpandRow = (logId: number) => {
+        setExpandedLogRowId(currentId => (currentId === logId ? null : logId));
+    };
+
     const renderContent = () => {
         if (isLoading) {
             return <div className="flex justify-center items-center h-64"><LoadingSpinner /></div>;
         }
         if (logs.length === 0 && !error) {
             return <p className="text-center text-gray-400 py-16">You have no analysis history yet. Perform an analysis to get started!</p>;
-        }
-        if (error) {
-             return <div className="py-16"><ErrorAlert message={error} /></div>;
         }
         return (
             <div className="overflow-x-auto">
@@ -96,27 +96,47 @@ const HistoryPage: React.FC<HistoryPageProps> = ({ user }) => {
                             <th scope="col" className="px-4 py-3">Confidence</th>
                             <th scope="col" className="px-4 py-3">Tokens Used</th>
                             <th scope="col" className="px-4 py-3">Outcome</th>
+                            <th scope="col" className="px-4 py-3">Rationale</th>
                         </tr>
                     </thead>
                     <tbody>
                         {logs.map(log => (
-                            <tr key={log.id} className="border-b border-gray-700 hover:bg-gray-800/40">
-                                <td className="px-4 py-3">{new Date(log.created_at).toLocaleString()}</td>
-                                <td className="px-4 py-3 font-medium">{log.symbol}</td>
-                                <td className="px-4 py-3"><SignalBadge signal={log.signal} /></td>
-                                <td className="px-4 py-3">{log.entry_price?.toFixed(4) ?? 'N/A'}</td>
-                                <td className="px-4 py-3">{log.stop_loss?.toFixed(4) ?? 'N/A'}</td>
-                                <td className="px-4 py-3">{log.take_profit_1?.toFixed(4) ?? 'N/A'}</td>
-                                <td className="px-4 py-3">{log.confidence ?? 'N/A'}%</td>
-                                <td className="px-4 py-3 text-center">{log.tokens_used}</td>
-                                <td className="px-4 py-3">
-                                    {log.outcome === 'Pending' ? (
-                                        <OutcomeSelector logId={log.id} onUpdate={handleUpdateOutcome} />
-                                    ) : (
-                                        <OutcomeBadge outcome={log.outcome} />
-                                    )}
-                                </td>
-                            </tr>
+                            <React.Fragment key={log.id}>
+                                <tr className="border-b border-gray-700 hover:bg-gray-800/40">
+                                    <td className="px-4 py-3">{new Date(log.created_at).toLocaleString()}</td>
+                                    <td className="px-4 py-3 font-medium">{log.symbol}</td>
+                                    <td className="px-4 py-3"><SignalBadge signal={log.signal} /></td>
+                                    <td className="px-4 py-3">{log.entry_price?.toFixed(4) ?? 'N/A'}</td>
+                                    <td className="px-4 py-3">{log.stop_loss?.toFixed(4) ?? 'N/A'}</td>
+                                    <td className="px-4 py-3">{log.take_profit_1?.toFixed(4) ?? 'N/A'}</td>
+                                    <td className="px-4 py-3">{log.confidence ?? 'N/A'}%</td>
+                                    <td className="px-4 py-3 text-center">{log.tokens_used}</td>
+                                    <td className="px-4 py-3">
+                                        {log.outcome === 'Pending' ? (
+                                            <OutcomeSelector logId={log.id} onUpdate={handleUpdateOutcome} />
+                                        ) : (
+                                            <OutcomeBadge outcome={log.outcome} />
+                                        )}
+                                    </td>
+                                    <td className="px-4 py-3">
+                                        <button onClick={() => toggleExpandRow(log.id)} className="text-cyan-400 hover:underline">
+                                            {expandedLogRowId === log.id ? 'Hide' : 'View'}
+                                        </button>
+                                    </td>
+                                </tr>
+                                {expandedLogRowId === log.id && (
+                                    <tr className="bg-gray-900/50">
+                                        <td colSpan={10} className="p-4">
+                                            <div className="bg-gray-800 p-4 rounded-lg">
+                                                <h4 className="font-semibold text-gray-200 mb-2">AI Analysis Rationale:</h4>
+                                                <p className="text-gray-400 whitespace-pre-wrap text-sm leading-relaxed">
+                                                    {log.analysis_notes || 'No rationale was saved for this analysis.'}
+                                                </p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                )}
+                            </React.Fragment>
                         ))}
                     </tbody>
                 </table>

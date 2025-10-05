@@ -1,7 +1,7 @@
 // supabase/functions/reject-purchase/index.ts
-// Standardized the type reference to ensure consistency across all edge functions.
-// FIX: Use a more specific type reference for Supabase functions to assist local TypeScript environments.
-/// <reference types="https://esm.sh/@supabase/functions-js/src/edge-functions.d.ts" />
+// FIX: Use a more reliable CDN for Supabase edge function type definitions to resolve Deno type errors.
+// [FIX] Use a more reliable CDN for Supabase edge function type definitions to resolve Deno type errors.
+/// <reference types="https://esm.sh/@supabase/functions-js@2.4.1/src/edge-runtime.d.ts" />
 
 import { serve } from 'https://deno.land/std@0.177.0/http/server.ts'
 import { corsHeaders } from '../_shared/cors.ts'
@@ -18,14 +18,25 @@ serve(async (req) => {
       throw new Error('purchase_id is required.')
     }
 
-    const { error } = await supabaseAdmin
+    const { data, error } = await supabaseAdmin
       .from('token_purchases')
       .update({ status: 'rejected' })
       .eq('id', purchase_id)
       .eq('status', 'pending') // Can only reject pending purchases
+      .select('user_id, package_name')
+      .single();
 
     if (error) {
       throw error
+    }
+
+    if (data) {
+      await supabaseAdmin.from('notifications').insert({
+        user_id: data.user_id,
+        type: 'purchase_rejected',
+        message: `Your purchase for the ${data.package_name} package was rejected.`,
+        link: 'purchaseHistory'
+      });
     }
 
     return new Response(JSON.stringify({ message: 'Purchase rejected successfully.' }), {

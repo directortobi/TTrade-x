@@ -1,9 +1,9 @@
 // supabase/functions/_shared/supabaseAdminClient.ts
-// Standardized the type reference to ensure consistency across all edge functions.
-// FIX: Use a more specific type reference for Supabase functions to assist local TypeScript environments.
-/// <reference types="https://esm.sh/@supabase/functions-js/src/edge-functions.d.ts" />
+// FIX: Use a more reliable CDN for Supabase edge function type definitions to resolve Deno type errors.
+// [FIX] Use a more reliable CDN for Supabase edge function type definitions to resolve Deno type errors.
+/// <reference types="https://esm.sh/@supabase/functions-js@2.4.1/src/edge-runtime.d.ts" />
 
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.43.4'
 import type { Database } from '../_shared/database.types.ts'
 
 // Create a new Supabase client with the Service Role key

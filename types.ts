@@ -23,8 +23,9 @@ export interface Credentials {
 }
 
 export interface Asset {
-    ticker: string;
+    ticker: string; // User-facing ticker
     name: string;
+    tradingViewTicker: string; // Ticker for the TradingView widget
 }
 
 export interface Candle {
@@ -90,6 +91,7 @@ export interface AnalysisInput {
     data15m: Candle[];
     data1h: Candle[];
     newsSentiment: NewsSentiment;
+    userAnnotations?: string;
 }
 
 export interface ImageData {
@@ -237,4 +239,17 @@ export interface ReferralEarningWithEmail extends ReferralEarning {
     referred_user_profile: {
         email: string;
     } | null;
+}
+
+// New types for Notifications
+export type NotificationType = 'signal_buy' | 'signal_sell' | 'purchase_approved' | 'purchase_rejected' | 'withdrawal_approved' | 'withdrawal_rejected' | 'referral_earning' | 'referral_withdrawal_approved' | 'referral_withdrawal_rejected';
+
+export interface Notification {
+    id: number;
+    user_id: string;
+    created_at: string;
+    type: NotificationType;
+    message: string;
+    is_read: boolean;
+    link: string | null;
 }

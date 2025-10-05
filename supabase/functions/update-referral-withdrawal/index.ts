@@ -1,7 +1,7 @@
 // supabase/functions/update-referral-withdrawal/index.ts
-// Standardized the type reference to ensure consistency across all edge functions.
-// FIX: Use a more specific type reference for Supabase functions to assist local TypeScript environments.
-/// <reference types="https://esm.sh/@supabase/functions-js/src/edge-functions.d.ts" />
+// FIX: Use a more reliable CDN for Supabase edge function type definitions to resolve Deno type errors.
+// [FIX] Use a more reliable CDN for Supabase edge function type definitions to resolve Deno type errors.
+/// <reference types="https://esm.sh/@supabase/functions-js@2.4.1/src/edge-runtime.d.ts" />
 
 import { serve } from 'https://deno.land/std@0.177.0/http/server.ts'
 import { corsHeaders } from '../_shared/cors.ts'
@@ -38,6 +38,20 @@ serve(async (req) => {
             headers: { ...corsHeaders, 'Content-Type': 'application/json' },
             status: 404,
         });
+    }
+
+    if (data && data.length > 0) {
+      const withdrawal = data[0];
+      const message = new_status === 'approved'
+        ? `Your referral withdrawal of $${withdrawal.amount_usd} has been approved.`
+        : `Your referral withdrawal of $${withdrawal.amount_usd} was rejected.`;
+    
+      await supabaseAdmin.from('notifications').insert({
+        user_id: withdrawal.user_id,
+        type: `referral_withdrawal_${new_status}`,
+        message: message,
+        link: 'referralProgram'
+      });
     }
 
     return new Response(JSON.stringify({ message: `Referral withdrawal status updated to ${new_status}.` }), {
