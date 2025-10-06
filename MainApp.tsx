@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Header } from './components/Header';
+import { Footer } from './components/Footer';
 import { AssetSelector } from './components/results/ForexSelector';
 import { ErrorAlert } from './components/ErrorAlert';
 import { ImageAnalyzer } from './components/ImageAnalyzer';
@@ -15,7 +16,8 @@ import DashboardPage from './pages/DashboardPage';
 import CompoundingAgentPage from './pages/CompoundingAgentPage';
 import HistoryPage from './pages/HistoryPage';
 import ReferralPage from './pages/ReferralPage';
-import ContactUsPage from './pages/ContactUsPage'; // New Import
+import ContactUsPage from './pages/ContactUsPage';
+import LegalDisclaimerPage from './pages/LegalDisclaimerPage'; // New Import
 import { CandlestickSpinner } from './components/CandlestickSpinner';
 import TradingViewAdvancedChartWidget from './components/TradingViewAdvancedChartWidget';
 import { getSignalFromImage, isGeminiConfigured } from './services/geminiService';
@@ -32,7 +34,7 @@ interface MainAppProps {
     setUser: React.Dispatch<React.SetStateAction<AppUser | null>>;
 }
 
-export type View = 'dashboard' | 'marketScan' | 'forexScanner' | 'compoundingAgent' | 'buyTokens' | 'purchaseHistory' | 'history' | 'referralProgram' | 'about' | 'adminDashboard' | 'profile' | 'withdraw' | 'contact';
+export type View = 'dashboard' | 'marketScan' | 'forexScanner' | 'compoundingAgent' | 'buyTokens' | 'purchaseHistory' | 'history' | 'referralProgram' | 'about' | 'adminDashboard' | 'profile' | 'withdraw' | 'contact' | 'legalDisclaimer';
 
 // NOTE: This is a temporary, insecure way to identify an admin.
 // In a real application, this should be a role-based system in your database.
@@ -223,6 +225,8 @@ const MainApp: React.FC<MainAppProps> = ({ user, onLogout, setUser }) => {
         return <AboutUsPage />;
       case 'contact':
         return <ContactUsPage user={user} />;
+      case 'legalDisclaimer':
+        return <LegalDisclaimerPage />;
       case 'adminDashboard':
         return isAdmin ? <AdminPage /> : <p>Access Denied.</p>;
       default:
@@ -231,7 +235,7 @@ const MainApp: React.FC<MainAppProps> = ({ user, onLogout, setUser }) => {
   };
 
   return (
-    <div className="min-h-screen text-gray-200 font-sans">
+    <div className="min-h-screen text-gray-200 font-sans flex flex-col">
       <Header 
         activeView={activeView} 
         onNavigate={setActiveView} 
@@ -241,9 +245,10 @@ const MainApp: React.FC<MainAppProps> = ({ user, onLogout, setUser }) => {
         notifications={notifications}
         setNotifications={setNotifications} 
       />
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-4 py-8 flex-grow">
         {renderActiveView()}
       </main>
+      <Footer onNavigate={setActiveView} />
     </div>
   );
 };

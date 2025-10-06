@@ -69,6 +69,7 @@ export const Header: React.FC<HeaderProps> = ({ activeView, onNavigate, user, on
         { label: 'Admin', view: 'adminDashboard', adminOnly: true },
         { label: 'About Us', view: 'about' },
         { label: 'Contact Us', view: 'contact' },
+        { label: 'Legal Disclaimer', view: 'legalDisclaimer' },
     ];
     
     const unreadCount = notifications.filter(n => !n.is_read).length;
