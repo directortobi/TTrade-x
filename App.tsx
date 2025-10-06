@@ -21,6 +21,16 @@ const App: React.FC = () => {
     const [signupSuccessMessage, setSignupSuccessMessage] = useState<string | null>(null);
     
     useEffect(() => {
+        // This effect runs once on app load to capture a referral code from the URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const refCode = urlParams.get('ref');
+        if (refCode) {
+            // Store it in session storage so it's available until the browser tab is closed.
+            sessionStorage.setItem('referralCode', refCode);
+        }
+    }, []);
+
+    useEffect(() => {
         if (!isSupabaseConfigured) {
             setIsLoadingUser(false);
             return;
@@ -84,8 +94,10 @@ const App: React.FC = () => {
         setSignupSuccessMessage(null);
         setAuthActionInProgress(true);
         try {
-            await authService.signup(credentials);
+            const referredByCode = sessionStorage.getItem('referralCode');
+            await authService.signup(credentials, referredByCode);
             setSignupSuccessMessage("Success! Please check your email for a confirmation link to complete registration.");
+            sessionStorage.removeItem('referralCode'); // Clear after use
             setAuthPage('login');
         } catch (err: unknown) {
             setError(err instanceof Error ? err.message : 'An unknown error occurred.');

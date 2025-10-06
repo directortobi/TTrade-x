@@ -2,10 +2,13 @@ import { User, Credentials } from '../types';
 import { supabase } from './supabase';
 
 export const authService = {
-    signup: async ({ email, password }: Credentials): Promise<User> => {
+    signup: async ({ email, password }: Credentials, referredByCode?: string | null): Promise<User> => {
         const { data, error } = await supabase.auth.signUp({
             email: email,
             password: password,
+            options: {
+                data: referredByCode ? { referred_by: referredByCode } : undefined,
+            },
         });
 
         if (error) {

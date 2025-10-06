@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Credentials } from '../types';
 import { LoadingSpinner } from '../components/LoadingSpinner';
 import { SupabaseLogo } from '../components/icons/SupabaseLogo';
@@ -16,6 +16,13 @@ export const SignUpPage: React.FC<SignUpPageProps> = ({ onSignUp, onNavigateToLo
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [passwordError, setPasswordError] = useState<string | null>(null);
+    const [referralCode, setReferralCode] = useState<string | null>(null);
+
+    useEffect(() => {
+        const code = sessionStorage.getItem('referralCode');
+        setReferralCode(code);
+    }, []);
+
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -55,7 +62,21 @@ export const SignUpPage: React.FC<SignUpPageProps> = ({ onSignUp, onNavigateToLo
                                 className="mt-1 block w-full h-12 px-3 text-white bg-gray-700/50 border border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-green-500 focus:border-green-500"
                             />
                         </div>
-                        <div>
+                        {referralCode && (
+                            <div>
+                                <label htmlFor="referral" className="block text-sm font-medium text-gray-400">
+                                    Referred by
+                                </label>
+                                <input
+                                    id="referral"
+                                    type="text"
+                                    disabled
+                                    value={referralCode}
+                                    className="mt-1 block w-full h-12 px-3 text-gray-300 bg-gray-800/50 border border-gray-600 rounded-md shadow-sm cursor-not-allowed"
+                                />
+                            </div>
+                        )}
+                         <div>
                             <label htmlFor="password"className="block text-sm font-medium text-gray-300">Password</label>
                             <input
                                 id="password"

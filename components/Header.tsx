@@ -2,7 +2,6 @@ import React, { useState, useRef, useEffect } from 'react';
 import { AppUser, Notification } from '../types';
 import { View } from '../MainApp';
 import { ProfileIcon } from './icons/ProfileIcon';
-import { ThemeToggle } from './ThemeToggle';
 import { AppLogo } from './AppLogo';
 import { NotificationIcon } from './notifications/NotificationIcon';
 import { NotificationPanel } from './notifications/NotificationPanel';
@@ -119,7 +118,6 @@ export const Header: React.FC<HeaderProps> = ({ activeView, onNavigate, user, on
                             <span className="text-sm text-gray-400">Tokens:</span>
                             <span className="font-bold text-white">{user.profile.tokens}</span>
                         </div>
-                        <ThemeToggle />
                         <div className="relative" ref={notificationRef}>
                             <NotificationIcon unreadCount={unreadCount} onClick={() => setIsNotificationsOpen(prev => !prev)} />
                             {isNotificationsOpen && (

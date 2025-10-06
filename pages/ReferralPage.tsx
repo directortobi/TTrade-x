@@ -20,7 +20,7 @@ const StatCard: React.FC<{ title: string; value: string | number; icon: React.Re
 
 const UsersIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M15 21a6 6 0 00-9-5.197m0 0A11.995 11.995 0 0012 13a11.995 11.995 0 00-3-5.197m-2 2.197a4 4 0 11.22-6.572" /></svg>;
 const ClockIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>;
-const WalletIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M21 12a2.25 2.25 0 00-2.25-2.25H15a3 3 0 11-6 0H5.25A2.25 2.25 0 003 12m18 0v6a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 18v-6m18 0V9M3 12V9m18 0a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 9m18 0V6a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 6v3" /></svg>;
+const WalletIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M21 12a2.25 2.25 0 00-2.25-2.25H15a3 3 0 11-6 0H5.25A2.25 2.25 0 003 12m18 0v6a2.25 2.25 0 01-2.25-2.25H5.25A2.25 2.25 0 013 18v-6m18 0V9M3 12V9m18 0a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 9m18 0V6a2.25 2.25 0 00-2.25-2.25H5.25A2.25 2.25 0 003 6v3" /></svg>;
 
 const EarningStatusBadge: React.FC<{ status: EarningStatus }> = ({ status }) => {
     const styles = {
@@ -68,9 +68,11 @@ const ReferralPage: React.FC<ReferralPageProps> = ({ user }) => {
     useEffect(() => {
         fetchData();
     }, [fetchData]);
+
+    const referralLink = `${window.location.origin}/?ref=${user.profile.referral_code}`;
     
     const handleCopyToClipboard = () => {
-        navigator.clipboard.writeText(user.profile.referral_code);
+        navigator.clipboard.writeText(referralLink);
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
     };
@@ -130,12 +132,12 @@ const ReferralPage: React.FC<ReferralPageProps> = ({ user }) => {
             </div>
 
             <div className="bg-gray-800/50 p-6 rounded-2xl border border-gray-700">
-                <h2 className="text-xl font-semibold text-teal-300">Your Referral Code</h2>
-                <p className="text-gray-400 mb-4">Share this code with your friends. They can enter it when they sign up.</p>
+                <h2 className="text-xl font-semibold text-teal-300">Your Referral Link</h2>
+                <p className="text-gray-400 mb-4">Share this unique link with your friends. When they sign up, you'll earn commission.</p>
                 <div className="flex items-center gap-4 bg-gray-900/50 p-4 rounded-lg">
-                    <span className="font-mono text-xl text-white flex-grow">{user.profile.referral_code}</span>
+                    <span className="font-mono text-lg sm:text-xl text-white flex-grow overflow-x-auto">{referralLink}</span>
                     <button onClick={handleCopyToClipboard} className="px-4 py-2 text-sm font-semibold text-white bg-cyan-600 rounded-lg hover:bg-cyan-700 transition-colors">
-                        {copied ? 'Copied!' : 'Copy'}
+                        {copied ? 'Copied!' : 'Copy Link'}
                     </button>
                 </div>
             </div>

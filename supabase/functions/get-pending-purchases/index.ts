@@ -1,6 +1,7 @@
 // supabase/functions/get-pending-purchases/index.ts
-// FIX: Replaced broken unpkg CDN with esm.sh for Supabase edge function type definitions to resolve Deno type errors.
-/// <reference types="https://esm.sh/@supabase/functions-js/src/edge-runtime.d.ts" />
+// FIX: Use a version-pinned CDN URL for Supabase edge function type definitions to resolve Deno type errors.
+// FIX: Corrected the Supabase Edge Function type definition path to use index.d.ts.
+/// <reference types="https://esm.sh/@supabase/functions-js@2.4.1/src/index.d.ts" />
 
 import { serve } from 'https://deno.land/std@0.177.0/http/server.ts'
 import { corsHeaders } from '../_shared/cors.ts'

@@ -48,12 +48,16 @@ $$;
 -- 5. Create a trigger function to handle new user sign-ups
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER AS $$
+DECLARE
+  referred_by_code text;
 BEGIN
-  -- Check if the new user was referred
-  -- This part is a placeholder; referral link logic is handled client-side on signup
-  -- and the 'referred_by' field is set there.
-  INSERT INTO public.profiles (id, email, referral_code)
-  VALUES (new.id, new.email, public.generate_referral_code());
+  -- Extract 'referred_by' code from the new user's metadata, if it exists
+  referred_by_code := new.raw_user_meta_data->>'referred_by';
+  
+  -- Insert into public.profiles, including the referred_by code
+  INSERT INTO public.profiles (id, email, referral_code, referred_by)
+  VALUES (new.id, new.email, public.generate_referral_code(), referred_by_code);
+  
   RETURN new;
 END;
 $$;
