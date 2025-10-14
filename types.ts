@@ -253,3 +253,9 @@ export interface Notification {
     is_read: boolean;
     link: string | null;
 }
+
+// New type for Chatbot
+export interface ChatMessage {
+    role: 'user' | 'model';
+    text: string;
+}

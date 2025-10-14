@@ -8,8 +8,8 @@ const CONFIG_DETAILS = {
     Supabase: {
         title: 'Supabase Configuration Missing',
         message: 'Your application needs to be connected to a Supabase project to handle user authentication.',
-        file: 'services/supabase.ts',
-        instructions: 'Please follow Step 1 in the INSTRUCTIONS.md file to create a project and add your credentials.'
+        file: 'Environment Variables: SUPABASE_URL, SUPABASE_ANON_KEY',
+        instructions: 'Please set your Supabase URL and Anon Key as environment variables. Follow Step 1 in INSTRUCTIONS.md for details.'
     },
     Gemini: {
         title: 'Google Gemini API Key Missing',

@@ -27,6 +27,7 @@ import { AnalysisResult, Asset, ImageData, AppUser, Signal, Notification } from 
 import { AVAILABLE_ASSETS } from './constants';
 import { ConfigurationErrorPage } from './pages/ConfigurationErrorPage';
 import { notificationService } from './services/notificationService';
+import { Chatbot } from './components/chatbot/Chatbot';
 
 interface MainAppProps {
     user: AppUser;
@@ -248,6 +249,7 @@ const MainApp: React.FC<MainAppProps> = ({ user, onLogout, setUser }) => {
       <main className="container mx-auto px-4 py-8 flex-grow">
         {renderActiveView()}
       </main>
+      <Chatbot />
       <Footer onNavigate={setActiveView} />
     </div>
   );
