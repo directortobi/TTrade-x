@@ -5,7 +5,11 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
 
-export const isSupabaseConfigured = !!supabaseUrl && !!supabaseAnonKey;
+// A more robust check to see if the variables are not only present but also not placeholders or invalid.
+const isUrlValid = supabaseUrl && supabaseUrl.startsWith('http');
+const isKeyValid = supabaseAnonKey && !supabaseAnonKey.includes('YOUR_SUPABASE_ANON_KEY');
+
+export const isSupabaseConfigured = isUrlValid && isKeyValid;
 
 // Create a Supabase client.
 // If the credentials are not configured, the app will show a configuration error page.

@@ -2,9 +2,10 @@ import { GoogleGenAI, Type } from "@google/genai";
 import { AnalysisInput, AnalysisResult, Signal, ImageData, MarketAnalystInput, TradingStyle, TimeframeAnalysisInput, Timeframe } from '../types';
 
 // The API key is loaded from environment variables.
-// The key should be set as API_KEY in your deployment environment.
-// FIX: Use process.env.API_KEY to access environment variables, as import.meta.env is specific to Vite and was causing a type error. This also aligns with the Gemini API guidelines.
-export const isGeminiConfigured = !!process.env.API_KEY;
+const geminiApiKey = process.env.API_KEY;
+
+// A more robust check to see if the API key is present and not a placeholder.
+export const isGeminiConfigured = !!geminiApiKey && !geminiApiKey.includes('YOUR_API_KEY');
 
 // Initialize the AI client once.
 let ai: GoogleGenAI;
@@ -17,8 +18,7 @@ const initializeAi = () => {
         throw new Error("Google Gemini API Key not found. Please ensure the API_KEY environment variable is set.");
     }
     
-    // FIX: Use process.env.API_KEY to access environment variables, as import.meta.env is specific to Vite and was causing a type error.
-    ai = new GoogleGenAI({ apiKey: process.env.API_KEY! });
+    ai = new GoogleGenAI({ apiKey: geminiApiKey! });
 }
 
 const responseSchema = {
