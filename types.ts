@@ -10,6 +10,7 @@ export interface Profile {
     email: string;
     tokens: number;
     referral_code: string;
+    created_at: string;
 }
 
 export interface AppUser {
@@ -233,6 +234,7 @@ export interface AnalysisLog {
 export interface ReferredUser {
     id: string;
     email: string;
+    created_at: string;
 }
 
 export interface ReferralEarningWithEmail extends ReferralEarning {

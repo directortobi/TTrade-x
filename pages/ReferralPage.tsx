@@ -40,7 +40,6 @@ const ReferralPage: React.FC<ReferralPageProps> = ({ user }) => {
     const [activeTab, setActiveTab] = useState<'referrals' | 'earnings'>('referrals');
     const [copied, setCopied] = useState(false);
     
-    // Withdrawal state
     const [withdrawalAmount, setWithdrawalAmount] = useState('');
     const [walletAddress, setWalletAddress] = useState('');
     const [isWithdrawing, setIsWithdrawing] = useState(false);
@@ -134,9 +133,9 @@ const ReferralPage: React.FC<ReferralPageProps> = ({ user }) => {
             <div className="bg-gray-800/50 p-6 rounded-2xl border border-gray-700">
                 <h2 className="text-xl font-semibold text-teal-300">Your Referral Link</h2>
                 <p className="text-gray-400 mb-4">Share this unique link with your friends. When they sign up, you'll earn commission.</p>
-                <div className="flex items-center gap-4 bg-gray-900/50 p-4 rounded-lg">
-                    <span className="font-mono text-lg sm:text-xl text-white flex-grow overflow-x-auto">{referralLink}</span>
-                    <button onClick={handleCopyToClipboard} className="px-4 py-2 text-sm font-semibold text-white bg-cyan-600 rounded-lg hover:bg-cyan-700 transition-colors">
+                <div className="flex flex-col sm:flex-row items-center gap-4 bg-gray-900/50 p-4 rounded-lg">
+                    <span className="font-mono text-base sm:text-xl text-white flex-grow overflow-x-auto">{referralLink}</span>
+                    <button onClick={handleCopyToClipboard} className="px-4 py-2 text-sm font-semibold text-white bg-cyan-600 rounded-lg hover:bg-cyan-700 transition-colors w-full sm:w-auto">
                         {copied ? 'Copied!' : 'Copy Link'}
                     </button>
                 </div>
@@ -157,12 +156,12 @@ const ReferralPage: React.FC<ReferralPageProps> = ({ user }) => {
                     {activeTab === 'referrals' && (
                         <table className="w-full text-sm text-left text-gray-300">
                             <thead className="text-xs text-gray-400 uppercase bg-gray-900/70 sticky top-0">
-                                <tr><th scope="col" className="px-4 py-3">User Email</th></tr>
+                                <tr><th scope="col" className="px-4 py-3">User Email</th><th scope="col" className="px-4 py-3">Joined On</th></tr>
                             </thead>
                             <tbody>
                                 {referredUsers.length > 0 ? referredUsers.map(ref => (
-                                    <tr key={ref.id} className="border-b border-gray-700"><td className="px-4 py-3">{ref.email}</td></tr>
-                                )) : <tr><td className="px-4 py-10 text-center text-gray-500">No users have signed up with your code yet.</td></tr>}
+                                    <tr key={ref.id} className="border-b border-gray-700 hover:bg-gray-800/40"><td className="px-4 py-3">{ref.email}</td><td className="px-4 py-3">{new Date(ref.created_at).toLocaleDateString()}</td></tr>
+                                )) : <tr><td colSpan={2} className="px-4 py-10 text-center text-gray-500">No users have signed up with your code yet.</td></tr>}
                             </tbody>
                         </table>
                     )}
@@ -179,7 +178,7 @@ const ReferralPage: React.FC<ReferralPageProps> = ({ user }) => {
                             </thead>
                             <tbody>
                                 {earningsHistory.length > 0 ? earningsHistory.map(earn => (
-                                    <tr key={earn.id} className="border-b border-gray-700">
+                                    <tr key={earn.id} className="border-b border-gray-700 hover:bg-gray-800/40">
                                         <td className="px-4 py-3">{new Date(earn.created_at).toLocaleDateString()}</td>
                                         <td className="px-4 py-3">{earn.referred_user_profile?.email ?? 'N/A'}</td>
                                         <td className="px-4 py-3">${Number(earn.purchase_amount).toFixed(2)}</td>

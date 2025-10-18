@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { AppUser, TokenPurchase, TokenPurchaseStatus } from '../types';
 import { getPurchaseHistory } from '../services/tokenService';
 import { LoadingSpinner } from '../components/LoadingSpinner';
@@ -9,6 +9,19 @@ interface PurchaseHistoryPageProps {
     user: AppUser;
     onNavigate: (view: View) => void;
 }
+
+const TokensIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v.01M12 6v-1h4.5a1.5 1.5 0 001.5-1.5V3a1.5 1.5 0 00-1.5-1.5H12a1.5 1.5 0 00-1.5 1.5v1.5m1.5 0h-1.5M12 9a2.25 2.25 0 00-2.25 2.25c0 1.357.868 2.518 2.01 2.934m1.99-5.868A2.25 2.25 0 0114.25 11.25c0 1.357-.868 2.518-2.01 2.934m0-5.868V9.75" /></svg>;
+const SpentIcon = () => <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}><path strokeLinecap="round" strokeLinejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>;
+
+const StatCard: React.FC<{ title: string; value: string | number; icon: React.ReactNode; }> = ({ title, value, icon }) => (
+    <div className="bg-gray-800/50 p-4 rounded-xl border border-gray-700 flex items-center gap-4">
+        <div className="flex-shrink-0 text-sky-400">{icon}</div>
+        <div>
+            <h3 className="text-sm font-medium text-gray-400">{title}</h3>
+            <p className="text-2xl font-bold text-white">{value}</p>
+        </div>
+    </div>
+);
 
 const StatusBadge: React.FC<{ status: TokenPurchaseStatus }> = ({ status }) => {
     const styles = {
@@ -40,6 +53,13 @@ const PurchaseHistoryPage: React.FC<PurchaseHistoryPageProps> = ({ user, onNavig
     useEffect(() => {
         fetchHistory();
     }, [fetchHistory]);
+
+    const stats = useMemo(() => {
+        const approvedPurchases = history.filter(p => p.status === 'approved');
+        const totalTokens = approvedPurchases.reduce((acc, p) => acc + p.tokens_purchased, 0);
+        const totalSpent = approvedPurchases.reduce((acc, p) => acc + Number(p.price_usd), 0);
+        return { totalTokens, totalSpent };
+    }, [history]);
 
     const renderContent = () => {
         if (isLoading) {
@@ -104,6 +124,11 @@ const PurchaseHistoryPage: React.FC<PurchaseHistoryPageProps> = ({ user, onNavig
             </div>
              
              {error && !isLoading && <ErrorAlert message={error} />}
+
+             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <StatCard title="Total Tokens Purchased" value={stats.totalTokens.toLocaleString()} icon={<TokensIcon />} />
+                <StatCard title="Total Spent (Approved)" value={`$${stats.totalSpent.toFixed(2)}`} icon={<SpentIcon />} />
+            </div>
 
             <div className="bg-blue-900/50 p-4 sm:p-6 rounded-2xl border border-blue-800">
                 {renderContent()}

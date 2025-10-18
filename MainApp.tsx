@@ -236,7 +236,7 @@ const MainApp: React.FC<MainAppProps> = ({ user, onLogout, setUser }) => {
   };
 
   return (
-    <div className="min-h-screen text-gray-200 font-sans flex flex-col">
+    <div className="min-h-screen flex flex-col">
       <Header 
         activeView={activeView} 
         onNavigate={setActiveView} 

@@ -63,9 +63,9 @@ export const referralService = {
     async getReferredUsers(userReferralCode: string): Promise<ReferredUser[]> {
         const { data, error } = await supabase
             .from('profiles')
-            .select('id, email')
+            .select('id, email, created_at')
             .eq('referred_by', userReferralCode)
-            .order('email', { ascending: true });
+            .order('created_at', { ascending: false });
         
         if (error) throw error;
         return data;
