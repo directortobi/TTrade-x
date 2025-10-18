@@ -11,6 +11,7 @@ export interface Profile {
     tokens: number;
     referral_code: string;
     created_at: string;
+    referrer_id?: string | null;
 }
 
 export interface AppUser {
@@ -73,12 +74,10 @@ export interface AnalysisResult {
     takeProfit: number;
     stopLoss: number;
     rationale: string;
-    // New detailed fields
     pair: string;
     confidenceLevel: number;
     pips: Pips;
     riskRewardRatio: string;
-    // Expanded fields
     support: number;
     resistance: number;
     trend: TrendDirection;
@@ -118,7 +117,6 @@ export interface TimeframeAnalysisInput {
     data: Candle[];
 }
 
-// New types for Compounding Agent
 export interface CompoundingLevel {
   level: number;
   startBalance: number;
@@ -137,7 +135,6 @@ export interface TradeLog {
   balance: number;
 }
 
-// New types for Token and Referral System
 export interface TokenPackage {
     id: string;
     name: string;
@@ -172,7 +169,6 @@ export interface ReferralEarning {
     created_at: string;
 }
 
-// New types for Withdrawals
 export type WithdrawalStatus = 'pending' | 'approved' | 'rejected';
 
 export interface Withdrawal {
@@ -193,7 +189,6 @@ export interface ReferralWithdrawal {
     created_at: string;
 }
 
-// Types for Admin page with joined email data
 export interface PurchaseWithEmail extends TokenPurchase {
     profiles: {
         email: string;
@@ -212,7 +207,6 @@ export interface ReferralWithdrawalWithEmail extends ReferralWithdrawal {
     } | null;
 }
 
-// New types for Trading History
 export type AnalysisOutcome = 'Pending' | 'TP Hit' | 'SL Hit' | 'Cancelled';
 
 export interface AnalysisLog {
@@ -230,7 +224,6 @@ export interface AnalysisLog {
     tokens_used: number;
 }
 
-// New types for Referral Page
 export interface ReferredUser {
     id: string;
     email: string;
@@ -243,7 +236,6 @@ export interface ReferralEarningWithEmail extends ReferralEarning {
     } | null;
 }
 
-// New types for Notifications
 export type NotificationType = 'signal_buy' | 'signal_sell' | 'purchase_approved' | 'purchase_rejected' | 'withdrawal_approved' | 'withdrawal_rejected' | 'referral_earning' | 'referral_withdrawal_approved' | 'referral_withdrawal_rejected';
 
 export interface Notification {
@@ -256,7 +248,6 @@ export interface Notification {
     link: string | null;
 }
 
-// New type for Chatbot
 export interface ChatMessage {
     role: 'user' | 'model';
     text: string;

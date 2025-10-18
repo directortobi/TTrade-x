@@ -14,7 +14,7 @@ export const referralService = {
         const { count: totalReferrals, error: countError } = await supabase
             .from('profiles')
             .select('*', { count: 'exact', head: true })
-            .eq('referred_by', userReferralCode);
+            .eq('referrer_id', userId);
 
         if (countError) throw countError;
 
@@ -26,18 +26,18 @@ export const referralService = {
 
         if (earningsError) throw earningsError;
 
-        const stats = earnings.reduce((acc, earning) => {
+        const earningsSummary = earnings.reduce((acc, earning) => {
             const amount = Number(earning.commission_amount) || 0;
             if (earning.status === 'approved') {
-                acc.availableEarnings += amount;
+                acc.approved += amount;
             } else if (earning.status === 'pending') {
-                acc.pendingEarnings += amount;
+                acc.pending += amount;
             }
-            acc.lifetimeEarnings += amount;
+            acc.lifetime += amount;
             return acc;
-        }, { pendingEarnings: 0, availableEarnings: 0, lifetimeEarnings: 0 });
+        }, { pending: 0, approved: 0, lifetime: 0 });
         
-        // This query sums approved earnings that haven't been withdrawn yet.
+        // 3. Get total withdrawn or pending withdrawal amount
         const { data: withdrawnData, error: withdrawnError } = await supabase
             .from('referral_withdrawals')
             .select('amount_usd, status')
@@ -54,17 +54,17 @@ export const referralService = {
 
         return {
             totalReferrals: totalReferrals ?? 0,
-            pendingEarnings: stats.pendingEarnings,
-            availableEarnings: Math.max(0, stats.availableEarnings - totalWithdrawnOrPending),
-            lifetimeEarnings: stats.lifetimeEarnings,
+            pendingEarnings: earningsSummary.pending,
+            availableEarnings: Math.max(0, earningsSummary.approved - totalWithdrawnOrPending),
+            lifetimeEarnings: earningsSummary.lifetime,
         };
     },
 
-    async getReferredUsers(userReferralCode: string): Promise<ReferredUser[]> {
+    async getReferredUsers(userId: string): Promise<ReferredUser[]> {
         const { data, error } = await supabase
             .from('profiles')
             .select('id, email, created_at')
-            .eq('referred_by', userReferralCode)
+            .eq('referrer_id', userId)
             .order('created_at', { ascending: false });
         
         if (error) throw error;
@@ -82,7 +82,6 @@ export const referralService = {
             .order('created_at', { ascending: false });
 
         if (error) {
-             // Provide a more helpful error if the join fails due to RLS on the profiles table
             if (error.message.includes('permission denied')) {
                 throw new Error("Could not fetch earnings details. Please ensure the 'profiles' table has the correct RLS policies for read access.");
             }
