@@ -46,7 +46,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ isOpen, onClose, message
     if (!isOpen) return null;
 
     return (
-        <div className="fixed bottom-6 right-6 w-[calc(100%-3rem)] max-w-md h-[70vh] max-h-[600px] bg-gray-900/80 backdrop-blur-xl border border-gray-700 rounded-2xl shadow-2xl flex flex-col z-50 animate-fade-in-up">
+        <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 w-[calc(100%-2rem)] max-w-md h-[80vh] max-h-[600px] bg-gray-900/80 backdrop-blur-xl border border-gray-700 rounded-2xl shadow-2xl flex flex-col z-50 animate-fade-in-up">
             {/* Header */}
             <header className="flex items-center justify-between p-4 border-b border-gray-700">
                 <div className="flex items-center gap-2">
@@ -62,7 +62,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ isOpen, onClose, message
             <div className="flex-1 p-4 overflow-y-auto space-y-4">
                 {messages.map((msg, index) => (
                     <div key={index} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                        <div className={`max-w-xs md:max-w-sm px-4 py-2 rounded-xl ${msg.role === 'user' ? 'bg-blue-600 text-white rounded-br-none' : 'bg-gray-700 text-gray-200 rounded-bl-none'}`}>
+                        <div className={`max-w-xs md:max-w-sm px-4 py-2 rounded-xl break-words ${msg.role === 'user' ? 'bg-blue-600 text-white rounded-br-none' : 'bg-gray-700 text-gray-200 rounded-bl-none'}`}>
                             <p className="text-sm whitespace-pre-wrap">{msg.text}</p>
                         </div>
                     </div>
@@ -87,7 +87,7 @@ export const ChatWindow: React.FC<ChatWindowProps> = ({ isOpen, onClose, message
                         disabled={isLoading}
                         className="flex-1 h-12 px-4 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-cyan-500 disabled:opacity-50"
                     />
-                    <button type="submit" disabled={isLoading} className="w-12 h-12 flex items-center justify-center bg-cyan-600 rounded-lg hover:bg-cyan-700 transition-colors disabled:bg-gray-600 disabled:cursor-not-allowed">
+                    <button type="submit" disabled={isLoading} className="w-12 h-12 flex-shrink-0 flex items-center justify-center bg-cyan-600 rounded-lg hover:bg-cyan-700 transition-colors disabled:bg-gray-600 disabled:cursor-not-allowed">
                         <SendIcon />
                     </button>
                 </form>

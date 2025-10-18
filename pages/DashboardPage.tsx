@@ -17,7 +17,7 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ user, onNavigate }) => {
     return (
         <div className="max-w-7xl mx-auto animate-fade-in space-y-8">
             <div>
-                <h1 className="text-3xl md:text-4xl font-bold text-white">
+                <h1 className="text-2xl md:text-4xl font-bold text-white break-words">
                     Welcome back, <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-sky-400">{user.auth.email?.split('@')[0]}</span>
                 </h1>
                 <p className="text-gray-400 mt-2">Here's your real-time market overview and account status.</p>
@@ -26,7 +26,7 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ user, onNavigate }) => {
             <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
                 {/* Left Column */}
                 <div className="lg:col-span-2 space-y-6">
-                    <div className="bg-blue-900/50 p-6 rounded-xl border border-blue-800 shadow-lg">
+                    <div className="bg-blue-900/50 p-4 sm:p-6 rounded-xl border border-blue-800 shadow-lg">
                         <div className="flex items-start justify-between">
                             <div className="flex items-center gap-4">
                                 <div className="text-sky-400">
@@ -37,14 +37,14 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ user, onNavigate }) => {
                                     <p className="text-sm text-gray-400 truncate">{user.profile.email}</p>
                                 </div>
                             </div>
-                            <button onClick={() => onNavigate('profile')} className="px-3 py-1.5 text-xs font-semibold text-white bg-gray-700/80 rounded-md hover:bg-gray-600 transition-colors border border-gray-600">
+                            <button onClick={() => onNavigate('profile')} className="px-3 py-1.5 text-xs font-semibold text-white bg-gray-700/80 rounded-md hover:bg-gray-600 transition-colors border border-gray-600 flex-shrink-0">
                                 Manage
                             </button>
                         </div>
                         <div className="mt-6 border-t border-blue-800 pt-4">
                             <p className="text-sm text-gray-400">Available Tokens</p>
                             <div className="flex items-center gap-4 mt-2">
-                                <p className="text-5xl font-bold text-white">{user.profile.tokens}</p>
+                                <p className="text-4xl sm:text-5xl font-bold text-white">{user.profile.tokens}</p>
                                 <div className="text-sky-400">
                                   <TokensIcon/>
                                 </div>
@@ -62,7 +62,7 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ user, onNavigate }) => {
 
                 {/* Right Column */}
                 <div className="lg:col-span-3">
-                     <div className="h-[65vh] bg-blue-950/50 rounded-xl border border-blue-800 p-1">
+                     <div className="h-[60vh] lg:h-[65vh] bg-blue-950/50 rounded-xl border border-blue-800 p-1">
                         <TradingViewMarketOverviewWidget />
                     </div>
                 </div>

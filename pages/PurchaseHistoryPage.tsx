@@ -82,30 +82,49 @@ const PurchaseHistoryPage: React.FC<PurchaseHistoryPageProps> = ({ user, onNavig
             );
         }
         return (
-            <div className="overflow-x-auto">
-                <table className="w-full min-w-[700px] text-sm text-left text-gray-300">
-                    <thead className="text-xs text-gray-400 uppercase bg-gray-900/70">
-                        <tr>
-                            <th scope="col" className="px-4 py-3">Date</th>
-                            <th scope="col" className="px-4 py-3">Package Name</th>
-                            <th scope="col" className="px-4 py-3">Tokens</th>
-                            <th scope="col" className="px-4 py-3">Price (USD)</th>
-                            <th scope="col" className="px-4 py-3">Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {history.map(purchase => (
-                            <tr key={purchase.id} className="border-b border-gray-700 hover:bg-gray-800/40">
-                                <td className="px-4 py-3">{new Date(purchase.created_at).toLocaleString()}</td>
-                                <td className="px-4 py-3 font-medium">{purchase.package_name}</td>
-                                <td className="px-4 py-3 text-green-400">{purchase.tokens_purchased}</td>
-                                <td className="px-4 py-3">${Number(purchase.price_usd).toFixed(2)}</td>
-                                <td className="px-4 py-3"><StatusBadge status={purchase.status} /></td>
+            <>
+                {/* Desktop Table */}
+                <div className="hidden md:block overflow-x-auto">
+                    <table className="w-full min-w-[700px] text-sm text-left text-gray-300">
+                        <thead className="text-xs text-gray-400 uppercase bg-gray-900/70">
+                            <tr>
+                                <th scope="col" className="px-4 py-3">Date</th>
+                                <th scope="col" className="px-4 py-3">Package Name</th>
+                                <th scope="col" className="px-4 py-3">Tokens</th>
+                                <th scope="col" className="px-4 py-3">Price (USD)</th>
+                                <th scope="col" className="px-4 py-3">Status</th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
+                        </thead>
+                        <tbody>
+                            {history.map(purchase => (
+                                <tr key={purchase.id} className="border-b border-gray-700 hover:bg-gray-800/40">
+                                    <td className="px-4 py-3 whitespace-nowrap">{new Date(purchase.created_at).toLocaleString()}</td>
+                                    <td className="px-4 py-3 font-medium">{purchase.package_name}</td>
+                                    <td className="px-4 py-3 text-green-400">{purchase.tokens_purchased}</td>
+                                    <td className="px-4 py-3">${Number(purchase.price_usd).toFixed(2)}</td>
+                                    <td className="px-4 py-3"><StatusBadge status={purchase.status} /></td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+                {/* Mobile Card List */}
+                <div className="block md:hidden space-y-3">
+                    {history.map(purchase => (
+                        <div key={purchase.id} className="bg-gray-800/50 p-4 rounded-lg border border-gray-700">
+                            <div className="flex justify-between items-center">
+                                <span className="font-bold text-white">{purchase.package_name} Package</span>
+                                <StatusBadge status={purchase.status} />
+                            </div>
+                            <p className="text-xs text-gray-400 mt-1">{new Date(purchase.created_at).toLocaleString()}</p>
+                            <div className="mt-3 flex justify-between items-center text-sm">
+                                <p className="text-gray-300">Tokens: <span className="font-semibold text-green-400">{purchase.tokens_purchased}</span></p>
+                                <p className="text-gray-300">Price: <span className="font-semibold text-white">${Number(purchase.price_usd).toFixed(2)}</span></p>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </>
         );
     }
 
@@ -113,7 +132,7 @@ const PurchaseHistoryPage: React.FC<PurchaseHistoryPageProps> = ({ user, onNavig
         <div className="max-w-5xl mx-auto animate-fade-in space-y-6">
             <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
                 <div>
-                    <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-sky-400">
+                    <h1 className="text-2xl sm:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-sky-400">
                         Token Purchase History
                     </h1>
                     <p className="text-gray-400 mt-1">A record of all your token package purchases.</p>
@@ -130,7 +149,7 @@ const PurchaseHistoryPage: React.FC<PurchaseHistoryPageProps> = ({ user, onNavig
                 <StatCard title="Total Spent (Approved)" value={`$${stats.totalSpent.toFixed(2)}`} icon={<SpentIcon />} />
             </div>
 
-            <div className="bg-blue-900/50 p-4 sm:p-6 rounded-2xl border border-blue-800">
+            <div className="bg-blue-900/50 p-2 sm:p-4 rounded-2xl border border-blue-800">
                 {renderContent()}
             </div>
         </div>

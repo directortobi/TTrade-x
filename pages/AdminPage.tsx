@@ -158,7 +158,7 @@ const AdminPage: React.FC = () => {
 
     return (
         <div className="max-w-7xl mx-auto animate-fade-in space-y-8">
-            <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-teal-400">
+            <h1 className="text-2xl sm:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-teal-400">
                 Admin Dashboard
             </h1>
 
@@ -170,9 +170,9 @@ const AdminPage: React.FC = () => {
             )}
 
             {/* Token Purchases */}
-            <section className="bg-emerald-900/50 p-6 rounded-2xl border border-green-800">
-                <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-xl font-semibold text-teal-300">Pending Token Purchases</h2>
+            <section className="bg-emerald-900/50 p-4 sm:p-6 rounded-2xl border border-green-800">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3">
+                    <h2 className="text-lg sm:text-xl font-semibold text-teal-300">Pending Token Purchases</h2>
                     <button onClick={fetchPurchases} disabled={isLoading.purchases} className="px-3 py-1.5 text-sm font-medium text-white bg-gray-700/80 rounded-md hover:bg-gray-600 transition-colors border border-gray-600 disabled:opacity-50">
                         Refresh
                     </button>
@@ -198,9 +198,9 @@ const AdminPage: React.FC = () => {
                             <tbody>
                                 {purchases.map(p => (
                                     <tr key={p.id} className="border-b border-gray-700 hover:bg-gray-800/40">
-                                        <td className="px-4 py-3">{new Date(p.created_at).toLocaleString()}</td>
-                                        <td className="px-4 py-3">{p.profiles?.email || p.user_id}</td>
-                                        <td className="px-4 py-3">{p.package_name}</td>
+                                        <td className="px-4 py-3 whitespace-nowrap">{new Date(p.created_at).toLocaleString()}</td>
+                                        <td className="px-4 py-3 break-words">{p.profiles?.email || p.user_id}</td>
+                                        <td className="px-4 py-3 whitespace-nowrap">{p.package_name}</td>
                                         <td className="px-4 py-3">{p.tokens_purchased}</td>
                                         <td className="px-4 py-3">${p.price_usd}</td>
                                         <td className="px-4 py-3">
@@ -225,9 +225,9 @@ const AdminPage: React.FC = () => {
             </section>
 
             {/* Referral Earnings Withdrawals */}
-            <section className="bg-emerald-900/50 p-6 rounded-2xl border border-green-800">
-                <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-xl font-semibold text-teal-300">Pending Referral Earnings Withdrawals</h2>
+            <section className="bg-emerald-900/50 p-4 sm:p-6 rounded-2xl border border-green-800">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3">
+                    <h2 className="text-lg sm:text-xl font-semibold text-teal-300">Pending Referral Earnings Withdrawals</h2>
                     <button onClick={fetchReferralWithdrawals} disabled={isLoading.referralWithdrawals} className="px-3 py-1.5 text-sm font-medium text-white bg-gray-700/80 rounded-md hover:bg-gray-600 transition-colors border border-gray-600 disabled:opacity-50">
                         Refresh
                     </button>
@@ -251,10 +251,10 @@ const AdminPage: React.FC = () => {
                             <tbody>
                                 {referralWithdrawals.map(w => (
                                     <tr key={w.id} className="border-b border-gray-700 hover:bg-gray-800/40">
-                                        <td className="px-4 py-3">{new Date(w.created_at).toLocaleString()}</td>
-                                        <td className="px-4 py-3">{w.profiles?.email || w.user_id}</td>
+                                        <td className="px-4 py-3 whitespace-nowrap">{new Date(w.created_at).toLocaleString()}</td>
+                                        <td className="px-4 py-3 break-words">{w.profiles?.email || w.user_id}</td>
                                         <td className="px-4 py-3">${w.amount_usd}</td>
-                                        <td className="px-4 py-3 font-mono text-xs">{w.wallet_address}</td>
+                                        <td className="px-4 py-3 font-mono text-xs break-all">{w.wallet_address}</td>
                                         <td className="px-4 py-3">
                                             {actionInProgress === w.id ? <LoadingSpinner /> : (
                                                 <div className="flex gap-2">
@@ -272,9 +272,9 @@ const AdminPage: React.FC = () => {
             </section>
 
             {/* Token Withdrawals */}
-            <section className="bg-emerald-900/50 p-6 rounded-2xl border border-green-800">
-                <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-xl font-semibold text-teal-300">Pending Token Withdrawals</h2>
+            <section className="bg-emerald-900/50 p-4 sm:p-6 rounded-2xl border border-green-800">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3">
+                    <h2 className="text-lg sm:text-xl font-semibold text-teal-300">Pending Token Withdrawals</h2>
                     <button onClick={fetchWithdrawals} disabled={isLoading.withdrawals} className="px-3 py-1.5 text-sm font-medium text-white bg-gray-700/80 rounded-md hover:bg-gray-600 transition-colors border border-gray-600 disabled:opacity-50">
                         Refresh
                     </button>
@@ -298,10 +298,10 @@ const AdminPage: React.FC = () => {
                             <tbody>
                                 {withdrawals.map(w => (
                                     <tr key={w.id} className="border-b border-gray-700 hover:bg-gray-800/40">
-                                        <td className="px-4 py-3">{new Date(w.created_at).toLocaleString()}</td>
-                                        <td className="px-4 py-3">{w.profiles?.email || w.user_id}</td>
+                                        <td className="px-4 py-3 whitespace-nowrap">{new Date(w.created_at).toLocaleString()}</td>
+                                        <td className="px-4 py-3 break-words">{w.profiles?.email || w.user_id}</td>
                                         <td className="px-4 py-3">{w.tokens_to_withdraw}</td>
-                                        <td className="px-4 py-3 font-mono text-xs">{w.wallet_address}</td>
+                                        <td className="px-4 py-3 font-mono text-xs break-all">{w.wallet_address}</td>
                                         <td className="px-4 py-3">
                                             {actionInProgress === w.id ? <LoadingSpinner /> : (
                                                 <div className="flex gap-2">

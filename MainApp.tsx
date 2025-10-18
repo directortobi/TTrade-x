@@ -157,7 +157,7 @@ const MainApp: React.FC<MainAppProps> = ({ user, onLogout, setUser }) => {
                   <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
                       {/* Left Column: Controls */}
                       <div className="lg:col-span-1 space-y-6">
-                           <div className="bg-blue-900/50 p-6 rounded-2xl border border-blue-800">
+                           <div className="bg-blue-900/50 p-4 sm:p-6 rounded-2xl border border-blue-800">
                                 <h2 className="text-xl font-bold text-white mb-4">Live Chart</h2>
                                 <p className="text-gray-400 text-sm mb-4">Select an asset to view the full-featured TradingView chart.</p>
                                 <AssetSelector
@@ -166,7 +166,7 @@ const MainApp: React.FC<MainAppProps> = ({ user, onLogout, setUser }) => {
                                   onSelectAsset={setSelectedAsset}
                                 />
                            </div>
-                           <div className="bg-blue-900/50 p-6 rounded-2xl border border-blue-800">
+                           <div className="bg-blue-900/50 p-4 sm:p-6 rounded-2xl border border-blue-800">
                                 <h2 className="text-xl font-bold text-white mb-4">AI Image Analysis</h2>
                                 <p className="text-gray-400 text-sm mb-4">Alternatively, upload a chart screenshot for an AI-powered analysis.</p>
                                 <ImageAnalyzer
@@ -187,7 +187,7 @@ const MainApp: React.FC<MainAppProps> = ({ user, onLogout, setUser }) => {
                       </div>
                       
                       {/* Right Column: Chart */}
-                      <div className="lg:col-span-3 h-[80vh] bg-blue-950/50 rounded-xl border border-blue-800 p-1">
+                      <div className="lg:col-span-3 h-[60vh] lg:h-[80vh] bg-blue-950/50 rounded-xl border border-blue-800 p-1">
                           <TradingViewAdvancedChartWidget 
                               symbol={selectedAsset.tradingViewTicker}
                               key={selectedAsset.tradingViewTicker} // Force re-mount on symbol change
@@ -246,7 +246,7 @@ const MainApp: React.FC<MainAppProps> = ({ user, onLogout, setUser }) => {
         notifications={notifications}
         setNotifications={setNotifications} 
       />
-      <main className="container mx-auto px-4 py-8 flex-grow">
+      <main className="container mx-auto px-4 py-6 sm:py-8 flex-grow">
         {renderActiveView()}
       </main>
       <Chatbot />

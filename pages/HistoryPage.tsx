@@ -114,64 +114,111 @@ const HistoryPage: React.FC<HistoryPageProps> = ({ user }) => {
             return <p className="text-center text-gray-400 py-16">You have no analysis history yet. Perform an analysis to get started!</p>;
         }
         return (
-            <div className="overflow-x-auto">
-                <table className="w-full min-w-[1000px] text-sm text-left text-gray-300">
-                    <thead className="text-xs text-gray-400 uppercase bg-gray-900/70">
-                        <tr>
-                            <th scope="col" className="px-4 py-3">Date</th>
-                            <th scope="col" className="px-4 py-3">Symbol</th>
-                            <th scope="col" className="px-4 py-3">Signal</th>
-                            <th scope="col" className="px-4 py-3">Entry</th>
-                            <th scope="col" className="px-4 py-3">Stop Loss</th>
-                            <th scope="col" className="px-4 py-3">Take Profit</th>
-                            <th scope="col" className="px-4 py-3">Confidence</th>
-                            <th scope="col" className="px-4 py-3">Tokens Used</th>
-                            <th scope="col" className="px-4 py-3">Outcome</th>
-                            <th scope="col" className="px-4 py-3">Rationale</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {logs.map(log => (
-                            <React.Fragment key={log.id}>
-                                <tr className="border-b border-gray-700 hover:bg-gray-800/40">
-                                    <td className="px-4 py-3">{new Date(log.created_at).toLocaleString()}</td>
-                                    <td className="px-4 py-3 font-medium">{log.symbol}</td>
-                                    <td className="px-4 py-3"><SignalBadge signal={log.signal} /></td>
-                                    <td className="px-4 py-3">{log.entry_price?.toFixed(4) ?? 'N/A'}</td>
-                                    <td className="px-4 py-3">{log.stop_loss?.toFixed(4) ?? 'N/A'}</td>
-                                    <td className="px-4 py-3">{log.take_profit_1?.toFixed(4) ?? 'N/A'}</td>
-                                    <td className="px-4 py-3">{log.confidence ?? 'N/A'}%</td>
-                                    <td className="px-4 py-3 text-center">{log.tokens_used}</td>
-                                    <td className="px-4 py-3">
-                                        {log.signal !== 'HOLD' && log.outcome === 'Pending' ? (
-                                            <OutcomeSelector logId={log.id} onUpdate={handleUpdateOutcome} />
-                                        ) : (
-                                            <OutcomeBadge outcome={log.outcome} />
-                                        )}
-                                    </td>
-                                    <td className="px-4 py-3">
-                                        <button onClick={() => toggleExpandRow(log.id)} className="text-cyan-400 hover:underline">
-                                            {expandedLogRowId === log.id ? 'Hide' : 'View'}
-                                        </button>
-                                    </td>
-                                </tr>
-                                {expandedLogRowId === log.id && (
-                                    <tr className="bg-gray-900/50">
-                                        <td colSpan={10} className="p-4">
-                                            <div className="bg-gray-800 p-4 rounded-lg">
-                                                <h4 className="font-semibold text-gray-200 mb-2">AI Analysis Rationale:</h4>
-                                                <p className="text-gray-400 whitespace-pre-wrap text-sm leading-relaxed">
-                                                    {log.analysis_notes || 'No rationale was saved for this analysis.'}
-                                                </p>
-                                            </div>
+            <>
+                {/* Desktop Table */}
+                <div className="hidden lg:block overflow-x-auto">
+                    <table className="w-full min-w-[1000px] text-sm text-left text-gray-300">
+                        <thead className="text-xs text-gray-400 uppercase bg-gray-900/70">
+                            <tr>
+                                <th scope="col" className="px-4 py-3">Date</th>
+                                <th scope="col" className="px-4 py-3">Symbol</th>
+                                <th scope="col" className="px-4 py-3">Signal</th>
+                                <th scope="col" className="px-4 py-3">Entry</th>
+                                <th scope="col" className="px-4 py-3">Stop Loss</th>
+                                <th scope="col" className="px-4 py-3">Take Profit</th>
+                                <th scope="col" className="px-4 py-3">Confidence</th>
+                                <th scope="col" className="px-4 py-3">Tokens Used</th>
+                                <th scope="col" className="px-4 py-3">Outcome</th>
+                                <th scope="col" className="px-4 py-3">Rationale</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {logs.map(log => (
+                                <React.Fragment key={log.id}>
+                                    <tr className="border-b border-gray-700 hover:bg-gray-800/40">
+                                        <td className="px-4 py-3 whitespace-nowrap">{new Date(log.created_at).toLocaleString()}</td>
+                                        <td className="px-4 py-3 font-medium">{log.symbol}</td>
+                                        <td className="px-4 py-3"><SignalBadge signal={log.signal} /></td>
+                                        <td className="px-4 py-3">{log.entry_price?.toFixed(4) ?? 'N/A'}</td>
+                                        <td className="px-4 py-3">{log.stop_loss?.toFixed(4) ?? 'N/A'}</td>
+                                        <td className="px-4 py-3">{log.take_profit_1?.toFixed(4) ?? 'N/A'}</td>
+                                        <td className="px-4 py-3">{log.confidence ?? 'N/A'}%</td>
+                                        <td className="px-4 py-3 text-center">{log.tokens_used}</td>
+                                        <td className="px-4 py-3">
+                                            {log.signal !== 'HOLD' && log.outcome === 'Pending' ? (
+                                                <OutcomeSelector logId={log.id} onUpdate={handleUpdateOutcome} />
+                                            ) : (
+                                                <OutcomeBadge outcome={log.outcome} />
+                                            )}
+                                        </td>
+                                        <td className="px-4 py-3">
+                                            <button onClick={() => toggleExpandRow(log.id)} className="text-cyan-400 hover:underline">
+                                                {expandedLogRowId === log.id ? 'Hide' : 'View'}
+                                            </button>
                                         </td>
                                     </tr>
+                                    {expandedLogRowId === log.id && (
+                                        <tr className="bg-gray-900/50">
+                                            <td colSpan={10} className="p-4">
+                                                <div className="bg-gray-800 p-4 rounded-lg">
+                                                    <h4 className="font-semibold text-gray-200 mb-2">AI Analysis Rationale:</h4>
+                                                    <p className="text-gray-400 whitespace-pre-wrap text-sm leading-relaxed">
+                                                        {log.analysis_notes || 'No rationale was saved for this analysis.'}
+                                                    </p>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    )}
+                                </React.Fragment>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+
+                {/* Mobile Card List */}
+                <div className="block lg:hidden space-y-4">
+                    {logs.map(log => (
+                        <div key={log.id} className="bg-gray-800/50 p-4 rounded-lg border border-gray-700">
+                             <div className="flex justify-between items-start gap-4">
+                                <div>
+                                    <span className="font-bold text-lg text-white">{log.symbol}</span>
+                                    <p className="text-xs text-gray-400">{new Date(log.created_at).toLocaleString()}</p>
+                                </div>
+                                <SignalBadge signal={log.signal} />
+                            </div>
+                            <div className="mt-4 grid grid-cols-2 gap-4 text-sm">
+                                <div className="space-y-2">
+                                    <p className="text-gray-400">Entry: <span className="font-mono text-white">{log.entry_price?.toFixed(4) ?? 'N/A'}</span></p>
+                                    <p className="text-gray-400">SL: <span className="font-mono text-red-400">{log.stop_loss?.toFixed(4) ?? 'N/A'}</span></p>
+                                    <p className="text-gray-400">TP: <span className="font-mono text-green-400">{log.take_profit_1?.toFixed(4) ?? 'N/A'}</span></p>
+                                </div>
+                                <div className="space-y-2 text-right">
+                                    <p className="text-gray-400">Confidence: <span className="font-semibold text-white">{log.confidence ?? 'N/A'}%</span></p>
+                                    <p className="text-gray-400">Tokens: <span className="font-semibold text-white">{log.tokens_used}</span></p>
+                                </div>
+                            </div>
+                            <div className="mt-4 border-t border-gray-700 pt-3 flex justify-between items-center">
+                                {log.signal !== 'HOLD' && log.outcome === 'Pending' ? (
+                                    <OutcomeSelector logId={log.id} onUpdate={handleUpdateOutcome} />
+                                ) : (
+                                    <OutcomeBadge outcome={log.outcome} />
                                 )}
-                            </React.Fragment>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
+                                <button onClick={() => toggleExpandRow(log.id)} className="text-cyan-400 hover:underline text-sm">
+                                    {expandedLogRowId === log.id ? 'Hide Rationale' : 'View Rationale'}
+                                </button>
+                            </div>
+                            {expandedLogRowId === log.id && (
+                                <div className="mt-3 bg-gray-900/70 p-3 rounded-md">
+                                    <h4 className="font-semibold text-gray-200 mb-1 text-sm">AI Rationale:</h4>
+                                    <p className="text-gray-400 whitespace-pre-wrap text-xs leading-relaxed">
+                                        {log.analysis_notes || 'No rationale was saved for this analysis.'}
+                                    </p>
+                                </div>
+                            )}
+                        </div>
+                    ))}
+                </div>
+            </>
         );
     }
 
@@ -179,7 +226,7 @@ const HistoryPage: React.FC<HistoryPageProps> = ({ user }) => {
         <div className="max-w-7xl mx-auto animate-fade-in space-y-6">
             <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
                 <div>
-                    <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-sky-400">
+                    <h1 className="text-2xl sm:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-sky-400">
                         Trading History
                     </h1>
                     <p className="text-gray-400 mt-1">Review your past AI analyses and track trade outcomes.</p>
@@ -191,14 +238,14 @@ const HistoryPage: React.FC<HistoryPageProps> = ({ user }) => {
              
              {error && !isLoading && <ErrorAlert message={error} />}
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 <StatCard title="Total Signals" value={stats.totalTrades} icon={<TradesIcon />} />
                 <StatCard title="Win Rate" value={`${stats.winRate}%`} icon={<WinRateIcon />} />
                 <StatCard title="Trades Won" value={stats.wins} icon={<WinIcon />} />
                 <StatCard title="Trades Lost" value={stats.losses} icon={<LossIcon />} />
             </div>
 
-            <div className="bg-blue-900/50 p-4 sm:p-6 rounded-2xl border border-blue-800">
+            <div className="bg-blue-900/50 p-2 sm:p-4 rounded-2xl border border-blue-800">
                 {renderContent()}
             </div>
         </div>

@@ -9,11 +9,11 @@ interface ReferralPageProps {
 }
 
 const StatCard: React.FC<{ title: string; value: string | number; icon: React.ReactNode; }> = ({ title, value, icon }) => (
-    <div className="bg-gray-800/50 p-6 rounded-xl border border-gray-700 flex items-center gap-4">
+    <div className="bg-gray-800/50 p-4 sm:p-6 rounded-xl border border-gray-700 flex items-center gap-4">
         <div className="flex-shrink-0 text-cyan-400">{icon}</div>
         <div>
             <h3 className="text-sm font-medium text-gray-400">{title}</h3>
-            <p className="text-3xl font-bold text-white">{value}</p>
+            <p className="text-2xl sm:text-3xl font-bold text-white">{value}</p>
         </div>
     </div>
 );
@@ -116,7 +116,7 @@ const ReferralPage: React.FC<ReferralPageProps> = ({ user }) => {
     return (
         <div className="max-w-7xl mx-auto animate-fade-in space-y-8">
             <div>
-                <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-teal-400">
+                <h1 className="text-2xl sm:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-teal-400">
                     Referral Program
                 </h1>
                 <p className="text-gray-400 mt-1">Earn 20% commission on every token purchase made by users you refer.</p>
@@ -130,19 +130,19 @@ const ReferralPage: React.FC<ReferralPageProps> = ({ user }) => {
                 <StatCard title="Available for Withdrawal" value={`$${stats.availableEarnings.toFixed(2)}`} icon={<WalletIcon />} />
             </div>
 
-            <div className="bg-gray-800/50 p-6 rounded-2xl border border-gray-700">
-                <h2 className="text-xl font-semibold text-teal-300">Your Referral Link</h2>
-                <p className="text-gray-400 mb-4">Share this unique link with your friends. When they sign up, you'll earn commission.</p>
-                <div className="flex flex-col sm:flex-row items-center gap-4 bg-gray-900/50 p-4 rounded-lg">
-                    <span className="font-mono text-base sm:text-xl text-white flex-grow overflow-x-auto">{referralLink}</span>
-                    <button onClick={handleCopyToClipboard} className="px-4 py-2 text-sm font-semibold text-white bg-cyan-600 rounded-lg hover:bg-cyan-700 transition-colors w-full sm:w-auto">
+            <div className="bg-gray-800/50 p-4 sm:p-6 rounded-2xl border border-gray-700">
+                <h2 className="text-lg sm:text-xl font-semibold text-teal-300">Your Referral Link</h2>
+                <p className="text-gray-400 mb-4 text-sm">Share this unique link with your friends. When they sign up, you'll earn commission.</p>
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 bg-gray-900/50 p-4 rounded-lg">
+                    <span className="font-mono text-sm sm:text-base text-white flex-grow break-all">{referralLink}</span>
+                    <button onClick={handleCopyToClipboard} className="px-4 py-2 text-sm font-semibold text-white bg-cyan-600 rounded-lg hover:bg-cyan-700 transition-colors w-full sm:w-auto flex-shrink-0">
                         {copied ? 'Copied!' : 'Copy Link'}
                     </button>
                 </div>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <div className="lg:col-span-2 bg-gray-800/50 p-6 rounded-2xl border border-gray-700">
+                <div className="lg:col-span-2 bg-gray-800/50 p-4 sm:p-6 rounded-2xl border border-gray-700">
                     <div className="flex border-b border-gray-700 mb-4">
                         <button onClick={() => setActiveTab('referrals')} className={`px-4 py-2 font-medium text-sm transition-colors ${activeTab === 'referrals' ? 'text-cyan-400 border-b-2 border-cyan-400' : 'text-gray-400 hover:text-white'}`}>
                             My Referrals ({referredUsers.length})
@@ -160,7 +160,7 @@ const ReferralPage: React.FC<ReferralPageProps> = ({ user }) => {
                             </thead>
                             <tbody>
                                 {referredUsers.length > 0 ? referredUsers.map(ref => (
-                                    <tr key={ref.id} className="border-b border-gray-700 hover:bg-gray-800/40"><td className="px-4 py-3">{ref.email}</td><td className="px-4 py-3">{new Date(ref.created_at).toLocaleDateString()}</td></tr>
+                                    <tr key={ref.id} className="border-b border-gray-700 hover:bg-gray-800/40"><td className="px-4 py-3 break-all">{ref.email}</td><td className="px-4 py-3 whitespace-nowrap">{new Date(ref.created_at).toLocaleDateString()}</td></tr>
                                 )) : <tr><td colSpan={2} className="px-4 py-10 text-center text-gray-500">No users have signed up with your code yet.</td></tr>}
                             </tbody>
                         </table>
@@ -179,8 +179,8 @@ const ReferralPage: React.FC<ReferralPageProps> = ({ user }) => {
                             <tbody>
                                 {earningsHistory.length > 0 ? earningsHistory.map(earn => (
                                     <tr key={earn.id} className="border-b border-gray-700 hover:bg-gray-800/40">
-                                        <td className="px-4 py-3">{new Date(earn.created_at).toLocaleDateString()}</td>
-                                        <td className="px-4 py-3">{earn.referred_user_profile?.email ?? 'N/A'}</td>
+                                        <td className="px-4 py-3 whitespace-nowrap">{new Date(earn.created_at).toLocaleDateString()}</td>
+                                        <td className="px-4 py-3 break-all">{earn.referred_user_profile?.email ?? 'N/A'}</td>
                                         <td className="px-4 py-3">${Number(earn.purchase_amount).toFixed(2)}</td>
                                         <td className="px-4 py-3 font-semibold text-green-400">+${Number(earn.commission_amount).toFixed(2)}</td>
                                         <td className="px-4 py-3"><EarningStatusBadge status={earn.status} /></td>

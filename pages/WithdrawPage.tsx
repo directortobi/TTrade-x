@@ -56,7 +56,7 @@ const WithdrawPage: React.FC<WithdrawPageProps> = ({ user, onWithdrawSuccess }) 
     return (
          <div className="max-w-2xl mx-auto animate-fade-in space-y-8">
             <div>
-                <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-teal-400">
+                <h1 className="text-2xl sm:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-teal-400">
                     Request Token Withdrawal
                 </h1>
                 <p className="text-gray-400 mt-1">
