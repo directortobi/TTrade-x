@@ -1,23 +1,9 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, Suspense } from 'react';
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
 import { AssetSelector } from './components/results/ForexSelector';
 import { ErrorAlert } from './components/ErrorAlert';
 import { ImageAnalyzer } from './components/ImageAnalyzer';
-import { ResultsPage } from './pages/ResultsPage';
-import MarketAnalystPage from './pages/MarketAnalystPage';
-import ProfilePage from './pages/ProfilePage';
-import PurchaseHistoryPage from './pages/PurchaseHistoryPage';
-import BuyTokensPage from './pages/BuyTokensPage';
-import WithdrawPage from './pages/WithdrawPage';
-import AboutUsPage from './pages/AboutUsPage';
-import AdminPage from './pages/AdminPage';
-import DashboardPage from './pages/DashboardPage';
-import CompoundingAgentPage from './pages/CompoundingAgentPage';
-import HistoryPage from './pages/HistoryPage';
-import ReferralPage from './pages/ReferralPage';
-import ContactUsPage from './pages/ContactUsPage';
-import LegalDisclaimerPage from './pages/LegalDisclaimerPage'; // New Import
 import { CandlestickSpinner } from './components/CandlestickSpinner';
 import TradingViewAdvancedChartWidget from './components/TradingViewAdvancedChartWidget';
 import { getSignalFromImage, isGeminiConfigured } from './services/geminiService';
@@ -28,6 +14,23 @@ import { AVAILABLE_ASSETS } from './constants';
 import { ConfigurationErrorPage } from './pages/ConfigurationErrorPage';
 import { notificationService } from './services/notificationService';
 import { Chatbot } from './components/chatbot/Chatbot';
+import { PageLoader } from './components/PageLoader';
+
+// --- Lazy Load Page Components for Code Splitting ---
+const ResultsPage = React.lazy(() => import('./pages/ResultsPage'));
+const MarketAnalystPage = React.lazy(() => import('./pages/MarketAnalystPage'));
+const ProfilePage = React.lazy(() => import('./pages/ProfilePage'));
+const PurchaseHistoryPage = React.lazy(() => import('./pages/PurchaseHistoryPage'));
+const BuyTokensPage = React.lazy(() => import('./pages/BuyTokensPage'));
+const WithdrawPage = React.lazy(() => import('./pages/WithdrawPage'));
+const AboutUsPage = React.lazy(() => import('./pages/AboutUsPage'));
+const AdminPage = React.lazy(() => import('./pages/AdminPage'));
+const DashboardPage = React.lazy(() => import('./pages/DashboardPage'));
+const CompoundingAgentPage = React.lazy(() => import('./pages/CompoundingAgentPage'));
+const HistoryPage = React.lazy(() => import('./pages/HistoryPage'));
+const ReferralPage = React.lazy(() => import('./pages/ReferralPage'));
+const ContactUsPage = React.lazy(() => import('./pages/ContactUsPage'));
+const LegalDisclaimerPage = React.lazy(() => import('./pages/LegalDisclaimerPage'));
 
 interface MainAppProps {
     user: AppUser;
@@ -247,7 +250,9 @@ const MainApp: React.FC<MainAppProps> = ({ user, onLogout, setUser }) => {
         setNotifications={setNotifications} 
       />
       <main className="container mx-auto px-4 py-6 sm:py-8 flex-grow">
-        {renderActiveView()}
+        <Suspense fallback={<PageLoader />}>
+            {renderActiveView()}
+        </Suspense>
       </main>
       <Chatbot />
       <Footer onNavigate={setActiveView} />
