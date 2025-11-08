@@ -48,7 +48,7 @@ export const adminService = {
         if (error) throw new Error(error.message);
     },
 
-    // Functions for Referral Withdrawals
+    // New functions for Referral Withdrawals
     async getPendingReferralWithdrawals(): Promise<ReferralWithdrawalWithEmail[]> {
         const { data, error } = await supabase.functions.invoke('get-pending-referral-withdrawals');
         if (error) throw new Error(error.message);

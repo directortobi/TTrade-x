@@ -1,28 +1,20 @@
 {
   "name": "trade-x",
   "private": true,
-  "version": "0.0.0",
-  "type": "module",
+  "version": "1.0.0",
+  "description": "An AI-powered application that analyzes market data and charts to provide trading signals for forex, commodities, and crypto.",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
+    "sync": "npx cap sync android"
   },
   "dependencies": {
-    "@google/genai": "^1.11.0",
-    "@supabase/supabase-js": "^2.43.4",
-    "javascript-time-ago": "2.5.10",
-    "lightweight-charts": "4.1.0",
+    "@capacitor/android": "^6.0.0",
+    "@capacitor/core": "^6.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
-    "@types/node": "^22.14.0",
-    "@vitejs/plugin-react": "^5.0.0",
-    "autoprefixer": "^10.4.21",
-    "postcss": "^8.5.6",
-    "tailwindcss": "^3.4.4",
-    "typescript": "~5.8.2",
-    "vite": "^6.2.0"
-  }
+    "@capacitor/cli": "^6.0.0"
+  },
+  "author": "Trade X",
+  "license": "UNLICENSED"
 }

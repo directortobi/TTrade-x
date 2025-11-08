@@ -1,9 +1,26 @@
-import React, { useState, useEffect, useCallback, Suspense } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
 import { AssetSelector } from './components/results/ForexSelector';
 import { ErrorAlert } from './components/ErrorAlert';
 import { ImageAnalyzer } from './components/ImageAnalyzer';
+import { ResultsPage } from './pages/ResultsPage';
+import MarketAnalystPage from './pages/MarketAnalystPage';
+import ProfilePage from './pages/ProfilePage';
+import PurchaseHistoryPage from './pages/PurchaseHistoryPage';
+import BuyTokensPage from './pages/BuyTokensPage';
+import WithdrawPage from './pages/WithdrawPage';
+import WithdrawalHistoryPage from './pages/WithdrawalHistoryPage';
+import AboutUsPage from './pages/AboutUsPage';
+import AdminPage from './pages/AdminPage';
+import DashboardPage from './pages/DashboardPage';
+import CompoundingAgentPage from './pages/CompoundingAgentPage';
+import HistoryPage from './pages/HistoryPage';
+import ReferralPage from './pages/ReferralPage';
+import ContactUsPage from './pages/ContactUsPage';
+import LegalDisclaimerPage from './pages/LegalDisclaimerPage';
+// FIX: Correctly import DerivTraderPage from its file.
+import DerivTraderPage from './pages/DerivTraderPage'; // New Import
 import { CandlestickSpinner } from './components/CandlestickSpinner';
 import TradingViewAdvancedChartWidget from './components/TradingViewAdvancedChartWidget';
 import { getSignalFromImage, isGeminiConfigured } from './services/geminiService';
@@ -14,23 +31,6 @@ import { AVAILABLE_ASSETS } from './constants';
 import { ConfigurationErrorPage } from './pages/ConfigurationErrorPage';
 import { notificationService } from './services/notificationService';
 import { Chatbot } from './components/chatbot/Chatbot';
-import { PageLoader } from './components/PageLoader';
-
-// --- Lazy Load Page Components for Code Splitting ---
-const ResultsPage = React.lazy(() => import('./pages/ResultsPage'));
-const MarketAnalystPage = React.lazy(() => import('./pages/MarketAnalystPage'));
-const ProfilePage = React.lazy(() => import('./pages/ProfilePage'));
-const PurchaseHistoryPage = React.lazy(() => import('./pages/PurchaseHistoryPage'));
-const BuyTokensPage = React.lazy(() => import('./pages/BuyTokensPage'));
-const WithdrawPage = React.lazy(() => import('./pages/WithdrawPage'));
-const AboutUsPage = React.lazy(() => import('./pages/AboutUsPage'));
-const AdminPage = React.lazy(() => import('./pages/AdminPage'));
-const DashboardPage = React.lazy(() => import('./pages/DashboardPage'));
-const CompoundingAgentPage = React.lazy(() => import('./pages/CompoundingAgentPage'));
-const HistoryPage = React.lazy(() => import('./pages/HistoryPage'));
-const ReferralPage = React.lazy(() => import('./pages/ReferralPage'));
-const ContactUsPage = React.lazy(() => import('./pages/ContactUsPage'));
-const LegalDisclaimerPage = React.lazy(() => import('./pages/LegalDisclaimerPage'));
 
 interface MainAppProps {
     user: AppUser;
@@ -38,7 +38,7 @@ interface MainAppProps {
     setUser: React.Dispatch<React.SetStateAction<AppUser | null>>;
 }
 
-export type View = 'dashboard' | 'marketScan' | 'forexScanner' | 'compoundingAgent' | 'buyTokens' | 'purchaseHistory' | 'history' | 'referralProgram' | 'about' | 'adminDashboard' | 'profile' | 'withdraw' | 'contact' | 'legalDisclaimer';
+export type View = 'dashboard' | 'marketScan' | 'forexScanner' | 'compoundingAgent' | 'buyTokens' | 'purchaseHistory' | 'history' | 'referralProgram' | 'about' | 'adminDashboard' | 'profile' | 'withdraw' | 'withdrawalHistory' | 'contact' | 'legalDisclaimer' | 'derivTrader';
 
 // NOTE: This is a temporary, insecure way to identify an admin.
 // In a real application, this should be a role-based system in your database.
@@ -50,7 +50,7 @@ const MainApp: React.FC<MainAppProps> = ({ user, onLogout, setUser }) => {
   const [selectedAsset, setSelectedAsset] = useState<Asset>(AVAILABLE_ASSETS[0]);
   const [imageData, setImageData] = useState<ImageData | null>(null);
   const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [loadingStep, setLoadingStep] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [notifications, setNotifications] = useState<Notification[]>([]);
 
@@ -94,7 +94,7 @@ const MainApp: React.FC<MainAppProps> = ({ user, onLogout, setUser }) => {
         return;
     }
     
-    setIsLoading(true);
+    setLoadingStep("Analyzing chart image with AI...");
     setError(null);
     setAnalysisResult(null);
 
@@ -102,6 +102,7 @@ const MainApp: React.FC<MainAppProps> = ({ user, onLogout, setUser }) => {
       let result: AnalysisResult;
       result = await getSignalFromImage(imageData);
       
+      setLoadingStep("Finalizing analysis...");
       const tokensUsed = result.confidenceLevel > 50 ? 1 : 0;
       await logService.createLog(result, user.auth.email!, tokensUsed, user.auth.id);
       
@@ -133,7 +134,7 @@ const MainApp: React.FC<MainAppProps> = ({ user, onLogout, setUser }) => {
       }
       console.error(err);
     } finally {
-      setIsLoading(false);
+      setLoadingStep(null);
     }
   }, [imageData, user, handleTokenUsed, fetchNotifications]);
 
@@ -152,6 +153,8 @@ const MainApp: React.FC<MainAppProps> = ({ user, onLogout, setUser }) => {
     switch (activeView) {
       case 'dashboard':
         return <DashboardPage user={user} onNavigate={setActiveView} />;
+      case 'derivTrader':
+        return <DerivTraderPage />;
       case 'forexScanner':
         return (
           <>
@@ -160,7 +163,7 @@ const MainApp: React.FC<MainAppProps> = ({ user, onLogout, setUser }) => {
                   <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
                       {/* Left Column: Controls */}
                       <div className="lg:col-span-1 space-y-6">
-                           <div className="bg-blue-900/50 p-4 sm:p-6 rounded-2xl border border-blue-800">
+                           <div className="bg-blue-900/50 p-6 rounded-2xl border border-blue-800">
                                 <h2 className="text-xl font-bold text-white mb-4">Live Chart</h2>
                                 <p className="text-gray-400 text-sm mb-4">Select an asset to view the full-featured TradingView chart.</p>
                                 <AssetSelector
@@ -169,43 +172,46 @@ const MainApp: React.FC<MainAppProps> = ({ user, onLogout, setUser }) => {
                                   onSelectAsset={setSelectedAsset}
                                 />
                            </div>
-                           <div className="bg-blue-900/50 p-4 sm:p-6 rounded-2xl border border-blue-800">
+                           <div className="bg-blue-900/50 p-6 rounded-2xl border border-blue-800">
                                 <h2 className="text-xl font-bold text-white mb-4">AI Image Analysis</h2>
                                 <p className="text-gray-400 text-sm mb-4">Alternatively, upload a chart screenshot for an AI-powered analysis.</p>
                                 <ImageAnalyzer
                                   imageData={imageData}
                                   onImageDataChange={setImageData}
-                                  disabled={isLoading}
+                                  disabled={!!loadingStep}
                                 />
                                 <div className="mt-6">
                                     <button
                                       onClick={handleAnalysis}
-                                      disabled={isLoading || !imageData}
+                                      disabled={!!loadingStep || !imageData}
                                       className="w-full h-14 px-6 text-lg text-white font-semibold bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-blue-950 transition-all duration-300 disabled:opacity-50 disabled:bg-gray-600 disabled:cursor-not-allowed flex items-center justify-center"
                                     >
-                                      {isLoading ? <CandlestickSpinner /> : 'Analyze Image (1 Token)'}
+                                      {loadingStep ? <CandlestickSpinner /> : 'Analyze Image (1 Token)'}
                                     </button>
+                                     {loadingStep && (
+                                        <p className="text-center text-sm text-gray-300 mt-3 animate-pulse">
+                                            {loadingStep}
+                                        </p>
+                                     )}
+                                     {error && <div className="mt-4"><ErrorAlert message={error} /></div>}
                                 </div>
                             </div>
                       </div>
                       
                       {/* Right Column: Chart */}
-                      <div className="lg:col-span-3 h-[60vh] lg:h-[80vh] bg-blue-950/50 rounded-xl border border-blue-800 p-1">
+                      <div className="lg:col-span-3 h-[80vh] bg-blue-950/50 rounded-xl border border-blue-800 p-1">
                           <TradingViewAdvancedChartWidget 
+                              user={user}
                               symbol={selectedAsset.tradingViewTicker}
                               key={selectedAsset.tradingViewTicker} // Force re-mount on symbol change
                            />
                       </div>
                   </div>
-
-                  <div className="mt-6 max-w-3xl mx-auto">
-                    {error && <ErrorAlert message={error} />}
-                  </div>
               </div>
             )}
             
             {currentPage === 'results' && analysisResult && (
-              <ResultsPage result={analysisResult} onGoBack={handleGoHome} />
+              <ResultsPage result={analysisResult} onGoBack={handleGoHome} onNavigate={setActiveView} />
             )}
           </>
         );
@@ -223,6 +229,8 @@ const MainApp: React.FC<MainAppProps> = ({ user, onLogout, setUser }) => {
         return <BuyTokensPage user={user} onPurchaseSuccess={() => { /* Can add a user profile refresh logic here */ }} />;
       case 'withdraw':
         return <WithdrawPage user={user} onWithdrawSuccess={() => { /* Can add a user profile refresh logic here */ }} />;
+      case 'withdrawalHistory':
+        return <WithdrawalHistoryPage user={user} />;
        case 'profile':
         return <ProfilePage user={user} onLogout={onLogout} onNavigate={setActiveView} />;
       case 'about':
@@ -239,7 +247,7 @@ const MainApp: React.FC<MainAppProps> = ({ user, onLogout, setUser }) => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen text-gray-200 font-sans flex flex-col">
       <Header 
         activeView={activeView} 
         onNavigate={setActiveView} 
@@ -249,10 +257,8 @@ const MainApp: React.FC<MainAppProps> = ({ user, onLogout, setUser }) => {
         notifications={notifications}
         setNotifications={setNotifications} 
       />
-      <main className="container mx-auto px-4 py-6 sm:py-8 flex-grow">
-        <Suspense fallback={<PageLoader />}>
-            {renderActiveView()}
-        </Suspense>
+      <main className="container mx-auto px-4 py-8 flex-grow">
+        {renderActiveView()}
       </main>
       <Chatbot />
       <Footer onNavigate={setActiveView} />

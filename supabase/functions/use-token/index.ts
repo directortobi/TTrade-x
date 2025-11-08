@@ -1,77 +1,43 @@
-// supabase/functions/use-token/index.ts
-// FIX: Use a version-pinned CDN URL for Supabase edge function type definitions to resolve Deno type errors.
-// FIX: Corrected the Supabase Edge Function type definition path to use index.d.ts.
-// FIX: Corrected the Supabase Edge Function type definition path to point to the 'dist' folder, resolving the type error and enabling Deno types.
-// FIX: Switched to unpkg for the type definitions to resolve module loading errors with esm.sh.
-// FIX: Switched Supabase functions type reference from unpkg to esm.sh to fix Deno type resolution errors.
-/// <reference types="https://esm.sh/@supabase/functions-js@2.4.1" />
-
 import { serve } from 'https://deno.land/std@0.177.0/http/server.ts'
-import { createClient } from 'https://unpkg.com/@supabase/supabase-js@2.43.4/dist/module/index.js'
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { corsHeaders } from '../_shared/cors.ts'
-import { supabaseAdmin } from '../_shared/supabaseAdminClient.ts'
 
 serve(async (req) => {
+  // Handle preflight requests for CORS
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
   }
 
   try {
-    console.log("Function 'use-token' invoked.");
-    // 1. Get auth header to identify the user
-    const authHeader = req.headers.get('Authorization')
-    if (!authHeader) {
-      console.error("❌ Missing authorization header in 'use-token'.");
-      throw new Error('Missing authorization header');
-    }
-    
-    // 2. Create a temporary Supabase client with the user's JWT to validate it
-    const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL')!,
-      Deno.env.get('SUPABASE_ANON_KEY')!,
-      { global: { headers: { Authorization: authHeader } } }
+    // Create a Supabase client with the user's auth token
+    const client = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+      { global: { headers: { Authorization: req.headers.get('Authorization')! } } }
     )
-    
-    // 3. Get the user from the JWT.
-    const { data: { user }, error: userError } = await supabaseClient.auth.getUser()
-    if (userError || !user) {
-      console.error("❌ Invalid token or user not found in 'use-token':", userError?.message);
-      throw userError || new Error('User not found or invalid token');
-    }
 
-    console.log(`✅ Authenticated user: ${user.id}`);
+    // Get the user from the token
+    const { data: { user }, error: userError } = await client.auth.getUser();
+    if (userError) throw userError;
+    if (!user) throw new Error("User not found.");
 
-    // 4. Call the 'decrement_user_tokens' RPC function.
-    console.log(`Attempting to decrement tokens for user ${user.id}...`);
-    const { data, error: rpcError } = await supabaseAdmin.rpc('decrement_user_tokens', {
+    // Call the RPC function to decrement the token count.
+    // This is the secure way, as the logic is in the database.
+    const { data, error: rpcError } = await client.rpc('decrement_user_tokens', {
       p_user_id: user.id,
-      p_amount: 1,
-    })
+      p_decrement_amount: 1
+    });
 
-    if (rpcError) {
-      console.error(`❌ RPC error for user ${user.id}:`, rpcError.message);
-      throw rpcError;
-    }
-    
-    console.log(`✅ Successfully decremented tokens for user ${user.id}. New balance: ${data}`);
-    
-    // 5. Return the new token balance.
+    if (rpcError) throw rpcError;
+
     return new Response(JSON.stringify({ new_balance: data }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 200,
     })
-
   } catch (error) {
-    const errorMessage = error.message || JSON.stringify(error);
-    console.error("❌ Final error in 'use-token' function:", errorMessage);
-    
-    let status = 400; // Bad Request
-    if (errorMessage.includes('Insufficient tokens')) status = 402; // Payment Required
-    if (errorMessage.includes('authorization') || errorMessage.includes('token')) status = 401; // Unauthorized
-
-    return new Response(JSON.stringify({ error: errorMessage }), {
+    return new Response(JSON.stringify({ error: error.message }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      status,
+      status: 400,
     })
   }
 })

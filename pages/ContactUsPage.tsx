@@ -30,8 +30,8 @@ const ContactUsPage: React.FC<ContactUsPageProps> = ({ user }) => {
 
     return (
         <div className="max-w-4xl mx-auto animate-fade-in text-gray-300">
-            <div className="bg-emerald-900/50 p-6 sm:p-8 rounded-2xl border border-green-800 shadow-lg">
-                <h1 className="text-3xl sm:text-4xl font-bold text-center text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-teal-400 mb-2">
+            <div className="bg-emerald-900/50 p-8 rounded-2xl border border-green-800 shadow-lg">
+                <h1 className="text-4xl font-bold text-center text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-teal-400 mb-2">
                     Contact Us
                 </h1>
                 <p className="text-center text-gray-400 mb-8">We're here to help. Send us a message and we'll get back to you as soon as possible.</p>

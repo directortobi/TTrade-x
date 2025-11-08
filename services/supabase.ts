@@ -1,19 +1,16 @@
 import { createClient } from '@supabase/supabase-js';
 import type { SupabaseClient } from '@supabase/supabase-js';
 
-// Load Supabase credentials from environment variables.
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
+// Load Supabase credentials from environment variables safely.
+const supabaseUrl = (typeof process !== 'undefined' && process.env && process.env.SUPABASE_URL) ? process.env.SUPABASE_URL : undefined;
+const supabaseAnonKey = (typeof process !== 'undefined' && process.env && process.env.SUPABASE_ANON_KEY) ? process.env.SUPABASE_ANON_KEY : undefined;
 
-// A more robust check to see if the variables are not only present but also not placeholders or invalid.
-const isUrlValid = supabaseUrl && supabaseUrl.startsWith('http');
-const isKeyValid = supabaseAnonKey && !supabaseAnonKey.includes('YOUR_SUPABASE_ANON_KEY');
 
-export const isSupabaseConfigured = isUrlValid && isKeyValid;
+export const isSupabaseConfigured = !!supabaseUrl && !!supabaseAnonKey;
 
 // Create a Supabase client.
 // If the credentials are not configured, the app will show a configuration error page.
 // We still create a dummy client to prevent other parts of the app from crashing on import.
 export const supabase: SupabaseClient = isSupabaseConfigured
-  ? createClient(supabaseUrl, supabaseAnonKey)
+  ? createClient(supabaseUrl!, supabaseAnonKey!)
   : createClient('http://localhost:54321', 'dummy-key');

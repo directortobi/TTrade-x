@@ -1,11 +1,9 @@
-// supabase/functions/update-referral-withdrawal/index.ts
-/// <reference types="https://esm.sh/@supabase/functions-js@2.4.1" />
-
 import { serve } from 'https://deno.land/std@0.177.0/http/server.ts'
 import { corsHeaders } from '../_shared/cors.ts'
 import { supabaseAdmin } from '../_shared/supabaseAdminClient.ts'
 
 serve(async (req) => {
+  // Handle preflight requests for CORS
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
   }
@@ -13,47 +11,22 @@ serve(async (req) => {
   try {
     const { withdrawal_id, new_status } = await req.json()
     if (!withdrawal_id || !new_status) {
-      throw new Error('withdrawal_id and new_status are required.')
+      throw new Error('Missing required parameters: withdrawal_id, new_status')
+    }
+    if (!['approved', 'rejected'].includes(new_status)) {
+        throw new Error('Invalid status provided.')
     }
 
-    if (new_status !== 'approved' && new_status !== 'rejected') {
-        throw new Error("Invalid status provided. Must be 'approved' or 'rejected'.");
-    }
-
-    const { data, error } = await supabaseAdmin
+    const { error } = await supabaseAdmin
       .from('referral_withdrawals')
       .update({ status: new_status })
       .eq('id', withdrawal_id)
-      .eq('status', 'pending') // Only update if it's currently pending
-      .select()
-      .single();
 
     if (error) {
       throw error
     }
 
-    if (!data) {
-        return new Response(JSON.stringify({ error: 'Withdrawal not found or already processed.' }), {
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-            status: 404,
-        });
-    }
-
-    if (data) {
-      const withdrawal = data;
-      const message = new_status === 'approved'
-        ? `Your referral withdrawal of $${withdrawal.amount_usd} has been approved.`
-        : `Your referral withdrawal of $${withdrawal.amount_usd} was rejected.`;
-    
-      await supabaseAdmin.from('notifications').insert({
-        user_id: withdrawal.user_id,
-        type: `referral_withdrawal_${new_status}`,
-        message: message,
-        link: 'referralProgram'
-      });
-    }
-
-    return new Response(JSON.stringify({ message: `Referral withdrawal status updated to ${new_status}.` }), {
+    return new Response(JSON.stringify({ message: `Referral withdrawal status updated to ${new_status}` }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 200,
     })

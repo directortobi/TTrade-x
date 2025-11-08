@@ -1,0 +1,167 @@
+import { 
+    DerivActiveSymbol, DerivBalance, DerivProposal, DerivContractsForSymbol, DerivTick, 
+    DerivPortfolio, DerivProfitTableEntry, DerivTradeParams
+} from '../types';
+
+type MessageCallback = (data: any) => void;
+type TickHistoryCallback = (history: any[]) => void;
+
+interface Callbacks {
+    onOpen: () => void;
+    onBalance: (balance: DerivBalance) => void;
+    onActiveSymbols: (symbols: DerivActiveSymbol[]) => void;
+    onContractsFor: (contracts: DerivContractsForSymbol) => void;
+    onTick: (tick: DerivTick) => void;
+    onProposal: (proposal: DerivProposal) => void;
+    onPortfolio: (portfolio: DerivPortfolio) => void;
+    onTransaction: (isSale: boolean) => void;
+    onProfitTable: (table: DerivProfitTableEntry[]) => void;
+    onError: (error: string) => void;
+    onClose: () => void;
+}
+
+let ws: WebSocket | null = null;
+let callbacks: Callbacks | null = null;
+let tickHistoryCallback: TickHistoryCallback | null = null;
+
+const derivService = {
+    connect: async (apiToken: string, cbs: Callbacks) => {
+        callbacks = cbs;
+        ws = new WebSocket('wss://ws.derivws.com/websockets/v3?app_id=1089');
+
+        ws.onopen = () => {
+            ws?.send(JSON.stringify({ authorize: apiToken }));
+        };
+
+        ws.onmessage = (msg) => {
+            const data = JSON.parse(msg.data);
+            if (data.error) {
+                callbacks?.onError(data.error.message);
+                return;
+            }
+
+            switch (data.msg_type) {
+                case 'authorize':
+                    if (callbacks) {
+                        ws?.send(JSON.stringify({ balance: 1, subscribe: 1 }));
+                        ws?.send(JSON.stringify({ active_symbols: 'brief', product_type: 'basic' }));
+                        callbacks.onOpen();
+                    }
+                    break;
+                case 'balance':
+                    callbacks?.onBalance(data.balance);
+                    break;
+                case 'active_symbols':
+                    callbacks?.onActiveSymbols(data.active_symbols);
+                    break;
+                case 'contracts_for':
+                    callbacks?.onContractsFor(data.contracts_for);
+                    break;
+                case 'tick':
+                    callbacks?.onTick(data.tick);
+                    break;
+                case 'proposal':
+                    callbacks?.onProposal(data.proposal);
+                    break;
+                case 'portfolio':
+                    callbacks?.onPortfolio(data.portfolio);
+                    break;
+                case 'transaction':
+                    callbacks?.onTransaction(!!data.transaction.action);
+                    break;
+                case 'profit_table':
+                    callbacks?.onProfitTable(data.profit_table.transactions);
+                    break;
+                 case 'history':
+                    if (tickHistoryCallback) {
+                        tickHistoryCallback(data.history.prices.map((p: string, i: number) => ({
+                            epoch: data.history.times[i],
+                            open: parseFloat(p),
+                            high: parseFloat(p),
+                            low: parseFloat(p),
+                            close: parseFloat(p),
+                        })));
+                    }
+                    break;
+            }
+        };
+
+        ws.onerror = () => callbacks?.onError('WebSocket error occurred.');
+        ws.onclose = () => callbacks?.onClose();
+    },
+
+    disconnect: () => {
+        if (ws) {
+            ws.close();
+            ws = null;
+        }
+    },
+
+    setOnTickHistory: (callback: TickHistoryCallback) => {
+        tickHistoryCallback = callback;
+    },
+    
+    subscribeToTicks: (symbol: string) => {
+        ws?.send(JSON.stringify({ ticks: symbol, subscribe: 1 }));
+    },
+
+    unsubscribeFromTicks: () => {
+        ws?.send(JSON.stringify({ forget_all: 'ticks' }));
+    },
+    
+    getTickHistory: (symbol: string, count: number) => {
+        ws?.send(JSON.stringify({
+            ticks_history: symbol,
+            adjust_start_time: 1,
+            count: count,
+            end: "latest",
+            start: 1,
+            style: "candles"
+        }));
+    },
+
+    getContractsFor: (symbol: string) => {
+        ws?.send(JSON.stringify({ contracts_for: symbol }));
+    },
+
+    getProposal: (params: DerivTradeParams) => {
+        const req: any = {
+            proposal: 1,
+            amount: params.stake,
+            basis: 'stake',
+            contract_type: params.contract_type === 'rise_fall' ? 'CALL' : params.contract_type,
+            currency: 'USD',
+            duration: params.duration,
+            duration_unit: params.duration_unit,
+            symbol: params.symbol,
+        };
+        if(params.barrier1) req.barrier = params.barrier1;
+        if(params.multiplier) req.multiplier = params.multiplier;
+
+        ws?.send(JSON.stringify(req));
+    },
+
+    buyContract: (proposalId: string, price: number, params: DerivTradeParams) => {
+        const req: any = {
+            buy: proposalId,
+            price: price
+        };
+
+        if (params.contract_type.startsWith('MULT')) {
+            if (params.takeProfit) req.take_profit = params.takeProfit;
+            if (params.stopLoss) req.stop_loss = params.stopLoss;
+        }
+        
+        ws?.send(JSON.stringify(req));
+    },
+    
+    getPortfolio: () => {
+        ws?.send(JSON.stringify({ portfolio: 1 }));
+    },
+
+    getProfitTable: () => {
+        ws?.send(JSON.stringify({ profit_table: 1, description: 1, limit: 20 }));
+    },
+};
+
+export { derivService };

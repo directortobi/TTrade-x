@@ -20,7 +20,12 @@ export const Chatbot: React.FC = () => {
 
         const initializeChat = async () => {
             try {
-                const ai = new GoogleGenAI({ apiKey: process.env.API_KEY! });
+                // Safely access the API key from environment variables.
+                const geminiApiKey = (typeof process !== 'undefined' && process.env && process.env.API_KEY) ? process.env.API_KEY : undefined;
+                if (!geminiApiKey) {
+                    throw new Error("Gemini API key is not configured.");
+                }
+                const ai = new GoogleGenAI({ apiKey: geminiApiKey });
                 
                 const systemInstruction = `You are "Trade X Assistant", an expert AI companion for the Trade X financial analysis application. Your primary role is to help users understand market trends, explain trading concepts, and guide them on how to use the app's features.
 

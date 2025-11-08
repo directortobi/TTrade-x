@@ -58,7 +58,7 @@ const MarketAnalystPage: React.FC<MarketAnalystPageProps> = ({ user, onTokenUsed
     const [selectedAsset, setSelectedAsset] = useState<Asset>(AVAILABLE_ASSETS[0]);
     const [tradingStyle, setTradingStyle] = useState<TradingStyle>(TRADING_STYLES[0].id);
     const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
-    const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [loadingStep, setLoadingStep] = useState<string | null>(null);
     const [error, setError] = useState<string | null>(null);
 
     const handleAnalysis = useCallback(async () => {
@@ -67,7 +67,7 @@ const MarketAnalystPage: React.FC<MarketAnalystPageProps> = ({ user, onTokenUsed
             return;
         }
 
-        setIsLoading(true);
+        setLoadingStep("Fetching market data...");
         setError(null);
         setAnalysisResult(null);
 
@@ -79,6 +79,7 @@ const MarketAnalystPage: React.FC<MarketAnalystPageProps> = ({ user, onTokenUsed
                     fetchCandlestickData(selectedAsset.ticker, '4hour'),
                     fetchCandlestickData(selectedAsset.ticker, '1day')
                 ]);
+                setLoadingStep("Analyzing market data with AI...");
                 result = await getMarketAnalystPrediction({
                     pair: selectedAsset.ticker,
                     tradingStyle,
@@ -89,6 +90,7 @@ const MarketAnalystPage: React.FC<MarketAnalystPageProps> = ({ user, onTokenUsed
             } else {
                 // Mode is a timeframe
                 const data = await fetchCandlestickData(selectedAsset.ticker, mode as Timeframe);
+                setLoadingStep("Analyzing market data with AI...");
                 result = await getTimeframeAnalysis({
                     pair: selectedAsset.ticker,
                     timeframe: mode as Timeframe,
@@ -96,6 +98,7 @@ const MarketAnalystPage: React.FC<MarketAnalystPageProps> = ({ user, onTokenUsed
                 });
             }
             
+            setLoadingStep("Finalizing analysis...");
             const tokensUsed = result.confidenceLevel > 50 ? 1 : 0;
             await logService.createLog(result, user.auth.email!, tokensUsed, user.auth.id);
             
@@ -124,7 +127,7 @@ const MarketAnalystPage: React.FC<MarketAnalystPageProps> = ({ user, onTokenUsed
             }
             console.error(err);
         } finally {
-            setIsLoading(false);
+            setLoadingStep(null);
         }
     }, [selectedAsset, tradingStyle, mode, user, onTokenUsed]);
     
@@ -158,7 +161,7 @@ const MarketAnalystPage: React.FC<MarketAnalystPageProps> = ({ user, onTokenUsed
                        <button
                          key={m.id}
                          onClick={() => setMode(m.id)}
-                         disabled={isLoading}
+                         disabled={!!loadingStep}
                          className={`flex-grow px-3 py-2 text-sm font-semibold rounded-md transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-green-500 disabled:cursor-not-allowed ${
                            mode === m.id
                              ? 'bg-green-600 text-white shadow-md'
@@ -180,26 +183,26 @@ const MarketAnalystPage: React.FC<MarketAnalystPageProps> = ({ user, onTokenUsed
                     <TradingStyleSelector
                         selectedStyle={tradingStyle}
                         onStyleSelect={setTradingStyle}
-                        disabled={isLoading}
+                        disabled={!!loadingStep}
                     />
                 )}
 
                 <div className="pt-2">
                     <button
                         onClick={handleAnalysis}
-                        disabled={isLoading}
+                        disabled={!!loadingStep}
                         className="w-full h-14 px-6 text-lg text-white font-semibold bg-green-600 rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition-all duration-300 disabled:bg-gray-600 disabled:cursor-not-allowed flex items-center justify-center"
                     >
-                        {isLoading ? <CandlestickSpinner /> : 'Analyze Market (1 Token)'}
+                        {loadingStep ? <CandlestickSpinner /> : 'Analyze Market (1 Token)'}
                     </button>
                 </div>
             </div>
             <div className="mt-10 max-w-3xl mx-auto">
                 {error && <ErrorAlert message={error} />}
-                {isLoading && (
+                {loadingStep && (
                     <div className="text-center p-8 flex flex-col items-center justify-center">
                         <CandlestickSpinner />
-                        <p className="text-lg text-gray-300 mt-4">AI is performing deep market analysis...</p>
+                        <p className="text-lg text-gray-300 mt-4 animate-pulse">{loadingStep}</p>
                     </div>
                 )}
             </div>

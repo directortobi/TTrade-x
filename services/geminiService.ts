@@ -2,10 +2,11 @@ import { GoogleGenAI, Type } from "@google/genai";
 import { AnalysisInput, AnalysisResult, Signal, ImageData, MarketAnalystInput, TradingStyle, TimeframeAnalysisInput, Timeframe } from '../types';
 
 // The API key is loaded from environment variables.
-const geminiApiKey = process.env.API_KEY;
+// The key should be set as API_KEY in your deployment environment.
+// Safely access the API key to prevent "process is not defined" errors in the browser.
+const geminiApiKey = (typeof process !== 'undefined' && process.env && process.env.API_KEY) ? process.env.API_KEY : undefined;
 
-// A more robust check to see if the API key is present and not a placeholder.
-export const isGeminiConfigured = !!geminiApiKey && !geminiApiKey.includes('YOUR_API_KEY');
+export const isGeminiConfigured = !!geminiApiKey;
 
 // Initialize the AI client once.
 let ai: GoogleGenAI;

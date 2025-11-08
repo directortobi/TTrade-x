@@ -1,23 +1,17 @@
-import React, { useState, useEffect, useCallback, Suspense } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { AppUser, Credentials } from './types';
 import { authService } from './services/authService';
 import { supabase, isSupabaseConfigured } from './services/supabase';
 import { LoginPage } from './pages/LoginPage';
 import { SignUpPage } from './pages/SignUpPage';
+import MainApp from './MainApp';
 import { LoadingSpinner } from './components/LoadingSpinner';
 import { ConfigurationErrorPage } from './pages/ConfigurationErrorPage';
 import { profileService } from './services/profileService';
 import { ThemeProvider } from './contexts/ThemeContext';
-
-const MainApp = React.lazy(() => import('./MainApp'));
+import { SignalProvider } from './contexts/SignalContext';
 
 type AuthPage = 'login' | 'signup';
-
-const FullPageLoader: React.FC = () => (
-    <div className="bg-blue-950 dark:bg-blue-950 min-h-screen flex items-center justify-center">
-        <LoadingSpinner />
-    </div>
-);
 
 const App: React.FC = () => {
     const [user, setUser] = useState<AppUser | null>(null);
@@ -62,8 +56,7 @@ const App: React.FC = () => {
                                 id: session.user.id,
                                 email: session.user.email!,
                                 tokens: 12, // Fallback to new user token amount
-                                referral_code: 'N/A',
-                                created_at: new Date().toISOString(),
+                                referral_code: 'N/A'
                             }
                         });
                     }
@@ -137,7 +130,11 @@ const App: React.FC = () => {
     }
 
     if (isLoadingUser) {
-        return <FullPageLoader />;
+        return (
+            <div className="bg-blue-950 dark:bg-blue-950 min-h-screen flex items-center justify-center">
+                <LoadingSpinner />
+            </div>
+        );
     }
 
     if (!user) {
@@ -159,16 +156,14 @@ const App: React.FC = () => {
         );
     }
     
-    return (
-        <Suspense fallback={<FullPageLoader />}>
-            <MainApp user={user} onLogout={handleLogout} setUser={setUser} />
-        </Suspense>
-    );
+    return <MainApp user={user} onLogout={handleLogout} setUser={setUser} />;
 };
 
 const WrappedApp: React.FC = () => (
     <ThemeProvider>
-        <App />
+        <SignalProvider>
+            <App />
+        </SignalProvider>
     </ThemeProvider>
 );
 

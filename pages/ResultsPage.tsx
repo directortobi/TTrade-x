@@ -1,12 +1,15 @@
-import React from 'react';
-import { AnalysisResult, Signal, TrendDirection } from '../types';
+import React, { useState } from 'react';
+import { AnalysisResult, Signal, TrendDirection, UiDerivContractType } from '../types';
 import { BuyIcon, SellIcon, HoldIcon } from '../components/icons/SignalIcons';
 import { ConfidenceMeter } from '../components/results/ConfidenceMeter';
 import { ReadAloudButton } from '../components/results/ReadAloudButton';
+import { useSignal } from '../contexts/SignalContext';
+import { View } from '../MainApp';
 
 interface ResultsPageProps {
     result: AnalysisResult;
     onGoBack: () => void;
+    onNavigate: (view: View) => void;
 }
 
 const getSignalAppearance = (signal: Signal) => {
@@ -88,11 +91,18 @@ const RationaleItem: React.FC<{ icon: React.ReactNode; children: React.ReactNode
 );
 
 
-export const ResultsPage: React.FC<ResultsPageProps> = ({ result, onGoBack }) => {
+export const ResultsPage: React.FC<ResultsPageProps> = ({ result, onGoBack, onNavigate }) => {
     const { signal, entryPrice, takeProfit, stopLoss, rationale, pair, confidenceLevel, pips, riskRewardRatio, support, resistance, trend, indicators } = result;
     const appearance = getSignalAppearance(signal);
+    const { setSignal } = useSignal();
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     const isTradeSignal = signal === Signal.BUY || signal === Signal.SELL;
+    
+    const handleTradeSignal = (contractType: UiDerivContractType) => {
+        setSignal(result, contractType);
+        onNavigate('derivTrader');
+    };
 
     const generateSummaryText = () => {
         const intro = `AI analysis for ${pair} indicates a ${signal} signal with ${confidenceLevel} percent confidence. The current market trend is identified as ${trend}.`;
@@ -113,9 +123,37 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({ result, onGoBack }) =>
     }
     const trendInfo = getTrendInfo(trend);
 
+    const TradeSignalModal: React.FC = () => (
+        <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4" onClick={() => setIsModalOpen(false)}>
+            <div className="bg-gray-800 border border-gray-700 rounded-2xl shadow-2xl w-full max-w-sm animate-fade-in-up" onClick={(e) => e.stopPropagation()}>
+                <div className="p-6 text-center">
+                    <h3 className="text-lg font-semibold text-white">How do you want to trade this <span className={appearance.color}>{result.signal}</span> signal?</h3>
+                    <p className="text-sm text-gray-400 mt-2">Select a Deriv contract type to pre-fill the trading form.</p>
+                </div>
+                <div className="p-4 space-y-3">
+                     <button onClick={() => handleTradeSignal('multiplier')} className="w-full text-left p-4 bg-gray-700/50 hover:bg-gray-700 rounded-lg transition-colors">
+                        <p className="font-semibold text-cyan-400">Multiplier</p>
+                        <p className="text-xs text-gray-400">Trade with leverage, Take Profit, and Stop Loss.</p>
+                    </button>
+                    <button onClick={() => handleTradeSignal('higher_lower')} className="w-full text-left p-4 bg-gray-700/50 hover:bg-gray-700 rounded-lg transition-colors">
+                        <p className="font-semibold text-cyan-400">Higher / Lower</p>
+                        <p className="text-xs text-gray-400">Predict if the exit spot is higher or lower than a barrier.</p>
+                    </button>
+                    <button onClick={() => handleTradeSignal('reset')} className="w-full text-left p-4 bg-gray-700/50 hover:bg-gray-700 rounded-lg transition-colors">
+                        <p className="font-semibold text-cyan-400">Reset Call / Reset Put</p>
+                        <p className="text-xs text-gray-400">Win if the exit spot is higher/lower than the entry spot.</p>
+                    </button>
+                </div>
+                <div className="p-4 border-t border-gray-700 text-right">
+                    <button onClick={() => setIsModalOpen(false)} className="px-4 py-2 text-sm text-gray-300 rounded-lg hover:bg-gray-700">Cancel</button>
+                </div>
+            </div>
+        </div>
+    );
 
     return (
         <div className="max-w-3xl mx-auto animate-fade-in-up space-y-6">
+            {isModalOpen && <TradeSignalModal />}
             <div className={`p-6 rounded-xl border ${appearance.borderColor} ${appearance.bgColor} flex flex-col sm:flex-row items-center gap-6 shadow-lg`}>
                 <div className="flex-shrink-0">{appearance.icon}</div>
                 <div className="text-center sm:text-left">
@@ -200,13 +238,21 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({ result, onGoBack }) =>
                 </div>
             </div>
 
-            <div className="mt-8 text-center">
+            <div className="mt-8 flex justify-center items-center gap-4">
                 <button
                     onClick={onGoBack}
-                    className="h-12 px-8 text-lg text-white font-semibold bg-green-600 rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition-all duration-300"
+                    className="h-12 px-8 text-lg text-white font-semibold bg-gray-600 rounded-lg hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition-all duration-300"
                 >
                     Analyze Another
                 </button>
+                {isTradeSignal && (
+                     <button
+                        onClick={() => setIsModalOpen(true)}
+                        className="h-12 px-8 text-lg text-white font-semibold bg-green-600 rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition-all duration-300 animate-pulse"
+                    >
+                        Trade this Signal on Deriv
+                    </button>
+                )}
             </div>
         </div>
     );

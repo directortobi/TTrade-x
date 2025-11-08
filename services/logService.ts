@@ -26,35 +26,17 @@ export const logService = {
                 // This prevents a scary error message for a non-critical feature if the DB isn't fully set up.
                 console.warn(`Analysis history not saved: ${specificError}`);
             } else {
-                console.error("Failed to create analysis log:", errorMessage);
-                // We don't re-throw other errors to avoid blocking the user from seeing their result.
-            }
-        }
-
-        // Create notification for high-confidence signals
-        if (result.signal !== 'HOLD' && result.confidenceLevel > 70) {
-            try {
-                const message = `New ${result.signal} signal for ${result.pair} with ${result.confidenceLevel}% confidence.`;
-                const type = result.signal === 'BUY' ? 'signal_buy' : 'signal_sell';
-
-                const { error: notificationError } = await supabase.from('notifications').insert({
-                    user_id: userId,
-                    type: type,
-                    message: message,
-                    link: 'history',
-                });
-                if (notificationError) throw notificationError;
-            } catch (err) {
-                console.error("Failed to create signal notification:", err);
-                // Don't block UI for this
+                console.error("Error creating analysis log:", err);
+                // We don't re-throw here, as logging is a non-critical background task.
+                // Throwing would block the user from seeing their analysis result.
             }
         }
     },
-
+    
     async getLogs(): Promise<AnalysisLog[]> {
         const { data: { user } } = await supabase.auth.getUser();
-        if (!user || !user.email) {
-            // This can happen on initial load, not an error.
+        if (!user) {
+            console.log("No user session found, cannot fetch logs.");
             return [];
         }
 
@@ -65,31 +47,24 @@ export const logService = {
             .order('created_at', { ascending: false });
 
         if (error) {
-            const errorMessage = (error.message || '').toLowerCase();
-            if (errorMessage.includes('relation "public.analysis_logs" does not exist') || errorMessage.includes("could not find the table 'public.analysis_logs'")) {
-                 console.warn('The analysis_logs table is missing. History page will be empty. Please run the setup script in INSTRUCTIONS.md.');
-                 return []; // Gracefully handle missing table
+            console.error('Error fetching analysis logs:', error);
+            if (error.message.includes('relation "public.analysis_logs" does not exist')) {
+                 throw new Error("The 'analysis_logs' table seems to be missing. Please run the database setup script in INSTRUCTIONS.md to enable this feature.");
             }
-            console.error("Error fetching analysis logs:", error);
-            throw new Error(error.message); // Throw for other unexpected errors
+            throw error;
         }
-
-        return data as AnalysisLog[];
+        return data || [];
     },
 
-    async updateLogOutcome(logId: number, outcome: AnalysisOutcome): Promise<AnalysisLog> {
-        const { data, error } = await supabase
+    async updateLogOutcome(logId: number, outcome: AnalysisOutcome): Promise<void> {
+        const { error } = await supabase
             .from('analysis_logs')
-            .update({ outcome })
-            .eq('id', logId)
-            .select()
-            .single();
+            .update({ outcome: outcome })
+            .eq('id', logId);
 
         if (error) {
-            console.error("Error updating log outcome:", error);
-            throw new Error(error.message);
+            console.error('Error updating log outcome:', error);
+            throw error;
         }
-
-        return data as AnalysisLog;
     }
 };

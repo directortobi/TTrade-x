@@ -30,8 +30,8 @@ const WithdrawPage: React.FC<WithdrawPageProps> = ({ user, onWithdrawSuccess }) 
             setError("Withdrawal amount cannot exceed your current token balance.");
             return;
         }
-        if (walletAddress.trim().length < 26) { // Basic validation for TRC20 address length
-            setError("Please enter a valid USDT (TRC20) wallet address.");
+        if (walletAddress.trim().length < 10) { // Simple validation
+            setError("Please enter a valid wallet address.");
             return;
         }
 
@@ -45,7 +45,7 @@ const WithdrawPage: React.FC<WithdrawPageProps> = ({ user, onWithdrawSuccess }) 
             setSuccessMessage("Your withdrawal request has been submitted successfully. It will be processed by an admin shortly.");
             setAmount('');
             setWalletAddress('');
-            onWithdrawSuccess();
+            onWithdrawSuccess(); // This could trigger a refresh of user data in the main app
         } catch (err) {
             setError(err instanceof Error ? err.message : "An unknown error occurred.");
         } finally {
@@ -56,8 +56,8 @@ const WithdrawPage: React.FC<WithdrawPageProps> = ({ user, onWithdrawSuccess }) 
     return (
          <div className="max-w-2xl mx-auto animate-fade-in space-y-8">
             <div>
-                <h1 className="text-2xl sm:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-teal-400">
-                    Request Token Withdrawal
+                <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-teal-400">
+                    Request Withdrawal
                 </h1>
                 <p className="text-gray-400 mt-1">
                     Your current balance: <span className="font-bold text-white">{user.profile.tokens} Tokens</span>
@@ -72,16 +72,6 @@ const WithdrawPage: React.FC<WithdrawPageProps> = ({ user, onWithdrawSuccess }) 
             )}
             
             {error && <ErrorAlert message={error} />}
-            
-            <div className="bg-gray-800/50 p-4 rounded-lg border border-gray-700 text-sm text-gray-400 space-y-2">
-                <p><strong className="text-gray-300">How it works:</strong></p>
-                <ol className="list-decimal list-inside space-y-1">
-                    <li>Enter the number of tokens you wish to withdraw and your USDT (TRC20) wallet address.</li>
-                    <li>The conversion rate is for demonstration and will be confirmed by an admin upon approval.</li>
-                    <li>Your request will be sent to an administrator for review (usually within 48 hours).</li>
-                    <li>Once approved, your token balance will be debited, and the corresponding value sent to your wallet.</li>
-                </ol>
-            </div>
 
             <div className="bg-emerald-900/50 p-6 rounded-2xl border border-green-800">
                 <form onSubmit={handleSubmit} className="space-y-6">
@@ -94,7 +84,7 @@ const WithdrawPage: React.FC<WithdrawPageProps> = ({ user, onWithdrawSuccess }) 
                             type="number"
                             value={amount}
                             onChange={(e) => setAmount(e.target.value)}
-                            placeholder={`Max: ${user.profile.tokens}`}
+                            placeholder="e.g., 100"
                             required
                             className="mt-1 block w-full h-12 px-3 text-white bg-gray-700/50 border border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-cyan-500 focus:border-cyan-500 sm:text-sm"
                         />
@@ -108,7 +98,7 @@ const WithdrawPage: React.FC<WithdrawPageProps> = ({ user, onWithdrawSuccess }) 
                             type="text"
                             value={walletAddress}
                             onChange={(e) => setWalletAddress(e.target.value)}
-                            placeholder="e.g., T... (TRC20 Address)"
+                            placeholder="Enter your wallet address"
                             required
                             className="mt-1 block w-full h-12 px-3 text-white bg-gray-700/50 border border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-cyan-500 focus:border-cyan-500 sm:text-sm"
                         />

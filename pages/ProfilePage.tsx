@@ -98,6 +98,12 @@ const ProfilePage: React.FC<ProfilePageProps> = ({ user, onLogout, onNavigate })
                         >
                             Purchase History
                         </button>
+                         <button
+                            onClick={() => onNavigate('withdrawalHistory')}
+                            className="px-4 py-2 text-sm font-semibold text-white bg-gray-600 rounded-lg hover:bg-gray-500 transition-colors"
+                        >
+                            Withdrawal History
+                        </button>
                         <button
                             onClick={() => onNavigate('withdraw')}
                             className="px-4 py-2 text-sm font-semibold text-white bg-cyan-600 rounded-lg hover:bg-cyan-700 transition-colors"

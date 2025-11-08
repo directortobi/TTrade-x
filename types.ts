@@ -1,4 +1,8 @@
-import { TRADING_STYLES } from "./constants";
+// --- User & Auth ---
+export interface Credentials {
+    email: string;
+    password: string;
+}
 
 export interface User {
     id: string;
@@ -10,8 +14,6 @@ export interface Profile {
     email: string;
     tokens: number;
     referral_code: string;
-    created_at: string;
-    referrer_id?: string | null;
 }
 
 export interface AppUser {
@@ -19,16 +21,14 @@ export interface AppUser {
     profile: Profile;
 }
 
-export interface Credentials {
-    email: string;
-    password: string;
+// --- Market Data & Assets ---
+export interface Asset {
+    ticker: string;
+    name: string;
+    tradingViewTicker: string;
 }
 
-export interface Asset {
-    ticker: string; // User-facing ticker
-    name: string;
-    tradingViewTicker: string; // Ticker for the TradingView widget
-}
+export type Timeframe = '1min' | '5min' | '15min' | '1hour' | '4hour' | '1day';
 
 export interface Candle {
     datetime: string;
@@ -40,50 +40,24 @@ export interface Candle {
 }
 
 export interface NewsSentiment {
-    score: number; // -10 (very negative) to +10 (very positive)
+    score: number;
     rationale: string;
     articles: { title: string; source: string }[];
 }
 
+// --- Gemini AI Analysis ---
 export enum Signal {
     BUY = 'BUY',
     SELL = 'SELL',
     HOLD = 'HOLD'
 }
 
-export interface Pips {
-    takeProfit: number;
-    stopLoss: number;
-}
-
-export interface IndicatorReadings {
-    rsi: {
-        value: number;
-        interpretation: 'Overbought' | 'Oversold' | 'Neutral' | 'Divergence';
-    };
-    macd: {
-        signal: 'Bullish Crossover' | 'Bearish Crossover' | 'No Crossover';
-    };
-}
-
 export type TrendDirection = 'Bullish' | 'Bearish' | 'Sideways';
 
-export interface AnalysisResult {
-    signal: Signal;
-    entryPrice: number;
-    takeProfit: number;
-    stopLoss: number;
-    rationale: string;
-    pair: string;
-    confidenceLevel: number;
-    pips: Pips;
-    riskRewardRatio: string;
-    support: number;
-    resistance: number;
-    trend: TrendDirection;
-    indicators: IndicatorReadings;
+export interface ImageData {
+    data: string; // base64 encoded string
+    mimeType: string;
 }
-
 
 export interface AnalysisInput {
     pair: string;
@@ -94,14 +68,7 @@ export interface AnalysisInput {
     userAnnotations?: string;
 }
 
-export interface ImageData {
-    data: string; // base64 encoded string
-    mimeType: string;
-}
-
-export type TradingStyle = typeof TRADING_STYLES[number]['id'];
-
-export type Timeframe = '1min' | '5min' | '15min' | '1hour' | '4hour' | '1day';
+export type TradingStyle = 'ict' | 'swing' | 'scalper';
 
 export interface MarketAnalystInput {
     pair: string;
@@ -117,96 +84,34 @@ export interface TimeframeAnalysisInput {
     data: Candle[];
 }
 
-export interface CompoundingLevel {
-  level: number;
-  startBalance: number;
-  profitTarget: number;
-  endBalance: number;
-  risk: number;
+export interface AnalysisResult {
+    signal: Signal;
+    entryPrice: number;
+    takeProfit: number;
+    stopLoss: number;
+    rationale: string;
+    pair: string;
+    confidenceLevel: number;
+    pips: {
+        takeProfit: number;
+        stopLoss: number;
+    };
+    riskRewardRatio: string;
+    support: number;
+    resistance: number;
+    trend: TrendDirection;
+    indicators: {
+        rsi: {
+            value: number;
+            interpretation: 'Overbought' | 'Oversold' | 'Neutral' | 'Divergence';
+        };
+        macd: {
+            signal: 'Bullish Crossover' | 'Bearish Crossover' | 'No Crossover';
+        };
+    };
 }
 
-export interface TradeLog {
-  timestamp: string;
-  level: number;
-  symbol: string;
-  entryPrice: number;
-  result: 'TP Hit' | 'SL Hit';
-  pnl: number;
-  balance: number;
-}
-
-export interface TokenPackage {
-    id: string;
-    name: string;
-    tokens: number;
-    price: number;
-    description: string;
-}
-
-export type TokenPurchaseStatus = 'pending' | 'approved' | 'rejected';
-
-export interface TokenPurchase {
-    id: string;
-    user_id: string;
-    package_name: string;
-    tokens_purchased: number;
-    price_usd: number;
-    payment_proof_url: string;
-    status: TokenPurchaseStatus;
-    created_at: string;
-}
-
-export type EarningStatus = 'pending' | 'approved' | 'rejected';
-
-export interface ReferralEarning {
-    id: number;
-    referrer_id: string;
-    referred_user_id: string;
-    purchase_id: string;
-    purchase_amount: number;
-    commission_amount: number;
-    status: EarningStatus;
-    created_at: string;
-}
-
-export type WithdrawalStatus = 'pending' | 'approved' | 'rejected';
-
-export interface Withdrawal {
-    id: string;
-    user_id: string;
-    tokens_to_withdraw: number;
-    wallet_address: string;
-    status: WithdrawalStatus;
-    created_at: string;
-}
-
-export interface ReferralWithdrawal {
-    id: string;
-    user_id: string;
-    amount_usd: number;
-    wallet_address: string;
-    status: WithdrawalStatus;
-    created_at: string;
-}
-
-export interface PurchaseWithEmail extends TokenPurchase {
-    profiles: {
-        email: string;
-    } | null;
-}
-
-export interface WithdrawalWithEmail extends Withdrawal {
-     profiles: {
-        email:string;
-    } | null;
-}
-
-export interface ReferralWithdrawalWithEmail extends ReferralWithdrawal {
-     profiles: {
-        email: string;
-    } | null;
-}
-
+// --- App Functionality ---
 export type AnalysisOutcome = 'Pending' | 'TP Hit' | 'SL Hit' | 'Cancelled';
 
 export interface AnalysisLog {
@@ -224,31 +129,257 @@ export interface AnalysisLog {
     tokens_used: number;
 }
 
+export interface CompoundingLevel {
+    level: number;
+    startBalance: number;
+    profitTarget: number;
+    endBalance: number;
+    risk: number;
+}
+
+export interface TradeLog {
+    timestamp: string;
+    level: number;
+    symbol: string;
+    entryPrice: number;
+    result: 'TP Hit' | 'SL Hit';
+    pnl: number;
+    balance: number;
+}
+
+// --- Tokens & Purchases ---
+export interface TokenPackage {
+    id: string;
+    name: string;
+    tokens: number;
+    price: number;
+    description: string;
+}
+
+export type TokenPurchaseStatus = 'pending' | 'approved' | 'rejected';
+
+export interface TokenPurchase {
+    id: string;
+    created_at: string;
+    user_id: string;
+    package_name: string;
+    tokens_purchased: number;
+    price_usd: number;
+    payment_proof_url: string;
+    status: TokenPurchaseStatus;
+}
+
+export interface PurchaseWithEmail extends TokenPurchase {
+    profiles: { email: string } | null;
+}
+
+// --- Withdrawals ---
+export type WithdrawalStatus = 'pending' | 'approved' | 'rejected';
+
+export interface Withdrawal {
+    id: string;
+    created_at: string;
+    user_id: string;
+    tokens_to_withdraw: number;
+    wallet_address: string;
+    status: WithdrawalStatus;
+}
+
+export interface WithdrawalWithEmail extends Withdrawal {
+    profiles: { email: string } | null;
+}
+
+// --- Referrals ---
+export type EarningStatus = 'pending' | 'approved' | 'rejected';
+
 export interface ReferredUser {
     id: string;
     email: string;
+}
+
+export interface ReferralEarning {
+    id: string;
     created_at: string;
+    referrer_id: string;
+    referred_user_id: string;
+    purchase_amount: number;
+    commission_amount: number;
+    status: EarningStatus;
 }
 
 export interface ReferralEarningWithEmail extends ReferralEarning {
-    referred_user_profile: {
-        email: string;
-    } | null;
+    referred_user_profile: { email: string } | null;
 }
 
-export type NotificationType = 'signal_buy' | 'signal_sell' | 'purchase_approved' | 'purchase_rejected' | 'withdrawal_approved' | 'withdrawal_rejected' | 'referral_earning' | 'referral_withdrawal_approved' | 'referral_withdrawal_rejected';
+export interface ReferralWithdrawal {
+    id: string;
+    created_at: string;
+    user_id: string;
+    amount_usd: number;
+    wallet_address: string;
+    status: WithdrawalStatus;
+}
+
+export interface ReferralWithdrawalWithEmail extends ReferralWithdrawal {
+    profiles: { email: string } | null;
+}
+
+// --- Notifications ---
+export type NotificationType =
+    | 'signal_high_confidence'
+    | 'purchase_approved'
+    | 'purchase_rejected'
+    | 'withdrawal_approved'
+    | 'withdrawal_rejected'
+    | 'referral_signup'
+    | 'referral_commission'
+    | 'referral_withdrawal_approved'
+    | 'referral_withdrawal_rejected'
+    | 'welcome';
 
 export interface Notification {
     id: number;
-    user_id: string;
     created_at: string;
-    type: NotificationType;
+    user_id: string;
     message: string;
     is_read: boolean;
+    type: NotificationType;
     link: string | null;
 }
 
+// --- Chatbot ---
 export interface ChatMessage {
     role: 'user' | 'model';
     text: string;
+}
+
+// --- Charting ---
+export interface LineSettings {
+    color: string;
+    style: number; // 0=Solid, 1=Dotted, 2=Dashed
+    width: number;
+}
+
+export interface DrawingSettings {
+    trendline: LineSettings;
+    horizontalLine: LineSettings;
+    fibRetracement: LineSettings;
+}
+
+// --- Deriv Trading ---
+export type UiDerivContractType = 'multiplier' | 'higher_lower' | 'reset';
+
+export interface DerivActiveSymbol {
+    allow_forward_starting: number;
+    display_name: string;
+    exchange_is_open: number;
+    is_trading_suspended: number;
+    market: string;
+    market_display_name: string;
+    pip: number;
+    submarket: string;
+    submarket_display_name: string;
+    symbol: string;
+    symbol_type: string;
+}
+
+export interface DerivBalance {
+    balance: number;
+    currency: string;
+    id: string;
+    loginid: string;
+}
+
+export interface DerivContractsForSymbol {
+    available: {
+        barrier_category: string;
+        barriers: number;
+        contract_category: string;
+        contract_category_display: string;
+        contract_display: string;
+        contract_type: string;
+        exchange_name: string;
+        expiry_type: string;
+        market: string;
+        max_contract_duration: string;
+        min_contract_duration: string;
+        sentiment: string;
+        start_type: string;
+        submarket: string;
+        trading_period: object;
+        underlying_symbol: string;
+    }[];
+    close: number;
+    feed_license: string;
+    hit_count: number;
+    id: string;
+    open: number;
+    spot: number;
+}
+
+export interface DerivTick {
+    ask: number;
+    bid: number;
+    epoch: number;
+    id: string;
+    pip_size: number;
+    quote: number;
+    symbol: string;
+}
+
+export interface DerivProposal {
+    ask_price: number;
+    date_start: number;
+    display_value: string;
+    id: string;
+    longcode: string;
+    payout: number;
+    spot: number;
+    spot_time: number;
+}
+
+export interface DerivContract {
+    app_id: number;
+    buy_price: number;
+    contract_id: number;
+    contract_type: string;
+    currency: string;
+    date_start: number;
+    expiry_time: number;
+    longcode: string;
+    payout: number;
+    purchase_time: number;
+    shortcode: string;
+    symbol: string;
+    transaction_id: number;
+}
+
+export interface DerivPortfolio {
+    contracts: DerivContract[];
+}
+
+export interface DerivProfitTableEntry {
+    app_id: number;
+    buy_price: number;
+    contract_id: number;
+    duration_type: string;
+    longcode: string;
+    payout: number;
+    purchase_time: number;
+    sell_price: number;
+    sell_time: number;
+    shortcode: string;
+    transaction_id: number;
+}
+
+export interface DerivTradeParams {
+    symbol: string;
+    contract_type: string;
+    duration: number;
+    duration_unit: 't' | 'm' | 'h' | 'd';
+    stake: number;
+    barrier1?: string;
+    multiplier?: number;
+    stopLoss?: number;
+    takeProfit?: number;
 }
