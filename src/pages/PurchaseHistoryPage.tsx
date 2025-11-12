@@ -3,11 +3,10 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { AppUser, TokenPurchase, TokenPurchaseStatus } from '../types.ts';
 import { getPurchaseHistory } from '../services/tokenService';
 // FIX: Add .tsx extension to import path.
-import { LoadingSpinner } from '../components/LoadingSpinner.tsx';
-// FIX: Add .tsx extension to import path.
 import { ErrorAlert } from '../components/ErrorAlert.tsx';
 // FIX: Add .tsx extension to import path.
 import { View } from '../MainApp.tsx';
+import { TableSkeleton } from '../components/skeletons/TableSkeleton';
 
 interface PurchaseHistoryPageProps {
     user: AppUser;
@@ -47,7 +46,7 @@ const PurchaseHistoryPage: React.FC<PurchaseHistoryPageProps> = ({ user, onNavig
 
     const renderContent = () => {
         if (isLoading) {
-            return <div className="flex justify-center items-center h-64"><LoadingSpinner /></div>;
+            return <TableSkeleton cols={5} />;
         }
         if (error) {
             return <div className="py-16"><ErrorAlert message={error} /></div>;

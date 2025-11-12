@@ -1,13 +1,12 @@
-
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { derivService } from '../services/derivService';
 import { useSignal } from '../contexts/SignalContext';
 // FIX: Add .ts extension to import path.
-import { Signal, DerivActiveSymbol, DerivBalance, DerivProposal, DerivContractsForSymbol, DerivTick, DerivPortfolio, DerivProfitTableEntry, DerivTradeParams, UiDerivContractType } from '../types.ts';
+import { Signal, DerivActiveSymbol, DerivBalance, DerivProposal, DerivContractsForSymbol, DerivTick, DerivPortfolio, DerivProfitTableEntry, DerivTradeParams, UiDerivContractType } from '../types';
 // FIX: Add .tsx extension to import path.
-import { LoadingSpinner } from '../components/LoadingSpinner.tsx';
+import { LoadingSpinner } from '../components/LoadingSpinner';
 // FIX: Add .tsx extension to import path.
-import { ErrorAlert } from '../components/ErrorAlert.tsx';
+import { ErrorAlert } from '../components/ErrorAlert';
 
 const DerivTraderPage: React.FC = () => {
     const [apiToken, setApiToken] = useState('');
@@ -180,39 +179,4 @@ const DerivTraderPage: React.FC = () => {
                         <select value={selectedSymbol} onChange={e => setSelectedSymbol(e.target.value)} className="w-full h-10 pl-3 text-white bg-gray-700 border border-gray-600 rounded-lg">
                             {activeSymbols.map(s => <option key={s.symbol} value={s.symbol}>{s.display_name}</option>)}
                         </select>
-                         <select value={tradeParams.contract_type} onChange={e => setTradeParams({...tradeParams, contract_type: e.target.value})} className="w-full h-10 pl-3 text-white bg-gray-700 border border-gray-600 rounded-lg">
-                           {contracts?.available?.map(c => <option key={c.contract_type} value={c.contract_type}>{c.contract_display}</option>)}
-                        </select>
-                         <input type="number" value={tradeParams.stake} onChange={e => setTradeParams({...tradeParams, stake: parseFloat(e.target.value) || 0})} placeholder="Stake" className="w-full h-10 pl-3 text-white bg-gray-700 border border-gray-600 rounded-lg" />
-                         <div className="flex gap-2">
-                            <input type="number" value={tradeParams.duration} onChange={e => setTradeParams({...tradeParams, duration: parseInt(e.target.value) || 0})} placeholder="Duration" className="w-2/3 h-10 pl-3 text-white bg-gray-700 border border-gray-600 rounded-lg" />
-                            <select value={tradeParams.duration_unit} onChange={e => setTradeParams({...tradeParams, duration_unit: e.target.value as 't'|'m'})} className="w-1/3 h-10 pl-2 text-white bg-gray-700 border border-gray-600 rounded-lg">
-                                <option value="t">Ticks</option>
-                                <option value="m">Minutes</option>
-                            </select>
-                         </div>
-                    </div>
-                    {error && <div className="mt-4"><ErrorAlert message={error} /></div>}
-                     <div className="grid grid-cols-2 gap-4 mt-4">
-                        <button onClick={() => handleBuy(callProposal)} disabled={!callProposal} className="h-20 bg-green-600 text-white font-bold rounded-lg disabled:bg-gray-600/50 flex flex-col items-center justify-center transition-colors">
-                            <span>Higher / Rise</span>
-                            <span className="text-xs font-normal">Payout: ${callProposal?.payout.toFixed(2)}</span>
-                        </button>
-                        <button onClick={() => handleBuy(putProposal)} disabled={!putProposal} className="h-20 bg-red-600 text-white font-bold rounded-lg disabled:bg-gray-600/50 flex flex-col items-center justify-center transition-colors">
-                             <span>Lower / Fall</span>
-                            <span className="text-xs font-normal">Payout: ${putProposal?.payout.toFixed(2)}</span>
-                        </button>
-                    </div>
-                </div>
-                <div className="bg-gray-800/50 p-4 rounded-2xl border border-gray-700">
-                    <h3 className="font-bold text-lg mb-2">Open Positions</h3>
-                    <div className="overflow-x-auto max-h-64">
-                         <table className="w-full text-sm">
-                             <thead><tr className="text-left text-gray-400"><th className="p-2">Contract</th><th className="p-2">Buy Price</th><th className="p-2">Current Price</th><th className="p-2">Profit/Loss</th><th className="p-2"></th></tr></thead>
-                             <tbody>
-                                {portfolio?.contracts.map(c => (
-                                    <tr key={c.contract_id} className="border-t border-gray-700">
-                                        <td className="p-2">{c.longcode}</td>
-                                        <td className="p-2">${c.buy_price.toFixed(2)}</td>
-                                        <td className="p-2">${c.bid_price.toFixed(2)}</td>
-                                        <td className={`p-2 font-semibold ${c
+                         <select value={tradeParams.contract_type} onChange={

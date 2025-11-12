@@ -95,8 +95,7 @@ export const MainApp: React.FC<{ session: Session }> = ({ session }) => {
             case 'dashboard':
                 return <DashboardPage {...pageProps} />;
             case 'market_analyst':
-                // FIX: Pass onNavigate prop to MarketAnalystPage
-                return <MarketAnalystPage user={user} onTokenUsed={handleTokenUpdate} onNavigate={setView} />;
+                return <MarketAnalystPage {...pageProps} onTokenUsed={handleTokenUpdate} />;
             case 'image_analyst':
                  return <ImageAnalyzer {...pageProps} onTokenUsed={handleTokenUpdate} onNavigate={setView}/>;
             case 'chart':

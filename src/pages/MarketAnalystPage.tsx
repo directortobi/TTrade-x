@@ -151,6 +151,16 @@ const MarketAnalystPage: React.FC<MarketAnalystPageProps> = ({ user, onTokenUsed
         return `Get a focused technical analysis for the ${currentMode?.name} timeframe.`
     }
 
+    if (loadingStep) {
+        return (
+            <div className="max-w-3xl mx-auto flex flex-col items-center justify-center text-center pt-16">
+                <CandlestickSpinner />
+                <p className="text-xl text-gray-300 mt-6 animate-pulse font-semibold">{loadingStep}</p>
+                <p className="text-gray-500 mt-2">Please wait, this can take up to 30 seconds.</p>
+            </div>
+        );
+    }
+
     if (analysisResult) {
         // FIX: Pass the onNavigate prop to the ResultsPage component.
         return <ResultsPage result={analysisResult} onGoBack={handleReset} onNavigate={onNavigate} />;
@@ -201,19 +211,11 @@ const MarketAnalystPage: React.FC<MarketAnalystPageProps> = ({ user, onTokenUsed
                         disabled={!!loadingStep}
                         className="w-full h-14 px-6 text-lg text-white font-semibold bg-green-600 rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition-all duration-300 disabled:bg-gray-600 disabled:cursor-not-allowed flex items-center justify-center"
                     >
-                        {loadingStep ? <CandlestickSpinner /> : 'Analyze Market (1 Token)'}
+                        Analyze Market (1 Token)
                     </button>
                 </div>
             </div>
-            <div className="mt-10 max-w-3xl mx-auto">
-                {error && <ErrorAlert message={error} />}
-                {loadingStep && (
-                    <div className="text-center p-8 flex flex-col items-center justify-center">
-                        <CandlestickSpinner />
-                        <p className="text-lg text-gray-300 mt-4 animate-pulse">{loadingStep}</p>
-                    </div>
-                )}
-            </div>
+             {error && <div className="mt-4"><ErrorAlert message={error} /></div>}
          </div>
     );
 };

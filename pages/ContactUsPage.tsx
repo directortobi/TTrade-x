@@ -1,9 +1,8 @@
-
 import React, { useState } from 'react';
 // FIX: Add .ts extension to import path.
-import { AppUser } from '../types.ts';
+import { AppUser } from '../types';
 // FIX: Add .tsx extension to import path.
-import { LoadingSpinner } from '../components/LoadingSpinner.tsx';
+import { LoadingSpinner } from '../components/LoadingSpinner';
 
 interface ContactUsPageProps {
     user: AppUser;

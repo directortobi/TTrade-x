@@ -1,12 +1,12 @@
-
 import { GoogleGenAI, Type } from "@google/genai";
 // FIX: Add .ts extension to import path.
-import { AnalysisInput, AnalysisResult, Signal, ImageData, MarketAnalystInput, TradingStyle, TimeframeAnalysisInput, Timeframe } from '../types.ts';
+import { AnalysisInput, AnalysisResult, Signal, ImageData, MarketAnalystInput, TradingStyle, TimeframeAnalysisInput, Timeframe } from '../types';
 
 // The API key is loaded from environment variables.
 // The key should be set as API_KEY in your deployment environment.
 // Safely access the API key to prevent "process is not defined" errors in the browser.
-const geminiApiKey = (typeof process !== 'undefined' && process.env && process.env.API_KEY) ? process.env.API_KEY : undefined;
+// FIX: Use process.env.API_KEY directly as per guidelines.
+const geminiApiKey = process.env.API_KEY;
 
 export const isGeminiConfigured = !!geminiApiKey;
 

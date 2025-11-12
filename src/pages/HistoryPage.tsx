@@ -3,9 +3,8 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { AppUser, AnalysisLog, Signal, AnalysisOutcome } from '../types.ts';
 import { logService } from '../services/logService';
 // FIX: Add .tsx extension to import path.
-import { LoadingSpinner } from '../components/LoadingSpinner.tsx';
-// FIX: Add .tsx extension to import path.
 import { ErrorAlert } from '../components/ErrorAlert.tsx';
+import { TableSkeleton } from '../components/skeletons/TableSkeleton';
 
 interface HistoryPageProps {
     user: AppUser;
@@ -80,7 +79,7 @@ const HistoryPage: React.FC<HistoryPageProps> = ({ user }) => {
 
     const renderContent = () => {
         if (isLoading) {
-            return <div className="flex justify-center items-center h-64"><LoadingSpinner /></div>;
+            return <TableSkeleton cols={10} />;
         }
         if (logs.length === 0 && !error) {
             return <p className="text-center text-gray-400 py-16">You have no analysis history yet. Perform an analysis to get started!</p>;

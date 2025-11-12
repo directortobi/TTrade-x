@@ -6,6 +6,7 @@ import { PurchaseWithEmail, WithdrawalWithEmail, ReferralWithdrawalWithEmail } f
 import { LoadingSpinner } from '../components/LoadingSpinner.tsx';
 // FIX: Add .tsx extension to import path.
 import { ErrorAlert } from '../components/ErrorAlert.tsx';
+import { TableSkeleton } from '../components/skeletons/TableSkeleton';
 
 
 const AdminPage: React.FC = () => {
@@ -181,7 +182,7 @@ const AdminPage: React.FC = () => {
                     </button>
                 </div>
                 {isLoading.purchases ? (
-                    <div className="flex justify-center items-center h-48"><LoadingSpinner /></div>
+                    <TableSkeleton cols={7} />
                 ) : purchases.length === 0 ? (
                     <p className="text-center text-gray-400 py-12">No pending purchase requests.</p>
                 ) : (
@@ -236,7 +237,7 @@ const AdminPage: React.FC = () => {
                     </button>
                 </div>
                  {isLoading.referralWithdrawals ? (
-                    <div className="flex justify-center items-center h-48"><LoadingSpinner /></div>
+                    <TableSkeleton cols={5} />
                 ) : referralWithdrawals.length === 0 ? (
                     <p className="text-center text-gray-400 py-12">No pending referral withdrawal requests.</p>
                 ) : (
@@ -283,7 +284,7 @@ const AdminPage: React.FC = () => {
                     </button>
                 </div>
                  {isLoading.withdrawals ? (
-                    <div className="flex justify-center items-center h-48"><LoadingSpinner /></div>
+                    <TableSkeleton cols={5} />
                 ) : withdrawals.length === 0 ? (
                     <p className="text-center text-gray-400 py-12">No pending token withdrawal requests.</p>
                 ) : (

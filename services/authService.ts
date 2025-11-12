@@ -1,6 +1,5 @@
-
 // FIX: Add .ts extension to import path.
-import { User, Credentials } from '../types.ts';
+import { User, Credentials } from '../types';
 import { supabase } from './supabase';
 
 export const authService = {

@@ -3,9 +3,8 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { AppUser, Withdrawal, ReferralWithdrawal, WithdrawalStatus } from '../types.ts';
 import { withdrawalService } from '../services/withdrawalService';
 // FIX: Add .tsx extension to import path.
-import { LoadingSpinner } from '../components/LoadingSpinner.tsx';
-// FIX: Add .tsx extension to import path.
 import { ErrorAlert } from '../components/ErrorAlert.tsx';
+import { TableSkeleton } from '../components/skeletons/TableSkeleton';
 
 interface WithdrawalHistoryPageProps {
     user: AppUser;
@@ -112,20 +111,15 @@ const WithdrawalHistoryPage: React.FC<WithdrawalHistoryPageProps> = ({ user }) =
                 </button>
             </div>
             {error && <ErrorAlert message={error} />}
-            {isLoading ? (
-                <div className="flex justify-center items-center h-64"><LoadingSpinner /></div>
-            ) : (
-                <>
-                    <div className="bg-blue-900/50 p-4 sm:p-6 rounded-2xl border border-blue-800">
-                        <h2 className="text-xl font-semibold text-sky-300 mb-4">Token Withdrawals</h2>
-                        {tokenWithdrawals.length > 0 ? renderTokenHistory() : <p className="text-center text-gray-400 py-8">No token withdrawal history found.</p>}
-                    </div>
-                    <div className="bg-blue-900/50 p-4 sm:p-6 rounded-2xl border border-blue-800">
-                        <h2 className="text-xl font-semibold text-sky-300 mb-4">Referral Earnings Withdrawals</h2>
-                         {referralWithdrawals.length > 0 ? renderReferralHistory() : <p className="text-center text-gray-400 py-8">No referral earnings withdrawal history found.</p>}
-                    </div>
-                </>
-            )}
+            
+            <div className="bg-blue-900/50 p-4 sm:p-6 rounded-2xl border border-blue-800">
+                <h2 className="text-xl font-semibold text-sky-300 mb-4">Token Withdrawals</h2>
+                {isLoading ? <TableSkeleton cols={4} /> : (tokenWithdrawals.length > 0 ? renderTokenHistory() : <p className="text-center text-gray-400 py-8">No token withdrawal history found.</p>)}
+            </div>
+            <div className="bg-blue-900/50 p-4 sm:p-6 rounded-2xl border border-blue-800">
+                <h2 className="text-xl font-semibold text-sky-300 mb-4">Referral Earnings Withdrawals</h2>
+                 {isLoading ? <TableSkeleton cols={4} /> : (referralWithdrawals.length > 0 ? renderReferralHistory() : <p className="text-center text-gray-400 py-8">No referral earnings withdrawal history found.</p>)}
+            </div>
         </div>
     )
 }

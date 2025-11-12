@@ -1,24 +1,25 @@
-
 import React, { useState, useCallback } from 'react';
 // FIX: Add .tsx extension to import path.
-import { AssetSelector } from '../components/results/ForexSelector.tsx';
+import { AssetSelector } from '../components/results/ForexSelector';
 // FIX: Add .tsx extension to import path.
-import { ErrorAlert } from '../components/ErrorAlert.tsx';
+import { ErrorAlert } from '../components/ErrorAlert';
 import { ResultsPage } from './ResultsPage';
 import { getMarketAnalystPrediction, getTimeframeAnalysis } from '../services/geminiService';
 import { fetchCandlestickData } from '../services/marketDataService';
 import { useTokenForAnalysis } from '../services/tokenService';
 import { logService } from '../services/logService';
 // FIX: Add .ts extension to import path.
-import { AnalysisResult, AppUser, Asset, TradingStyle, Timeframe, Signal } from '../types.ts';
+import { AnalysisResult, AppUser, Asset, TradingStyle, Timeframe, Signal, View } from '../types';
 // FIX: Add .ts extension to import path.
-import { AVAILABLE_ASSETS, TRADING_STYLES } from '../constants.ts';
+import { AVAILABLE_ASSETS, TRADING_STYLES } from '../constants';
 // FIX: Add .tsx extension to import path.
-import { CandlestickSpinner } from '../components/CandlestickSpinner.tsx';
+import { CandlestickSpinner } from '../components/CandlestickSpinner';
 
 interface MarketAnalystPageProps {
     user: AppUser;
     onTokenUsed: (newBalance: number) => void;
+    // FIX: Add onNavigate to props
+    onNavigate: (view: View) => void;
 }
 
 type AnalysisMode = 'expert' | Timeframe;
@@ -59,7 +60,7 @@ const TradingStyleSelector: React.FC<{
 );
 
 
-const MarketAnalystPage: React.FC<MarketAnalystPageProps> = ({ user, onTokenUsed }) => {
+const MarketAnalystPage: React.FC<MarketAnalystPageProps> = ({ user, onTokenUsed, onNavigate }) => {
     const [mode, setMode] = useState<AnalysisMode>('expert');
     const [selectedAsset, setSelectedAsset] = useState<Asset>(AVAILABLE_ASSETS[0]);
     const [tradingStyle, setTradingStyle] = useState<TradingStyle>(TRADING_STYLES[0].id);
@@ -151,7 +152,8 @@ const MarketAnalystPage: React.FC<MarketAnalystPageProps> = ({ user, onTokenUsed
     }
 
     if (analysisResult) {
-        return <ResultsPage result={analysisResult} onGoBack={handleReset} />;
+        // FIX: Pass onNavigate prop to ResultsPage
+        return <ResultsPage result={analysisResult} onGoBack={handleReset} onNavigate={onNavigate} />;
     }
 
     return (

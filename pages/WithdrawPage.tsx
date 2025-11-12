@@ -1,12 +1,11 @@
-
 import React, { useState } from 'react';
 // FIX: Add .ts extension to import path.
-import { AppUser } from '../types.ts';
+import { AppUser } from '../types';
 import { withdrawalService } from '../services/withdrawalService';
 // FIX: Add .tsx extension to import path.
-import { LoadingSpinner } from '../components/LoadingSpinner.tsx';
+import { LoadingSpinner } from '../components/LoadingSpinner';
 // FIX: Add .tsx extension to import path.
-import { ErrorAlert } from '../components/ErrorAlert.tsx';
+import { ErrorAlert } from '../components/ErrorAlert';
 
 interface WithdrawPageProps {
     user: AppUser;

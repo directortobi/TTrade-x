@@ -6,6 +6,8 @@ import { referralService } from '../services/referralService';
 import { LoadingSpinner } from '../components/LoadingSpinner.tsx';
 // FIX: Add .tsx extension to import path.
 import { ErrorAlert } from '../components/ErrorAlert.tsx';
+import { StatCardSkeleton } from '../components/skeletons/StatCardSkeleton';
+import { TableSkeleton } from '../components/skeletons/TableSkeleton';
 
 interface ReferralPageProps {
     user: AppUser;
@@ -113,10 +115,6 @@ const ReferralPage: React.FC<ReferralPageProps> = ({ user }) => {
         }
     };
 
-    if (isLoading) {
-        return <div className="flex justify-center items-center h-64"><LoadingSpinner /></div>;
-    }
-
     return (
         <div className="max-w-7xl mx-auto animate-fade-in space-y-8">
             <div>
@@ -129,9 +127,19 @@ const ReferralPage: React.FC<ReferralPageProps> = ({ user }) => {
             {error && <ErrorAlert message={error} />}
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <StatCard title="Total Referrals" value={stats.totalReferrals} icon={<UsersIcon />} />
-                <StatCard title="Pending Earnings" value={`$${stats.pendingEarnings.toFixed(2)}`} icon={<ClockIcon />} />
-                <StatCard title="Available for Withdrawal" value={`$${stats.availableEarnings.toFixed(2)}`} icon={<WalletIcon />} />
+                {isLoading ? (
+                    <>
+                        <StatCardSkeleton />
+                        <StatCardSkeleton />
+                        <StatCardSkeleton />
+                    </>
+                ) : (
+                    <>
+                        <StatCard title="Total Referrals" value={stats.totalReferrals} icon={<UsersIcon />} />
+                        <StatCard title="Pending Earnings" value={`$${stats.pendingEarnings.toFixed(2)}`} icon={<ClockIcon />} />
+                        <StatCard title="Available for Withdrawal" value={`$${stats.availableEarnings.toFixed(2)}`} icon={<WalletIcon />} />
+                    </>
+                )}
             </div>
 
             <div className="bg-gray-800/50 p-6 rounded-2xl border border-gray-700">
@@ -149,15 +157,17 @@ const ReferralPage: React.FC<ReferralPageProps> = ({ user }) => {
                 <div className="lg:col-span-2 bg-gray-800/50 p-6 rounded-2xl border border-gray-700">
                     <div className="flex border-b border-gray-700 mb-4">
                         <button onClick={() => setActiveTab('referrals')} className={`px-4 py-2 font-medium text-sm transition-colors ${activeTab === 'referrals' ? 'text-cyan-400 border-b-2 border-cyan-400' : 'text-gray-400 hover:text-white'}`}>
-                            My Referrals ({referredUsers.length})
+                            My Referrals ({isLoading ? '...' : referredUsers.length})
                         </button>
                         <button onClick={() => setActiveTab('earnings')} className={`px-4 py-2 font-medium text-sm transition-colors ${activeTab === 'earnings' ? 'text-cyan-400 border-b-2 border-cyan-400' : 'text-gray-400 hover:text-white'}`}>
-                            Earnings History ({earningsHistory.length})
+                            Earnings History ({isLoading ? '...' : earningsHistory.length})
                         </button>
                     </div>
 
                     <div className="overflow-x-auto max-h-[60vh]">
-                    {activeTab === 'referrals' && (
+                    {isLoading ? (
+                        <TableSkeleton cols={activeTab === 'referrals' ? 1 : 5} />
+                    ) : activeTab === 'referrals' ? (
                         <table className="w-full text-sm text-left text-gray-300">
                             <thead className="text-xs text-gray-400 uppercase bg-gray-900/70 sticky top-0">
                                 <tr><th scope="col" className="px-4 py-3">User Email</th></tr>
@@ -168,8 +178,7 @@ const ReferralPage: React.FC<ReferralPageProps> = ({ user }) => {
                                 )) : <tr><td className="px-4 py-10 text-center text-gray-500">No users have signed up with your code yet.</td></tr>}
                             </tbody>
                         </table>
-                    )}
-                     {activeTab === 'earnings' && (
+                    ) : (
                         <table className="w-full min-w-[600px] text-sm text-left text-gray-300">
                             <thead className="text-xs text-gray-400 uppercase bg-gray-900/70 sticky top-0">
                                 <tr>
@@ -222,7 +231,7 @@ const ReferralPage: React.FC<ReferralPageProps> = ({ user }) => {
                             />
                          </div>
                          <div className="pt-2">
-                             <button type="submit" disabled={isWithdrawing || stats.availableEarnings <= 0}
+                             <button type="submit" disabled={isWithdrawing || stats.availableEarnings <= 0 || isLoading}
                                 className="w-full h-12 flex justify-center items-center text-white font-semibold bg-cyan-600 rounded-lg hover:bg-cyan-700 disabled:bg-gray-600 disabled:cursor-not-allowed">
                                 {isWithdrawing ? <LoadingSpinner /> : 'Request Withdrawal'}
                             </button>
