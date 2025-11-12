@@ -1,7 +1,7 @@
 {
   "appId": "com.tradex.app",
   "appName": "Trade X",
-  "webDir": ".",
+  "webDir": "dist",
   "server": {
     "androidScheme": "https"
   }

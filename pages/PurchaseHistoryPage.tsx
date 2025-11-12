@@ -1,9 +1,14 @@
+
 import React, { useState, useEffect, useCallback } from 'react';
-import { AppUser, TokenPurchase, TokenPurchaseStatus } from '../types';
+// FIX: Add .ts extension to import path.
+import { AppUser, TokenPurchase, TokenPurchaseStatus } from '../types.ts';
 import { getPurchaseHistory } from '../services/tokenService';
-import { LoadingSpinner } from '../components/LoadingSpinner';
-import { ErrorAlert } from '../components/ErrorAlert';
-import { View } from '../MainApp';
+// FIX: Add .tsx extension to import path.
+import { LoadingSpinner } from '../components/LoadingSpinner.tsx';
+// FIX: Add .tsx extension to import path.
+import { ErrorAlert } from '../components/ErrorAlert.tsx';
+// FIX: Add .tsx extension to import path.
+import { View } from '../MainApp.tsx';
 
 interface PurchaseHistoryPageProps {
     user: AppUser;

@@ -1,5 +1,7 @@
+
 import { supabase } from './supabase';
-import { Withdrawal, ReferralWithdrawal } from '../types';
+// FIX: Add .ts extension to import path.
+import { Withdrawal, ReferralWithdrawal } from '../types.ts';
 
 interface WithdrawalRequest {
     userId: string;

@@ -1,5 +1,7 @@
+
 import { supabase } from './supabase';
-import { AnalysisLog, AnalysisOutcome, AnalysisResult } from '../types';
+// FIX: Add .ts extension to import path.
+import { AnalysisLog, AnalysisOutcome, AnalysisResult } from '../types.ts';
 
 export const logService = {
     async createLog(result: AnalysisResult, userEmail: string, tokensUsed: number, userId: string): Promise<void> {

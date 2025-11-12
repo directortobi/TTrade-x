@@ -1,5 +1,7 @@
+
 import { supabase } from './supabase';
-import { DrawingSettings } from '../types';
+// FIX: Add .ts extension to import path.
+import { DrawingSettings } from '../types.ts';
 
 export const settingsService = {
     async saveSettings(userId: string, settings: DrawingSettings): Promise<void> {

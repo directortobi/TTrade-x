@@ -1,8 +1,5 @@
 {
   "name": "Trade X",
   "description": "An AI-powered application that analyzes market data and charts to provide trading signals for forex, commodities, and crypto.",
-  "requestFramePermissions": [
-    "camera"
-  ],
-  "prompt": ""
+  "requestFramePermissions": []
 }

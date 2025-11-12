@@ -1,14 +1,20 @@
+
 import React, { useState, useCallback } from 'react';
-import { AssetSelector } from '../components/results/ForexSelector';
-import { ErrorAlert } from '../components/ErrorAlert';
+// FIX: Add .tsx extension to import path.
+import { AssetSelector } from '../components/results/ForexSelector.tsx';
+// FIX: Add .tsx extension to import path.
+import { ErrorAlert } from '../components/ErrorAlert.tsx';
 import { ResultsPage } from './ResultsPage';
 import { getMarketAnalystPrediction, getTimeframeAnalysis } from '../services/geminiService';
 import { fetchCandlestickData } from '../services/marketDataService';
 import { useTokenForAnalysis } from '../services/tokenService';
 import { logService } from '../services/logService';
-import { AnalysisResult, AppUser, Asset, TradingStyle, Timeframe, Signal } from '../types';
-import { AVAILABLE_ASSETS, TRADING_STYLES } from '../constants';
-import { CandlestickSpinner } from '../components/CandlestickSpinner';
+// FIX: Add .ts extension to import path.
+import { AnalysisResult, AppUser, Asset, TradingStyle, Timeframe, Signal } from '../types.ts';
+// FIX: Add .ts extension to import path.
+import { AVAILABLE_ASSETS, TRADING_STYLES } from '../constants.ts';
+// FIX: Add .tsx extension to import path.
+import { CandlestickSpinner } from '../components/CandlestickSpinner.tsx';
 
 interface MarketAnalystPageProps {
     user: AppUser;

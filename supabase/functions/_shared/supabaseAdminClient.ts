@@ -1,4 +1,4 @@
-// FIX: Add Deno to global scope for TypeScript to avoid "Cannot find name 'Deno'" error.
+
 declare const Deno: any;
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'

@@ -1,5 +1,7 @@
+
 import { GoogleGenAI, Type } from "@google/genai";
-import { AnalysisInput, AnalysisResult, Signal, ImageData, MarketAnalystInput, TradingStyle, TimeframeAnalysisInput, Timeframe } from '../types';
+// FIX: Add .ts extension to import path.
+import { AnalysisInput, AnalysisResult, Signal, ImageData, MarketAnalystInput, TradingStyle, TimeframeAnalysisInput, Timeframe } from '../types.ts';
 
 // The API key is loaded from environment variables.
 // The key should be set as API_KEY in your deployment environment.

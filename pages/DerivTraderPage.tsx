@@ -1,9 +1,13 @@
+
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { derivService } from '../services/derivService';
 import { useSignal } from '../contexts/SignalContext';
-import { Signal, DerivActiveSymbol, DerivBalance, DerivProposal, DerivContractsForSymbol, DerivTick, DerivPortfolio, DerivProfitTableEntry, DerivTradeParams, UiDerivContractType } from '../types';
-import { LoadingSpinner } from '../components/LoadingSpinner';
-import { ErrorAlert } from '../components/ErrorAlert';
+// FIX: Add .ts extension to import path.
+import { Signal, DerivActiveSymbol, DerivBalance, DerivProposal, DerivContractsForSymbol, DerivTick, DerivPortfolio, DerivProfitTableEntry, DerivTradeParams, UiDerivContractType } from '../types.ts';
+// FIX: Add .tsx extension to import path.
+import { LoadingSpinner } from '../components/LoadingSpinner.tsx';
+// FIX: Add .tsx extension to import path.
+import { ErrorAlert } from '../components/ErrorAlert.tsx';
 
 const DerivTraderPage: React.FC = () => {
     const [apiToken, setApiToken] = useState('');
@@ -56,8 +60,8 @@ const DerivTraderPage: React.FC = () => {
             },
             onProfitTable: (table) => setProfitTable(table),
             // FIX: Handle `unknown` error type by converting it to a string before setting state, and ensure signature matches service contract.
-            onError: (err: unknown) => {
-                setError(String(err));
+            onError: (err: string) => {
+                setError(err);
                 setIsLoading(false);
                 setIsConnected(false);
             },
@@ -155,9 +159,9 @@ const DerivTraderPage: React.FC = () => {
         );
     }
     
-    // FIX: Use optional chaining `?.` to safely access `contract_type` on potentially null objects.
-    const callProposal = Object.values(proposals).find(p => p?.contract_type === 'CALL');
-    const putProposal = Object.values(proposals).find(p => p?.contract_type === 'PUT');
+    // FIX: Use optional chaining ?. to safely access contract_type on potentially null objects.
+    const callProposal = Object.values(proposals).find((p): p is DerivProposal => p?.contract_type === 'CALL');
+    const putProposal = Object.values(proposals).find((p): p is DerivProposal => p?.contract_type === 'PUT');
 
     return (
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6 animate-fade-in">
@@ -211,46 +215,4 @@ const DerivTraderPage: React.FC = () => {
                                         <td className="p-2">{c.longcode}</td>
                                         <td className="p-2">${c.buy_price.toFixed(2)}</td>
                                         <td className="p-2">${c.bid_price.toFixed(2)}</td>
-                                        <td className={`p-2 font-semibold ${c.profit > 0 ? 'text-green-400' : 'text-red-400'}`}>{c.profit > 0 ? '+':''}${c.profit.toFixed(2)}</td>
-                                        <td className="p-2 text-right"><button onClick={() => handleSell(c.contract_id)} disabled={!c.is_valid_to_sell} className="px-2 py-1 text-xs bg-gray-600 rounded hover:bg-gray-500 disabled:opacity-50">Sell</button></td>
-                                    </tr>
-                                ))}
-                                {(!portfolio || portfolio.contracts.length === 0) && <tr><td colSpan={5} className="text-center p-4 text-gray-500">No open positions.</td></tr>}
-                             </tbody>
-                         </table>
-                    </div>
-                </div>
-            </div>
-            {/* Right Column */}
-            <div className="lg:col-span-1 space-y-6">
-                 <div className="bg-gray-800/50 p-4 rounded-xl border border-gray-700 text-center">
-                    <p className="text-sm text-gray-400">{selectedSymbol}</p>
-                    <p className={`text-4xl font-mono font-bold transition-colors ${tick && tick.quote > (tick.bid || 0) ? 'text-green-400' : 'text-red-400'}`}>{tick?.quote}</p>
-                </div>
-                <div className="bg-gray-800/50 p-4 rounded-2xl border border-gray-700">
-                    <h3 className="font-bold text-lg mb-2">Recent Trades</h3>
-                    <div className="overflow-y-auto max-h-96">
-                        <table className="w-full text-sm">
-                             <tbody>
-                                {profitTable.map(t => (
-                                     <tr key={t.contract_id} className="border-b border-gray-700 last:border-0">
-                                        <td className="p-2">
-                                            <p className="font-medium">{t.longcode.split('_')[0]}</p>
-                                            <p className="text-xs text-gray-500">{new Date(t.sell_time * 1000).toLocaleTimeString()}</p>
-                                        </td>
-                                        <td className={`p-2 text-right font-semibold ${t.profit_loss > 0 ? 'text-green-400' : 'text-red-400'}`}>
-                                            {t.profit_loss > 0 ? '+':''}${t.profit_loss.toFixed(2)}
-                                        </td>
-                                     </tr>
-                                ))}
-                                 {profitTable.length === 0 && <tr><td colSpan={2} className="text-center p-4 text-gray-500">No recent trade history.</td></tr>}
-                             </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
-};
-
-export default DerivTraderPage;
+                                        <td className={`p-2 font-semibold ${c

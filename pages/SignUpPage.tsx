@@ -1,8 +1,13 @@
+
 import React, { useState, useEffect } from 'react';
-import { Credentials } from '../types';
-import { LoadingSpinner } from '../components/LoadingSpinner';
-import { SupabaseLogo } from '../components/icons/SupabaseLogo';
-import { AppLogo } from '../components/AppLogo';
+// FIX: Add .ts extension to import path.
+import { Credentials } from '../types.ts';
+// FIX: Add .tsx extension to import path.
+import { LoadingSpinner } from '../components/LoadingSpinner.tsx';
+// FIX: Add .tsx extension to import path.
+import { SupabaseLogo } from '../components/icons/SupabaseLogo.tsx';
+// FIX: Add .tsx extension to import path.
+import { AppLogo } from '../components/AppLogo.tsx';
 
 interface SignUpPageProps {
     onSignUp: (credentials: Credentials) => Promise<void>;

@@ -1,4 +1,4 @@
-// FIX: Add Deno to global scope for TypeScript to avoid "Cannot find name 'Deno'" error.
+
 declare const Deno: any;
 
 import { serve } from 'https://deno.land/std@0.177.0/http/server.ts'

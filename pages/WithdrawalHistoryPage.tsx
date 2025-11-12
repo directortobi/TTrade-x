@@ -1,8 +1,12 @@
+
 import React, { useState, useEffect, useCallback } from 'react';
-import { AppUser, Withdrawal, ReferralWithdrawal, WithdrawalStatus } from '../types';
+// FIX: Add .ts extension to import path.
+import { AppUser, Withdrawal, ReferralWithdrawal, WithdrawalStatus } from '../types.ts';
 import { withdrawalService } from '../services/withdrawalService';
-import { LoadingSpinner } from '../components/LoadingSpinner';
-import { ErrorAlert } from '../components/ErrorAlert';
+// FIX: Add .tsx extension to import path.
+import { LoadingSpinner } from '../components/LoadingSpinner.tsx';
+// FIX: Add .tsx extension to import path.
+import { ErrorAlert } from '../components/ErrorAlert.tsx';
 
 interface WithdrawalHistoryPageProps {
     user: AppUser;

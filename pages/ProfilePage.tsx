@@ -1,8 +1,12 @@
+
 import React, { useState } from 'react';
-import { AppUser } from '../types';
+// FIX: Add .ts extension to import path.
+import { AppUser } from '../types.ts';
 import { authService } from '../services/authService';
-import { LoadingSpinner } from '../components/LoadingSpinner';
-import { View } from '../MainApp';
+// FIX: Add .tsx extension to import path.
+import { LoadingSpinner } from '../components/LoadingSpinner.tsx';
+// FIX: Add .tsx extension to import path.
+import { View } from '../MainApp.tsx';
 
 interface ProfilePageProps {
     user: AppUser;

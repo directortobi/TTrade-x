@@ -1,8 +1,12 @@
+
 import React, { useState, useEffect, useCallback } from 'react';
-import { AppUser, AnalysisLog, Signal, AnalysisOutcome } from '../types';
+// FIX: Add .ts extension to import path.
+import { AppUser, AnalysisLog, Signal, AnalysisOutcome } from '../types.ts';
 import { logService } from '../services/logService';
-import { LoadingSpinner } from '../components/LoadingSpinner';
-import { ErrorAlert } from '../components/ErrorAlert';
+// FIX: Add .tsx extension to import path.
+import { LoadingSpinner } from '../components/LoadingSpinner.tsx';
+// FIX: Add .tsx extension to import path.
+import { ErrorAlert } from '../components/ErrorAlert.tsx';
 
 interface HistoryPageProps {
     user: AppUser;

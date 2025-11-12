@@ -5,31 +5,22 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Trade X</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-      tailwind.config = {
-        darkMode: 'class',
-      }
-    </script>
-    
   <script type="importmap">
 {
   "imports": {
-    "react": "https://esm.sh/react@^18.2.0",
-    "react-dom/client": "https://esm.sh/react-dom@^18.2.0/client",
-    "@google/genai": "https://esm.sh/@google/genai@^1.11.0",
-    "@supabase/supabase-js": "https://esm.sh/@supabase/supabase-js@^2.43.4",
-    "react-dom/": "https://esm.sh/react-dom@^18.2.0/",
-    "react/": "https://esm.sh/react@^18.2.0/",
-    "lightweight-charts": "https://esm.sh/lightweight-charts@4.1.0",
-    "javascript-time-ago": "https://esm.sh/javascript-time-ago@2.5.10",
-    "javascript-time-ago/": "https://esm.sh/javascript-time-ago@2.5.10/"
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.29.0",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+    "@supabase/supabase-js": "https://aistudiocdn.com/@supabase/supabase-js@^2.81.1",
+    "@vitejs/plugin-react": "https://aistudiocdn.com/@vitejs/plugin-react@^5.1.0",
+    "vite": "https://aistudiocdn.com/vite@^7.2.2",
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "react": "https://aistudiocdn.com/react@^19.2.0"
   }
 }
 </script>
 </head>
-  <body class="bg-blue-950">
+  <body class="bg-gray-900 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
     <div id="root"></div>
-    <script type="module" src="/index.tsx"></script>
+    <script type="module" src="/src/index.tsx"></script>
   </body>
 </html>
