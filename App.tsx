@@ -1,7 +1,8 @@
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { AppUser, Credentials } from './types';
 import { authService } from './services/authService';
-import { supabase, isSupabaseConfigured } from './services/supabase';
+import { initializeSupabase, isSupabaseConfigured, supabase } from './services/supabase';
 import { LoginPage } from './pages/LoginPage';
 import { SignUpPage } from './pages/SignUpPage';
 import MainApp from './MainApp';
@@ -14,6 +15,7 @@ import { SignalProvider } from './contexts/SignalContext';
 type AuthPage = 'login' | 'signup';
 
 const App: React.FC = () => {
+    const [isAppInitialized, setIsAppInitialized] = useState<boolean>(false);
     const [user, setUser] = useState<AppUser | null>(null);
     const [authPage, setAuthPage] = useState<AuthPage>('login');
     const [isLoadingUser, setIsLoadingUser] = useState<boolean>(true);
@@ -21,6 +23,14 @@ const App: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
     const [signupSuccessMessage, setSignupSuccessMessage] = useState<string | null>(null);
     
+    useEffect(() => {
+        const initializeApp = async () => {
+            await initializeSupabase();
+            setIsAppInitialized(true);
+        };
+        initializeApp();
+    }, []);
+
     useEffect(() => {
         // This effect runs once on app load to capture a referral code from the URL
         const urlParams = new URLSearchParams(window.location.search);
@@ -32,10 +42,11 @@ const App: React.FC = () => {
     }, []);
 
     useEffect(() => {
-        if (!isSupabaseConfigured) {
-            setIsLoadingUser(false);
+        if (!isAppInitialized || !isSupabaseConfigured) {
+            if (isAppInitialized) setIsLoadingUser(false);
             return;
         }
+
         setIsLoadingUser(true);
         const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
             if (session?.user) {
@@ -75,7 +86,7 @@ const App: React.FC = () => {
         return () => {
             subscription?.unsubscribe();
         };
-    }, []);
+    }, [isAppInitialized]);
 
     const handleLogin = useCallback(async (credentials: Credentials) => {
         setError(null);
@@ -124,6 +135,14 @@ const App: React.FC = () => {
         setAuthPage('login');
         setError(null);
     }, []);
+    
+    if (!isAppInitialized) {
+         return (
+            <div className="bg-blue-950 dark:bg-blue-950 min-h-screen flex items-center justify-center">
+                <LoadingSpinner />
+            </div>
+        );
+    }
     
     if (!isSupabaseConfigured) {
         return <ConfigurationErrorPage missingConfig="Supabase" />;

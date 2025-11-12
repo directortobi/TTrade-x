@@ -19,8 +19,8 @@ import HistoryPage from './pages/HistoryPage';
 import ReferralPage from './pages/ReferralPage';
 import ContactUsPage from './pages/ContactUsPage';
 import LegalDisclaimerPage from './pages/LegalDisclaimerPage';
-// FIX: Correctly import DerivTraderPage from its file.
-import DerivTraderPage from './pages/DerivTraderPage'; // New Import
+import DerivTraderPage from './pages/DerivTraderPage';
+import DerivSmartTraderPage from './pages/DerivSmartTraderPage'; // New Import
 import { CandlestickSpinner } from './components/CandlestickSpinner';
 import TradingViewAdvancedChartWidget from './components/TradingViewAdvancedChartWidget';
 import { getSignalFromImage, isGeminiConfigured } from './services/geminiService';
@@ -38,7 +38,7 @@ interface MainAppProps {
     setUser: React.Dispatch<React.SetStateAction<AppUser | null>>;
 }
 
-export type View = 'dashboard' | 'marketScan' | 'forexScanner' | 'compoundingAgent' | 'buyTokens' | 'purchaseHistory' | 'history' | 'referralProgram' | 'about' | 'adminDashboard' | 'profile' | 'withdraw' | 'withdrawalHistory' | 'contact' | 'legalDisclaimer' | 'derivTrader';
+export type View = 'dashboard' | 'marketScan' | 'forexScanner' | 'compoundingAgent' | 'buyTokens' | 'purchaseHistory' | 'history' | 'referralProgram' | 'about' | 'adminDashboard' | 'profile' | 'withdraw' | 'withdrawalHistory' | 'contact' | 'legalDisclaimer' | 'derivTrader' | 'derivSmartTrader';
 
 // NOTE: This is a temporary, insecure way to identify an admin.
 // In a real application, this should be a role-based system in your database.
@@ -155,6 +155,8 @@ const MainApp: React.FC<MainAppProps> = ({ user, onLogout, setUser }) => {
         return <DashboardPage user={user} onNavigate={setActiveView} />;
       case 'derivTrader':
         return <DerivTraderPage />;
+      case 'derivSmartTrader':
+        return <DerivSmartTraderPage />;
       case 'forexScanner':
         return (
           <>

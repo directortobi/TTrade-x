@@ -60,6 +60,7 @@ export const Header: React.FC<HeaderProps> = ({ activeView, onNavigate, user, on
         { label: 'Market Scanner', view: 'marketScan' },
         { label: 'Chart Upload', view: 'forexScanner' },
         { label: 'Deriv Trader', view: 'derivTrader' },
+        { label: 'Deriv Smart Trader', view: 'derivSmartTrader' },
         { label: 'Trading History', view: 'history' },
         { label: 'Compounding Agent', view: 'compoundingAgent' },
         { label: 'Buy Tokens', view: 'buyTokens' },

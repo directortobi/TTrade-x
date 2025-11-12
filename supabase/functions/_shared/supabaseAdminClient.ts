@@ -1,3 +1,6 @@
+// FIX: Add Deno to global scope for TypeScript to avoid "Cannot find name 'Deno'" error.
+declare const Deno: any;
+
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 // The SERVICE_ROLE_KEY is set in the function's environment variables.

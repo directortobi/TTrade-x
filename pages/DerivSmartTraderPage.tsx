@@ -1,11 +1,10 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { derivService } from '../services/derivService';
-import { useSignal } from '../contexts/SignalContext';
-import { Signal, DerivActiveSymbol, DerivBalance, DerivProposal, DerivContractsForSymbol, DerivTick, DerivPortfolio, DerivProfitTableEntry, DerivTradeParams, UiDerivContractType } from '../types';
+import { DerivActiveSymbol, DerivBalance, DerivProposal, DerivContractsForSymbol, DerivTick, DerivPortfolio, DerivProfitTableEntry, DerivTradeParams } from '../types';
 import { LoadingSpinner } from '../components/LoadingSpinner';
 import { ErrorAlert } from '../components/ErrorAlert';
 
-const DerivTraderPage: React.FC = () => {
+const DerivSmartTraderPage: React.FC = () => {
     const [apiToken, setApiToken] = useState('');
     const [isConnected, setIsConnected] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
@@ -26,7 +25,6 @@ const DerivTraderPage: React.FC = () => {
         contract_type: 'CALL'
     });
     
-    const { signal, contractType, clearSignal } = useSignal();
     const proposalSubIds = useRef<{ [key: string]: string }>({});
 
     const clearError = () => setError(null);
@@ -45,17 +43,29 @@ const DerivTraderPage: React.FC = () => {
             },
             onBalance: setBalance,
             onActiveSymbols: (symbols) => setActiveSymbols(symbols.filter(s => s.market === 'synthetic_index')),
-            onContractsFor: setContracts,
+            onContractsFor: (contracts) => {
+                setContracts(contracts);
+                // Set default contract type if the current one is not available for the new symbol
+                const defaultContract = contracts.available.find(c => c.contract_type === 'CALL');
+                if (defaultContract) {
+                    setTradeParams(prev => ({...prev, contract_type: defaultContract.contract_type}));
+                } else if (contracts.available.length > 0) {
+                     setTradeParams(prev => ({...prev, contract_type: contracts.available[0].contract_type}));
+                }
+            },
             onTick: setTick,
-            // FIX: Explicitly type the `p` parameter to ensure correct type inference in the `proposals` state.
-            onProposal: (p: DerivProposal) => setProposals(prev => ({...prev, [p.longcode]: p})),
+            onProposal: (p: DerivProposal) => {
+                if (p?.contract_type) {
+                     setProposals(prev => ({...prev, [p.contract_type]: p}));
+                }
+            },
             onPortfolio: setPortfolio,
-            onTransaction: () => {
+            onTransaction: () => { // Refresh portfolio and profit table after a trade
                 derivService.getPortfolio();
                 derivService.getProfitTable();
             },
-            onProfitTable: (table) => setProfitTable(table),
-            // FIX: Handle `unknown` error type by converting it to a string before setting state, and ensure signature matches service contract.
+            onProfitTable: setProfitTable,
+            // FIX: Changed the onError signature to accept a string to match the derivService contract, resolving the type error.
             onError: (err: unknown) => {
                 setError(String(err));
                 setIsLoading(false);
@@ -69,35 +79,21 @@ const DerivTraderPage: React.FC = () => {
     }, [apiToken]);
 
     useEffect(() => {
+        return () => {
+            derivService.disconnect();
+        };
+    }, []);
+    
+    useEffect(() => {
         if (isConnected) {
             derivService.unsubscribeFromTicks();
             derivService.subscribeToTicks(selectedSymbol);
             derivService.getContractsFor(selectedSymbol);
             derivService.getPortfolio();
             derivService.getProfitTable();
-            setTradeParams(prev => ({ ...prev, symbol: selectedSymbol, contract_type: 'CALL' }));
+            setTradeParams(prev => ({ ...prev, symbol: selectedSymbol }));
         }
     }, [isConnected, selectedSymbol]);
-
-    useEffect(() => {
-        if (signal && contractType) {
-            const symbolInfo = activeSymbols.find(s => s.display_name === signal.pair || s.symbol === signal.pair);
-            if (symbolInfo) {
-                setSelectedSymbol(symbolInfo.symbol);
-            }
-
-            let newParams: Partial<DerivTradeParams> = { symbol: symbolInfo?.symbol || signal.pair, stake: 10, duration: 5, duration_unit: 'm' };
-            if (contractType === 'multiplier') {
-                newParams.contract_type = signal.signal === Signal.BUY ? 'MULTUP' : 'MULTDOWN';
-                newParams.takeProfit = signal.takeProfit;
-                newParams.stopLoss = signal.stopLoss;
-            } else {
-                newParams.contract_type = signal.signal === Signal.BUY ? 'CALL' : 'PUT';
-            }
-            setTradeParams(newParams);
-            clearSignal();
-        }
-    }, [signal, contractType, activeSymbols, clearSignal]);
 
     // Request proposals when trade params change
     useEffect(() => {
@@ -110,11 +106,13 @@ const DerivTraderPage: React.FC = () => {
 
             const baseParams = { ...tradeParams, symbol: selectedSymbol };
             
-            if (tradeParams.contract_type.includes('MULT')) {
-                derivService.getProposal(baseParams);
-            } else {
+            // For Rise/Fall, we want both proposals to show payouts
+            if (['CALL', 'PUT'].includes(tradeParams.contract_type)) {
                  derivService.getProposal({ ...baseParams, contract_type: 'CALL' });
                  derivService.getProposal({ ...baseParams, contract_type: 'PUT' });
+            } else {
+                // For other types, just get the one
+                derivService.getProposal(baseParams);
             }
         };
         const timeoutId = setTimeout(getProposals, 300); // Debounce
@@ -122,7 +120,6 @@ const DerivTraderPage: React.FC = () => {
 
     }, [isConnected, selectedSymbol, tradeParams]);
     
-    // FIX: Update function signature to accept `undefined` to match the return type of `Array.prototype.find`.
     const handleBuy = (proposal: DerivProposal | null | undefined) => {
         if (proposal) {
             derivService.buyContract(proposal.id, proposal.ask_price);
@@ -135,9 +132,10 @@ const DerivTraderPage: React.FC = () => {
 
     if (!isConnected) {
         return (
-            <div className="max-w-md mx-auto text-center p-4">
+            <div className="max-w-md mx-auto text-center p-4 animate-fade-in">
                 <div className="bg-gray-800/50 p-8 rounded-2xl border border-gray-700 shadow-lg">
-                    <h1 className="text-2xl font-bold text-white mb-4">Connect to Deriv</h1>
+                    <h1 className="text-2xl font-bold text-white mb-4">Connect to Deriv Smart Trader</h1>
+                    <p className="text-gray-400 mb-4 text-sm">Enter your API token to access the manual trading terminal for all available synthetic indices and contract types.</p>
                     {error && <div className="mb-4"><ErrorAlert message={error} /></div>}
                     <input
                         type="password"
@@ -155,9 +153,8 @@ const DerivTraderPage: React.FC = () => {
         );
     }
     
-    // FIX: Use optional chaining `?.` to safely access `contract_type` on potentially null objects.
-    const callProposal = Object.values(proposals).find(p => p?.contract_type === 'CALL');
-    const putProposal = Object.values(proposals).find(p => p?.contract_type === 'PUT');
+    const callProposal = proposals['CALL'];
+    const putProposal = proposals['PUT'];
 
     return (
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6 animate-fade-in">
@@ -165,7 +162,7 @@ const DerivTraderPage: React.FC = () => {
             <div className="lg:col-span-2 space-y-6">
                 <div className="bg-gray-800/50 p-6 rounded-2xl border border-gray-700">
                     <div className="flex justify-between items-center mb-4">
-                         <h2 className="text-xl font-bold text-white">Trade Terminal</h2>
+                         <h2 className="text-xl font-bold text-white">Smart Trade Terminal</h2>
                          <div className="text-right">
                              <p className="font-bold text-lg text-green-400">${balance?.balance.toFixed(2)}</p>
                              <p className="text-xs text-gray-500">{balance?.loginid}</p>
@@ -185,6 +182,8 @@ const DerivTraderPage: React.FC = () => {
                             <select value={tradeParams.duration_unit} onChange={e => setTradeParams({...tradeParams, duration_unit: e.target.value as 't'|'m'})} className="w-1/3 h-10 pl-2 text-white bg-gray-700 border border-gray-600 rounded-lg">
                                 <option value="t">Ticks</option>
                                 <option value="m">Minutes</option>
+                                <option value="h">Hours</option>
+                                <option value="d">Days</option>
                             </select>
                          </div>
                     </div>
@@ -204,7 +203,7 @@ const DerivTraderPage: React.FC = () => {
                     <h3 className="font-bold text-lg mb-2">Open Positions</h3>
                     <div className="overflow-x-auto max-h-64">
                          <table className="w-full text-sm">
-                             <thead><tr className="text-left text-gray-400"><th className="p-2">Contract</th><th className="p-2">Buy Price</th><th className="p-2">Current Price</th><th className="p-2">Profit/Loss</th><th className="p-2"></th></tr></thead>
+                             <thead className="sticky top-0 bg-gray-800/50"><tr className="text-left text-gray-400"><th className="p-2">Contract</th><th className="p-2">Buy Price</th><th className="p-2">Current Price</th><th className="p-2">Profit/Loss</th><th className="p-2"></th></tr></thead>
                              <tbody>
                                 {portfolio?.contracts.map(c => (
                                     <tr key={c.contract_id} className="border-t border-gray-700">
@@ -235,7 +234,7 @@ const DerivTraderPage: React.FC = () => {
                                 {profitTable.map(t => (
                                      <tr key={t.contract_id} className="border-b border-gray-700 last:border-0">
                                         <td className="p-2">
-                                            <p className="font-medium">{t.longcode.split('_')[0]}</p>
+                                            <p className="font-medium">{t.shortcode.split('_')[0]}</p>
                                             <p className="text-xs text-gray-500">{new Date(t.sell_time * 1000).toLocaleTimeString()}</p>
                                         </td>
                                         <td className={`p-2 text-right font-semibold ${t.profit_loss > 0 ? 'text-green-400' : 'text-red-400'}`}>
@@ -253,4 +252,4 @@ const DerivTraderPage: React.FC = () => {
     );
 };
 
-export default DerivTraderPage;
+export default DerivSmartTraderPage;

@@ -23,6 +23,7 @@ interface Callbacks {
 let ws: WebSocket | null = null;
 let callbacks: Callbacks | null = null;
 let tickHistoryCallback: TickHistoryCallback | null = null;
+let proposalIdMap: { [key: string]: string } = {}; // To store proposal IDs for different contract types
 
 const derivService = {
     connect: async (apiToken: string, cbs: Callbacks) => {
@@ -61,6 +62,10 @@ const derivService = {
                     callbacks?.onTick(data.tick);
                     break;
                 case 'proposal':
+                    // Store the proposal ID based on its contract type for later use
+                    if (data.proposal && data.echo_req.contract_type) {
+                        proposalIdMap[data.echo_req.contract_type] = data.proposal.id;
+                    }
                     callbacks?.onProposal(data.proposal);
                     break;
                 case 'portfolio':
@@ -96,10 +101,6 @@ const derivService = {
             ws = null;
         }
     },
-
-    setOnTickHistory: (callback: TickHistoryCallback) => {
-        tickHistoryCallback = callback;
-    },
     
     subscribeToTicks: (symbol: string) => {
         ws?.send(JSON.stringify({ ticks: symbol, subscribe: 1 }));
@@ -108,28 +109,22 @@ const derivService = {
     unsubscribeFromTicks: () => {
         ws?.send(JSON.stringify({ forget_all: 'ticks' }));
     },
-    
-    getTickHistory: (symbol: string, count: number) => {
-        ws?.send(JSON.stringify({
-            ticks_history: symbol,
-            adjust_start_time: 1,
-            count: count,
-            end: "latest",
-            start: 1,
-            style: "candles"
-        }));
-    },
 
     getContractsFor: (symbol: string) => {
         ws?.send(JSON.stringify({ contracts_for: symbol }));
     },
 
-    getProposal: (params: DerivTradeParams) => {
+    getProposal: (params: Partial<DerivTradeParams>) => {
+        if (!params.symbol || !params.contract_type || !params.stake || !params.duration || !params.duration_unit) {
+            return;
+        }
+        
         const req: any = {
             proposal: 1,
+            subscribe: 1,
             amount: params.stake,
             basis: 'stake',
-            contract_type: params.contract_type === 'rise_fall' ? 'CALL' : params.contract_type,
+            contract_type: params.contract_type,
             currency: 'USD',
             duration: params.duration,
             duration_unit: params.duration_unit,
@@ -141,18 +136,19 @@ const derivService = {
         ws?.send(JSON.stringify(req));
     },
 
-    buyContract: (proposalId: string, price: number, params: DerivTradeParams) => {
-        const req: any = {
+    forgetProposal: (proposalId: string) => {
+        ws?.send(JSON.stringify({ forget: proposalId }));
+    },
+
+    buyContract: (proposalId: string, price: number) => {
+        ws?.send(JSON.stringify({
             buy: proposalId,
             price: price
-        };
-
-        if (params.contract_type.startsWith('MULT')) {
-            if (params.takeProfit) req.take_profit = params.takeProfit;
-            if (params.stopLoss) req.stop_loss = params.stopLoss;
-        }
-        
-        ws?.send(JSON.stringify(req));
+        }));
+    },
+    
+    sellContract: (contractId: number, price: number) => {
+        ws?.send(JSON.stringify({ sell: contractId, price: price }));
     },
     
     getPortfolio: () => {
@@ -160,7 +156,7 @@ const derivService = {
     },
 
     getProfitTable: () => {
-        ws?.send(JSON.stringify({ profit_table: 1, description: 1, limit: 20 }));
+        ws?.send(JSON.stringify({ profit_table: 1, description: 1, limit: 20, sort: 'DESC' }));
     },
 };
 

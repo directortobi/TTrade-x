@@ -306,7 +306,8 @@ export interface DerivContractsForSymbol {
         sentiment: string;
         start_type: string;
         submarket: string;
-        trading_period: object;
+        // FIX: Changed `object` to `any` to avoid potential type inference issues with complex objects.
+        trading_period: any;
         underlying_symbol: string;
     }[];
     close: number;
@@ -336,22 +337,25 @@ export interface DerivProposal {
     payout: number;
     spot: number;
     spot_time: number;
+    // FIX: Added optional `contract_type` to align with the data structure used in the component.
+    contract_type?: string;
 }
 
 export interface DerivContract {
-    app_id: number;
-    buy_price: number;
     contract_id: number;
+    buy_price: number;
     contract_type: string;
     currency: string;
     date_start: number;
-    expiry_time: number;
     longcode: string;
     payout: number;
     purchase_time: number;
-    shortcode: string;
     symbol: string;
     transaction_id: number;
+    bid_price: number;
+    profit: number;
+    is_expired: number;
+    is_valid_to_sell: number;
 }
 
 export interface DerivPortfolio {
@@ -370,6 +374,7 @@ export interface DerivProfitTableEntry {
     sell_time: number;
     shortcode: string;
     transaction_id: number;
+    profit_loss: number;
 }
 
 export interface DerivTradeParams {
