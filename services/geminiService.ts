@@ -1,12 +1,11 @@
 import { GoogleGenAI, Type } from "@google/genai";
 // FIX: Add .ts extension to import path.
-import { AnalysisInput, AnalysisResult, Signal, ImageData, MarketAnalystInput, TradingStyle, TimeframeAnalysisInput, Timeframe } from '../types';
+import { AnalysisInput, AnalysisResult, Signal, ImageData, MarketAnalystInput, TradingStyle, TimeframeAnalysisInput, Timeframe } from '../types.ts';
 
 // The API key is loaded from environment variables.
-// The key should be set as API_KEY in your deployment environment.
-// Safely access the API key to prevent "process is not defined" errors in the browser.
-// FIX: Use process.env.API_KEY directly as per guidelines.
-const geminiApiKey = process.env.API_KEY;
+// For Vite projects, use import.meta.env.VITE_...
+// FIX: Cast `import.meta` to `any` to resolve environment variable access error.
+const geminiApiKey = (import.meta as any).env.VITE_API_KEY;
 
 export const isGeminiConfigured = !!geminiApiKey;
 
@@ -17,8 +16,8 @@ const initializeAi = () => {
     if (ai) return;
 
     if (!isGeminiConfigured) {
-        console.error("Gemini API key is not configured. Please set the API_KEY environment variable.");
-        throw new Error("Google Gemini API Key not found. Please ensure the API_KEY environment variable is set.");
+        console.error("Gemini API key is not configured. Please set the VITE_API_KEY environment variable.");
+        throw new Error("Google Gemini API Key not found. Please ensure the VITE_API_KEY environment variable is set.");
     }
     
     ai = new GoogleGenAI({ apiKey: geminiApiKey! });
@@ -224,7 +223,7 @@ export const getSignalFromImage = async (imageData: ImageData, userAnnotations?:
     try {
         const response = await ai.models.generateContent({
             model: "gemini-2.5-flash",
-            contents: [{ parts: [imagePart, textPart] }],
+            contents: { parts: [imagePart, textPart] },
             config: {
                 responseMimeType: "application/json",
                 responseSchema: responseSchema,

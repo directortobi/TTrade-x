@@ -1,6 +1,6 @@
 import { supabase } from './supabase';
 // FIX: Add .ts extension to import path.
-import { Profile } from '../types';
+import { Profile } from '../types.ts';
 
 export const profileService = {
     async getProfile(userId: string): Promise<Profile | null> {

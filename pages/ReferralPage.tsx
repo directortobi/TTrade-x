@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
 // FIX: Add .ts extension to import path.
-import { AppUser, ReferredUser, ReferralEarningWithEmail, EarningStatus } from '../types';
+import { AppUser, ReferredUser, ReferralEarningWithEmail, EarningStatus } from '../types.ts';
 import { referralService } from '../services/referralService';
 // FIX: Add .tsx extension to import path.
-import { LoadingSpinner } from '../components/LoadingSpinner';
+import { LoadingSpinner } from '../components/LoadingSpinner.tsx';
 // FIX: Add .tsx extension to import path.
-import { ErrorAlert } from '../components/ErrorAlert';
+import { ErrorAlert } from '../components/ErrorAlert.tsx';
 import { StatCardSkeleton } from '../components/skeletons/StatCardSkeleton';
 import { TableSkeleton } from '../components/skeletons/TableSkeleton';
 

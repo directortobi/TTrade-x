@@ -2,18 +2,24 @@ import React, { useState, useEffect, useCallback } from 'react';
 import type { Session } from '@supabase/supabase-js';
 import { supabase } from './services/supabase';
 import { profileService } from './services/profileService';
-import { AppUser, Profile } from './types';
-import { Header } from './components/Header';
-import { LoadingSpinner } from './components/LoadingSpinner';
-import { ErrorAlert } from './components/ErrorAlert';
+// FIX: Add .ts extension to import path.
+import { AppUser, Profile } from './types.ts';
+// FIX: Add .tsx extension to import path.
+import { Header } from './components/Header.tsx';
+// FIX: Add .tsx extension to import path.
+import { LoadingSpinner } from './components/LoadingSpinner.tsx';
+// FIX: Add .tsx extension to import path.
+import { ErrorAlert } from './components/ErrorAlert.tsx';
 import { notificationService } from './services/notificationService';
 import { DashboardSkeleton } from './components/skeletons/DashboardSkeleton';
 
 // Lazy load pages for better initial performance
 const DashboardPage = React.lazy(() => import('./pages/DashboardPage'));
 const MarketAnalystPage = React.lazy(() => import('./pages/MarketAnalystPage'));
-const ImageAnalyzer = React.lazy(() => import('./components/ImageAnalyzer'));
-const InteractiveChart = React.lazy(() => import('./components/InteractiveChart'));
+// FIX: Add .tsx extension to import path.
+const ImageAnalyzer = React.lazy(() => import('./components/ImageAnalyzer.tsx'));
+// FIX: Add .tsx extension to import path.
+const InteractiveChart = React.lazy(() => import('./components/InteractiveChart.tsx'));
 const HistoryPage = React.lazy(() => import('./pages/HistoryPage'));
 const ProfilePage = React.lazy(() => import('./pages/ProfilePage'));
 const BuyTokensPage = React.lazy(() => import('./pages/BuyTokensPage'));
@@ -95,7 +101,6 @@ export const MainApp: React.FC<{ session: Session }> = ({ session }) => {
             case 'dashboard':
                 return <DashboardPage {...pageProps} />;
             case 'market_analyst':
-                // FIX: Pass onNavigate prop to MarketAnalystPage
                 return <MarketAnalystPage user={user} onTokenUsed={handleTokenUpdate} onNavigate={setView} />;
             case 'image_analyst':
                  return <ImageAnalyzer {...pageProps} onTokenUsed={handleTokenUpdate} onNavigate={setView}/>;

@@ -2,8 +2,9 @@ import { GoogleGenAI, Type } from "@google/genai";
 // FIX: Add .ts extension to import path.
 import { AnalysisInput, AnalysisResult, Signal, ImageData, MarketAnalystInput, TradingStyle, TimeframeAnalysisInput, Timeframe } from '../types.ts';
 
-// The API key MUST be obtained exclusively from the environment variable process.env.API_KEY.
-const geminiApiKey = process.env.API_KEY;
+// The API key is loaded from environment variables.
+// For Vite projects, use import.meta.env.VITE_...
+const geminiApiKey = import.meta.env.VITE_API_KEY;
 
 export const isGeminiConfigured = !!geminiApiKey;
 
@@ -14,8 +15,8 @@ const initializeAi = () => {
     if (ai) return;
 
     if (!isGeminiConfigured) {
-        console.error("Gemini API key is not configured. Please set the API_KEY environment variable.");
-        throw new Error("Google Gemini API Key not found. Please ensure the API_KEY environment variable is set.");
+        console.error("Gemini API key is not configured. Please set the VITE_API_KEY environment variable.");
+        throw new Error("Google Gemini API Key not found. Please ensure the VITE_API_KEY environment variable is set.");
     }
     
     ai = new GoogleGenAI({ apiKey: geminiApiKey! });

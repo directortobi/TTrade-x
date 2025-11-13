@@ -8,14 +8,14 @@ const CONFIG_DETAILS = {
     Supabase: {
         title: 'Supabase Configuration Missing',
         message: 'Your application needs to be connected to a Supabase project to handle user authentication.',
-        file: 'Environment Variables: SUPABASE_URL, SUPABASE_ANON_KEY',
-        instructions: 'Please set your Supabase URL and Anon Key as environment variables. Follow Step 1 in INSTRUCTIONS.md for details.'
+        file: 'Environment Variables: VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY',
+        instructions: 'Please set your Supabase URL and Anon Key in a .env file at the project root. Follow the setup instructions in your project README or documentation for details.'
     },
     Gemini: {
         title: 'Google Gemini API Key Missing',
         message: 'The AI analysis features require a Google Gemini API key to function.',
-        file: 'Environment Variable: API_KEY',
-        instructions: 'This application requires a Google Gemini API key to be configured as an environment variable named `API_KEY`.'
+        file: 'Vite Environment Variable: VITE_API_KEY',
+        instructions: 'This application requires a Google Gemini API key to be configured in your .env file as a variable named VITE_API_KEY.'
     }
 };
 
@@ -40,7 +40,7 @@ export const ConfigurationErrorPage: React.FC<ConfigurationErrorPageProps> = ({ 
                     <p className="text-gray-400">{details.instructions}</p>
                 </div>
                  <div className="mt-8 text-center">
-                    <p className="text-sm text-gray-500">After updating the configuration, please reload the application.</p>
+                    <p className="text-sm text-gray-500">After updating the configuration, please rebuild and reload the application.</p>
                 </div>
             </div>
         </div>
