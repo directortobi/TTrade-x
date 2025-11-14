@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import type { Session } from '@supabase/supabase-js';
-import { supabase } from './services/supabase';
-import { profileService } from './services/profileService';
+import { supabase } from './services/supabase.ts';
+import { profileService } from './services/profileService.ts';
 // FIX: Add .ts extension to import path.
 import { AppUser, Profile } from './types.ts';
 // FIX: Add .tsx extension to import path.
@@ -10,30 +10,30 @@ import { Header } from './components/Header.tsx';
 import { LoadingSpinner } from './components/LoadingSpinner.tsx';
 // FIX: Add .tsx extension to import path.
 import { ErrorAlert } from './components/ErrorAlert.tsx';
-import { notificationService } from './services/notificationService';
-import { DashboardSkeleton } from './components/skeletons/DashboardSkeleton';
+import { notificationService } from './services/notificationService.ts';
+import { DashboardSkeleton } from './components/skeletons/DashboardSkeleton.tsx';
 
 // Lazy load pages for better initial performance
-const DashboardPage = React.lazy(() => import('./pages/DashboardPage'));
-const MarketAnalystPage = React.lazy(() => import('./pages/MarketAnalystPage'));
+const DashboardPage = React.lazy(() => import('./pages/DashboardPage.tsx'));
+const MarketAnalystPage = React.lazy(() => import('./pages/MarketAnalystPage.tsx'));
 // FIX: Add .tsx extension to import path.
 const ImageAnalyzer = React.lazy(() => import('./components/ImageAnalyzer.tsx'));
 // FIX: Add .tsx extension to import path.
 const InteractiveChart = React.lazy(() => import('./components/InteractiveChart.tsx'));
-const HistoryPage = React.lazy(() => import('./pages/HistoryPage'));
-const ProfilePage = React.lazy(() => import('./pages/ProfilePage'));
-const BuyTokensPage = React.lazy(() => import('./pages/BuyTokensPage'));
-const PurchaseHistoryPage = React.lazy(() => import('./pages/PurchaseHistoryPage'));
-const AdminPage = React.lazy(() => import('./pages/AdminPage'));
-const ReferralPage = React.lazy(() => import('./pages/ReferralPage'));
-const WithdrawPage = React.lazy(() => import('./pages/WithdrawPage'));
-const WithdrawalHistoryPage = React.lazy(() => import('./pages/WithdrawalHistoryPage'));
-const AboutUsPage = React.lazy(() => import('./pages/AboutUsPage'));
-const ContactUsPage = React.lazy(() => import('./pages/ContactUsPage'));
-const LegalDisclaimerPage = React.lazy(() => import('./pages/LegalDisclaimerPage'));
-const DerivTraderPage = React.lazy(() => import('./pages/DerivTraderPage'));
-const DerivSmartTraderPage = React.lazy(() => import('./pages/DerivSmartTraderPage'));
-const CompoundingAgentPage = React.lazy(() => import('./pages/CompoundingAgentPage'));
+const HistoryPage = React.lazy(() => import('./pages/HistoryPage.tsx'));
+const ProfilePage = React.lazy(() => import('./pages/ProfilePage.tsx'));
+const BuyTokensPage = React.lazy(() => import('./pages/BuyTokensPage.tsx'));
+const PurchaseHistoryPage = React.lazy(() => import('./pages/PurchaseHistoryPage.tsx'));
+const AdminPage = React.lazy(() => import('./pages/AdminPage.tsx'));
+const ReferralPage = React.lazy(() => import('./pages/ReferralPage.tsx'));
+const WithdrawPage = React.lazy(() => import('./pages/WithdrawPage.tsx'));
+const WithdrawalHistoryPage = React.lazy(() => import('./pages/WithdrawalHistoryPage.tsx'));
+const AboutUsPage = React.lazy(() => import('./pages/AboutUsPage.tsx'));
+const ContactUsPage = React.lazy(() => import('./pages/ContactUsPage.tsx'));
+const LegalDisclaimerPage = React.lazy(() => import('./pages/LegalDisclaimerPage.tsx'));
+const DerivTraderPage = React.lazy(() => import('./pages/DerivTraderPage.tsx'));
+const DerivSmartTraderPage = React.lazy(() => import('./pages/DerivSmartTraderPage.tsx'));
+const CompoundingAgentPage = React.lazy(() => import('./pages/CompoundingAgentPage.tsx'));
 
 export type View = 'dashboard' | 'market_analyst' | 'image_analyst' | 'chart' | 'history' | 'profile' | 'buyTokens' | 'purchaseHistory' | 'admin' | 'referrals' | 'withdraw' | 'withdrawalHistory' | 'about' | 'contact' | 'disclaimer' | 'derivTrader' | 'derivSmartTrader' | 'compoundingAgent';
 

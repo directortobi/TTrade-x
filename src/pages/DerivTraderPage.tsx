@@ -1,11 +1,8 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { derivService } from '../services/derivService';
-import { useSignal } from '../contexts/SignalContext';
-// FIX: Add .ts extension to import path.
+import { derivService } from '../services/derivService.ts';
+import { useSignal } from '../contexts/SignalContext.tsx';
 import { Signal, DerivActiveSymbol, DerivBalance, DerivProposal, DerivContractsForSymbol, DerivTick, DerivPortfolio, DerivProfitTableEntry, DerivTradeParams, UiDerivContractType } from '../types.ts';
-// FIX: Add .tsx extension to import path.
 import { LoadingSpinner } from '../components/LoadingSpinner.tsx';
-// FIX: Add .tsx extension to import path.
 import { ErrorAlert } from '../components/ErrorAlert.tsx';
 
 const DerivTraderPage: React.FC = () => {
@@ -50,7 +47,6 @@ const DerivTraderPage: React.FC = () => {
             onActiveSymbols: (symbols) => setActiveSymbols(symbols.filter(s => s.market === 'synthetic_index')),
             onContractsFor: setContracts,
             onTick: setTick,
-            // FIX: Explicitly type the `p` parameter to ensure correct type inference in the `proposals` state.
             onProposal: (p: DerivProposal) => setProposals(prev => ({...prev, [p.longcode]: p})),
             onPortfolio: setPortfolio,
             onTransaction: () => {
@@ -58,7 +54,6 @@ const DerivTraderPage: React.FC = () => {
                 derivService.getProfitTable();
             },
             onProfitTable: (table) => setProfitTable(table),
-            // FIX: Handle `unknown` error type by converting it to a string before setting state, and ensure signature matches service contract.
             onError: (err: string) => {
                 setError(err);
                 setIsLoading(false);
@@ -125,7 +120,6 @@ const DerivTraderPage: React.FC = () => {
 
     }, [isConnected, selectedSymbol, tradeParams]);
     
-    // FIX: Update function signature to accept `undefined` to match the return type of `Array.prototype.find`.
     const handleBuy = (proposal: DerivProposal | null | undefined) => {
         if (proposal) {
             derivService.buyContract(proposal.id, proposal.ask_price);
@@ -158,7 +152,6 @@ const DerivTraderPage: React.FC = () => {
         );
     }
     
-    // FIX: Use optional chaining ?. to safely access contract_type on potentially null objects.
     const callProposal = Object.values(proposals).find((p): p is DerivProposal => p?.contract_type === 'CALL');
     const putProposal = Object.values(proposals).find((p): p is DerivProposal => p?.contract_type === 'PUT');
 

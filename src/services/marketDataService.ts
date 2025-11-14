@@ -1,4 +1,3 @@
-// FIX: Add .ts extension to import path.
 import { Candle, NewsSentiment, Timeframe } from '../types.ts';
 
 // ===================================================================================

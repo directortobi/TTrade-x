@@ -1,6 +1,5 @@
-// FIX: Add .ts extension to import path.
 import { User, Credentials } from '../types.ts';
-import { supabase } from './supabase';
+import { supabase } from './supabase.ts';
 
 export const authService = {
     signup: async ({ email, password }: Credentials, referredByCode?: string | null): Promise<User> => {

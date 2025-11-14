@@ -1,10 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
-// FIX: Add .ts extension to import path.
 import { AppUser, AnalysisLog, Signal, AnalysisOutcome } from '../types.ts';
-import { logService } from '../services/logService';
-// FIX: Add .tsx extension to import path.
+import { logService } from '../services/logService.ts';
 import { ErrorAlert } from '../components/ErrorAlert.tsx';
-import { TableSkeleton } from '../components/skeletons/TableSkeleton';
+import { TableSkeleton } from '../components/skeletons/TableSkeleton.tsx';
 
 interface HistoryPageProps {
     user: AppUser;

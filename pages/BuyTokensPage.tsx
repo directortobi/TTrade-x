@@ -3,7 +3,7 @@ import React, { useState, useRef } from 'react';
 import { AppUser, TokenPackage } from '../types.ts';
 // FIX: Add .ts extension to import path.
 import { TOKEN_PACKAGES } from '../constants.ts';
-import { createTokenPurchaseRequest } from '../services/tokenService';
+import { createTokenPurchaseRequest } from '../services/tokenService.ts';
 // FIX: Add .tsx extension to import path.
 import { LoadingSpinner } from '../components/LoadingSpinner.tsx';
 // FIX: Add .tsx extension to import path.

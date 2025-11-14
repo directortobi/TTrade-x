@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 // FIX: Add .ts extension to import path.
 import { AppUser } from '../types.ts';
-import { withdrawalService } from '../services/withdrawalService';
+import { withdrawalService } from '../services/withdrawalService.ts';
 // FIX: Add .tsx extension to import path.
 import { LoadingSpinner } from '../components/LoadingSpinner.tsx';
 // FIX: Add .tsx extension to import path.

@@ -1,4 +1,4 @@
-import { supabase } from './supabase';
+import { supabase } from './supabase.ts';
 // FIX: Add .ts extension to import path.
 import { PurchaseWithEmail, WithdrawalWithEmail, ReferralWithdrawalWithEmail } from '../types.ts';
 

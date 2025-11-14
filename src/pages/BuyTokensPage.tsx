@@ -1,12 +1,8 @@
 import React, { useState, useRef } from 'react';
-// FIX: Add .ts extension to import path.
 import { AppUser, TokenPackage } from '../types.ts';
-// FIX: Add .ts extension to import path.
 import { TOKEN_PACKAGES } from '../constants.ts';
-import { createTokenPurchaseRequest } from '../services/tokenService';
-// FIX: Add .tsx extension to import path.
+import { createTokenPurchaseRequest } from '../services/tokenService.ts';
 import { LoadingSpinner } from '../components/LoadingSpinner.tsx';
-// FIX: Add .tsx extension to import path.
 import { ErrorAlert } from '../components/ErrorAlert.tsx';
 
 interface BuyTokensPageProps {

@@ -1,10 +1,9 @@
 import { GoogleGenAI, Type } from "@google/genai";
-// FIX: Add .ts extension to import path.
 import { AnalysisInput, AnalysisResult, Signal, ImageData, MarketAnalystInput, TradingStyle, TimeframeAnalysisInput, Timeframe } from '../types.ts';
 
 // The API key is loaded from environment variables.
 // For Vite projects, use import.meta.env.VITE_...
-const geminiApiKey = import.meta.env.VITE_API_KEY;
+const geminiApiKey = (import.meta as any).env.VITE_API_KEY;
 
 export const isGeminiConfigured = !!geminiApiKey;
 

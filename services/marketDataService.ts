@@ -1,4 +1,5 @@
 // FIX: Add .ts extension to import path.
+// FIX: Corrected import path to be relative.
 import { Candle, NewsSentiment, Timeframe } from '../types.ts';
 
 // ===================================================================================

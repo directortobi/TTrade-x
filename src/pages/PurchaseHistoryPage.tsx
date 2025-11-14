@@ -1,12 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
-// FIX: Add .ts extension to import path.
 import { AppUser, TokenPurchase, TokenPurchaseStatus } from '../types.ts';
-import { getPurchaseHistory } from '../services/tokenService';
-// FIX: Add .tsx extension to import path.
+import { getPurchaseHistory } from '../services/tokenService.ts';
 import { ErrorAlert } from '../components/ErrorAlert.tsx';
-// FIX: Add .tsx extension to import path.
 import { View } from '../MainApp.tsx';
-import { TableSkeleton } from '../components/skeletons/TableSkeleton';
+import { TableSkeleton } from '../components/skeletons/TableSkeleton.tsx';
 
 interface PurchaseHistoryPageProps {
     user: AppUser;

@@ -1,4 +1,4 @@
-import { supabase } from './supabase';
+import { supabase } from './supabase.ts';
 // FIX: Add .ts extension to import path.
 import { TokenPackage, TokenPurchase } from '../types.ts';
 

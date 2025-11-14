@@ -32,47 +32,4 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ user, onNavigate }) => {
                 <div className="lg:col-span-2 space-y-6">
                     <div className="bg-blue-900/50 p-6 rounded-xl border border-blue-800 shadow-lg">
                         <div className="flex items-start justify-between">
-                            <div className="flex items-center gap-4">
-                                <div className="text-sky-400">
-                                    <ProfileIcon />
-                                </div>
-                                <div>
-                                    <h2 className="text-lg font-bold text-white">Profile & Balance</h2>
-                                    <p className="text-sm text-gray-400 truncate">{user.profile.email}</p>
-                                </div>
-                            </div>
-                            <button onClick={() => onNavigate('profile')} className="px-3 py-1.5 text-xs font-semibold text-white bg-gray-700/80 rounded-md hover:bg-gray-600 transition-colors border border-gray-600">
-                                Manage
-                            </button>
-                        </div>
-                        <div className="mt-6 border-t border-blue-800 pt-4">
-                            <p className="text-sm text-gray-400">Available Tokens</p>
-                            <div className="flex items-center gap-4 mt-2">
-                                <p className="text-5xl font-bold text-white">{user.profile.tokens}</p>
-                                <div className="text-sky-400">
-                                  <TokensIcon/>
-                                </div>
-                            </div>
-                            <button
-                                onClick={() => onNavigate('buyTokens')}
-                                className="mt-4 w-full px-6 py-3 text-sm font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors shadow-sm"
-                            >
-                                Buy More Tokens
-                            </button>
-                        </div>
-                    </div>
-                     <RecentSignals onNavigate={onNavigate} />
-                </div>
-
-                {/* Right Column */}
-                <div className="lg:col-span-3">
-                     <div className="h-[65vh] bg-blue-950/50 rounded-xl border border-blue-800 p-1">
-                        <TradingViewMarketOverviewWidget />
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
-};
-
-export default DashboardPage;
+                            <div className="flex

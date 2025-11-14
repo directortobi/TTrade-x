@@ -1,13 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
-// FIX: Add .ts extension to import path.
 import { AppUser, ReferredUser, ReferralEarningWithEmail, EarningStatus } from '../types.ts';
-import { referralService } from '../services/referralService';
-// FIX: Add .tsx extension to import path.
+import { referralService } from '../services/referralService.ts';
 import { LoadingSpinner } from '../components/LoadingSpinner.tsx';
-// FIX: Add .tsx extension to import path.
 import { ErrorAlert } from '../components/ErrorAlert.tsx';
-import { StatCardSkeleton } from '../components/skeletons/StatCardSkeleton';
-import { TableSkeleton } from '../components/skeletons/TableSkeleton';
+import { StatCardSkeleton } from '../components/skeletons/StatCardSkeleton.tsx';
+import { TableSkeleton } from '../components/skeletons/TableSkeleton.tsx';
 
 interface ReferralPageProps {
     user: AppUser;

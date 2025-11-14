@@ -1,20 +1,14 @@
 import React, { useState, useCallback } from 'react';
-// FIX: Add .tsx extension to import path.
 import { AssetSelector } from '../components/results/ForexSelector.tsx';
-// FIX: Add .tsx extension to import path.
 import { ErrorAlert } from '../components/ErrorAlert.tsx';
-import { ResultsPage } from './ResultsPage';
-import { getMarketAnalystPrediction, getTimeframeAnalysis } from '../services/geminiService';
-import { fetchCandlestickData } from '../services/marketDataService';
-import { useTokenForAnalysis } from '../services/tokenService';
-import { logService } from '../services/logService';
-// FIX: Add .ts extension to import path.
-import { AnalysisResult, AppUser, Asset, TradingStyle, Timeframe, Signal } from '../types.ts';
-// FIX: Add .ts extension to import path.
+import { ResultsPage } from './ResultsPage.tsx';
+import { getMarketAnalystPrediction, getTimeframeAnalysis } from '../services/geminiService.ts';
+import { fetchCandlestickData } from '../services/marketDataService.ts';
+import { useTokenForAnalysis } from '../services/tokenService.ts';
+import { logService } from '../services/logService.ts';
+import { AnalysisResult, AppUser, Asset, TradingStyle, Timeframe, Signal, View } from '../types.ts';
 import { AVAILABLE_ASSETS, TRADING_STYLES } from '../constants.ts';
-// FIX: Add .tsx extension to import path.
 import { CandlestickSpinner } from '../components/CandlestickSpinner.tsx';
-import { View } from '../MainApp';
 
 interface MarketAnalystPageProps {
     user: AppUser;
@@ -150,7 +144,7 @@ const MarketAnalystPage: React.FC<MarketAnalystPageProps> = ({ user, onTokenUsed
         const currentMode = MODES.find(m => m.id === mode);
         return `Get a focused technical analysis for the ${currentMode?.name} timeframe.`
     }
-
+    
     if (loadingStep) {
         return (
             <div className="max-w-3xl mx-auto flex flex-col items-center justify-center text-center pt-16">
@@ -162,7 +156,6 @@ const MarketAnalystPage: React.FC<MarketAnalystPageProps> = ({ user, onTokenUsed
     }
 
     if (analysisResult) {
-        // FIX: Pass the onNavigate prop to the ResultsPage component.
         return <ResultsPage result={analysisResult} onGoBack={handleReset} onNavigate={onNavigate} />;
     }
 

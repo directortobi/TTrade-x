@@ -1,10 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
-// FIX: Add .ts extension to import path.
 import { AppUser, Withdrawal, ReferralWithdrawal, WithdrawalStatus } from '../types.ts';
-import { withdrawalService } from '../services/withdrawalService';
-// FIX: Add .tsx extension to import path.
+import { withdrawalService } from '../services/withdrawalService.ts';
 import { ErrorAlert } from '../components/ErrorAlert.tsx';
-import { TableSkeleton } from '../components/skeletons/TableSkeleton';
+import { TableSkeleton } from '../components/skeletons/TableSkeleton.tsx';
 
 interface WithdrawalHistoryPageProps {
     user: AppUser;
