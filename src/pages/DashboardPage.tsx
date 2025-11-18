@@ -1,8 +1,8 @@
 import React from 'react';
-import { AppUser } from '../types.ts';
-import { View } from '../MainApp.tsx';
-import TradingViewMarketOverviewWidget from '../components/TradingViewMarketOverviewWidget.tsx';
-import RecentSignals from '../components/dashboard/RecentSignals.tsx';
+import { AppUser } from '../types';
+import { View } from '../MainApp';
+import TradingViewMarketOverviewWidget from '../components/TradingViewMarketOverviewWidget';
+import RecentSignals from '../components/dashboard/RecentSignals';
 
 interface DashboardPageProps {
     user: AppUser;

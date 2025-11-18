@@ -1,6 +1,6 @@
 import { supabase } from './supabase';
 // FIX: Add .ts extension to import path.
-import { ReferralEarningWithEmail, ReferredUser } from '../types';
+import { ReferralEarningWithEmail, ReferredUser } from '../types.ts';
 
 interface ReferralStats {
     totalReferrals: number;

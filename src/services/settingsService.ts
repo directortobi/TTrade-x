@@ -1,5 +1,5 @@
-import { supabase } from './supabase.ts';
-import { DrawingSettings } from '../types.ts';
+import { supabase } from './supabase';
+import { DrawingSettings } from '../types';
 
 export const settingsService = {
     async saveSettings(userId: string, settings: DrawingSettings): Promise<void> {

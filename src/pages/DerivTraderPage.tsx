@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { derivService } from '../services/derivService.ts';
-import { useSignal } from '../contexts/SignalContext.tsx';
-import { Signal, DerivActiveSymbol, DerivBalance, DerivProposal, DerivContractsForSymbol, DerivTick, DerivPortfolio, DerivProfitTableEntry, DerivTradeParams, UiDerivContractType } from '../types.ts';
-import { LoadingSpinner } from '../components/LoadingSpinner.tsx';
-import { ErrorAlert } from '../components/ErrorAlert.tsx';
+import { derivService } from '../services/derivService';
+import { useSignal } from '../contexts/SignalContext';
+import { Signal, DerivActiveSymbol, DerivBalance, DerivProposal, DerivContractsForSymbol, DerivTick, DerivPortfolio, DerivProfitTableEntry, DerivTradeParams, UiDerivContractType } from '../types';
+import { LoadingSpinner } from '../components/LoadingSpinner';
+import { ErrorAlert } from '../components/ErrorAlert';
 
 const DerivTraderPage: React.FC = () => {
     const [apiToken, setApiToken] = useState('');
@@ -152,8 +152,9 @@ const DerivTraderPage: React.FC = () => {
         );
     }
     
-    const callProposal = Object.values(proposals).find((p): p is DerivProposal => p?.contract_type === 'CALL');
-    const putProposal = Object.values(proposals).find((p): p is DerivProposal => p?.contract_type === 'PUT');
+    // FIX: Use type guard and check for null before accessing contract_type
+    const callProposal = Object.values(proposals).find((p): p is DerivProposal => !!p && p.contract_type === 'CALL');
+    const putProposal = Object.values(proposals).find((p): p is DerivProposal => !!p && p.contract_type === 'PUT');
 
     return (
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6 animate-fade-in">

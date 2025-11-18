@@ -1,14 +1,14 @@
 import React, { useState, useCallback } from 'react';
-import { AssetSelector } from '../components/results/ForexSelector.tsx';
-import { ErrorAlert } from '../components/ErrorAlert.tsx';
-import { ResultsPage } from './ResultsPage.tsx';
-import { getMarketAnalystPrediction, getTimeframeAnalysis } from '../services/geminiService.ts';
-import { fetchCandlestickData } from '../services/marketDataService.ts';
-import { useTokenForAnalysis } from '../services/tokenService.ts';
-import { logService } from '../services/logService.ts';
-import { AnalysisResult, AppUser, Asset, TradingStyle, Timeframe, Signal, View } from '../types.ts';
-import { AVAILABLE_ASSETS, TRADING_STYLES } from '../constants.ts';
-import { CandlestickSpinner } from '../components/CandlestickSpinner.tsx';
+import { AssetSelector } from '../components/results/ForexSelector';
+import { ErrorAlert } from '../components/ErrorAlert';
+import { ResultsPage } from './ResultsPage';
+import { getMarketAnalystPrediction, getTimeframeAnalysis } from '../services/geminiService';
+import { fetchCandlestickData } from '../services/marketDataService';
+import { useTokenForAnalysis } from '../services/tokenService';
+import { logService } from '../services/logService';
+import { AnalysisResult, AppUser, Asset, TradingStyle, Timeframe, Signal, View } from '../types';
+import { AVAILABLE_ASSETS, TRADING_STYLES } from '../constants';
+import { CandlestickSpinner } from '../components/CandlestickSpinner';
 
 interface MarketAnalystPageProps {
     user: AppUser;

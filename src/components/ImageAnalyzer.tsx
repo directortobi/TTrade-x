@@ -1,12 +1,12 @@
 import React, { useState, useRef, useCallback } from 'react';
-import { AnalysisResult, ImageData as ImageData_ } from '../types.ts';
-import { getSignalFromImage } from '../services/geminiService.ts';
-import { useTokenForAnalysis } from '../services/tokenService.ts';
-import { logService } from '../services/logService.ts';
-import { AppUser, Signal, View } from '../types.ts';
-import { ResultsPage } from '../pages/ResultsPage.tsx';
-import { ErrorAlert } from './ErrorAlert.tsx';
-import { CandlestickSpinner } from './CandlestickSpinner.tsx';
+import { AnalysisResult, ImageData as ImageData_ } from '../types';
+import { getSignalFromImage } from '../services/geminiService';
+import { useTokenForAnalysis } from '../services/tokenService';
+import { logService } from '../services/logService';
+import { AppUser, Signal, View } from '../types';
+import { ResultsPage } from '../pages/ResultsPage';
+import { ErrorAlert } from './ErrorAlert';
+import { CandlestickSpinner } from './CandlestickSpinner';
 
 interface ImageAnalyzerProps {
     user: AppUser;
@@ -154,26 +154,4 @@ const ImageAnalyzer: React.FC<ImageAnalyzerProps> = ({ user, onTokenUsed, onNavi
                         rows={3}
                         value={userAnnotations}
                         onChange={(e) => setUserAnnotations(e.target.value)}
-                        placeholder="e.g., 'Possible head and shoulders pattern forming on the 1-hour chart.'"
-                        className="w-full p-3 text-base text-white bg-gray-700/80 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-                    />
-                </div>
-
-                <div className="pt-2">
-                     <button
-                        onClick={handleAnalyze}
-                        disabled={!imageData}
-                        className="w-full h-14 px-6 text-lg text-white font-semibold bg-green-600 rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition-all duration-300 disabled:bg-gray-600 disabled:cursor-not-allowed flex items-center justify-center"
-                    >
-                        Analyze Chart (1 Token)
-                    </button>
-                </div>
-
-                {error && <ErrorAlert message={error} />}
-
-            </div>
-        </div>
-    );
-};
-
-export default ImageAnalyzer;
+                        

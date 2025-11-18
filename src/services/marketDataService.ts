@@ -1,4 +1,4 @@
-import { Candle, NewsSentiment, Timeframe } from '../types.ts';
+import { Candle, NewsSentiment, Timeframe } from '../types';
 
 // ===================================================================================
 // DEVELOPER NOTE: THIS IS A MOCK DATA SERVICE FOR DEMONSTRATION PURPOSES.

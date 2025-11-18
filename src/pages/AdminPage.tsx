@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { adminService } from '../services/adminService.ts';
-import { PurchaseWithEmail, WithdrawalWithEmail, ReferralWithdrawalWithEmail } from '../types.ts';
-import { LoadingSpinner } from '../components/LoadingSpinner.tsx';
-import { ErrorAlert } from '../components/ErrorAlert.tsx';
-import { TableSkeleton } from '../components/skeletons/TableSkeleton.tsx';
+import { adminService } from '../services/adminService';
+import { PurchaseWithEmail, WithdrawalWithEmail, ReferralWithdrawalWithEmail } from '../types';
+import { LoadingSpinner } from '../components/LoadingSpinner';
+import { ErrorAlert } from '../components/ErrorAlert';
+import { TableSkeleton } from '../components/skeletons/TableSkeleton';
 
 
 const AdminPage: React.FC = () => {
@@ -179,7 +179,7 @@ const AdminPage: React.FC = () => {
                     </button>
                 </div>
                 {isLoading.purchases ? (
-                    <TableSkeleton cols={7} />
+                    <div className="flex justify-center items-center h-48"><LoadingSpinner /></div>
                 ) : purchases.length === 0 ? (
                     <p className="text-center text-gray-400 py-12">No pending purchase requests.</p>
                 ) : (
@@ -234,7 +234,7 @@ const AdminPage: React.FC = () => {
                     </button>
                 </div>
                  {isLoading.referralWithdrawals ? (
-                    <TableSkeleton cols={5} />
+                    <div className="flex justify-center items-center h-48"><LoadingSpinner /></div>
                 ) : referralWithdrawals.length === 0 ? (
                     <p className="text-center text-gray-400 py-12">No pending referral withdrawal requests.</p>
                 ) : (
@@ -281,7 +281,7 @@ const AdminPage: React.FC = () => {
                     </button>
                 </div>
                  {isLoading.withdrawals ? (
-                    <TableSkeleton cols={5} />
+                    <div className="flex justify-center items-center h-48"><LoadingSpinner /></div>
                 ) : withdrawals.length === 0 ? (
                     <p className="text-center text-gray-400 py-12">No pending token withdrawal requests.</p>
                 ) : (

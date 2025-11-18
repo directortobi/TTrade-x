@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { derivService } from '../services/derivService.ts';
-import { DerivActiveSymbol, DerivBalance, DerivProposal, DerivContractsForSymbol, DerivTick, DerivPortfolio, DerivProfitTableEntry, DerivTradeParams } from '../types.ts';
-import { LoadingSpinner } from '../components/LoadingSpinner.tsx';
-import { ErrorAlert } from '../components/ErrorAlert.tsx';
+import { derivService } from '../services/derivService';
+import { DerivActiveSymbol, DerivBalance, DerivProposal, DerivContractsForSymbol, DerivTick, DerivPortfolio, DerivProfitTableEntry, DerivTradeParams } from '../types';
+import { LoadingSpinner } from '../components/LoadingSpinner';
+import { ErrorAlert } from '../components/ErrorAlert';
 
 const DerivSmartTraderPage: React.FC = () => {
     const [apiToken, setApiToken] = useState('');

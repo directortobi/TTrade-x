@@ -1,12 +1,12 @@
 import React from 'react';
 // FIX: Add .ts extension to import path.
-import { AppUser } from '../types';
+import { AppUser } from '../types.ts';
 // FIX: Add .tsx extension to import path.
-import { View } from '../MainApp';
+import { View } from '../MainApp.tsx';
 // FIX: Add .tsx extension to import path.
-import TradingViewMarketOverviewWidget from '../components/TradingViewMarketOverviewWidget';
+import TradingViewMarketOverviewWidget from '../components/TradingViewMarketOverviewWidget.tsx';
 // FIX: Add .tsx extension to import path.
-import RecentSignals from '../components/dashboard/RecentSignals';
+import RecentSignals from '../components/dashboard/RecentSignals.tsx';
 
 interface DashboardPageProps {
     user: AppUser;
@@ -32,31 +32,47 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ user, onNavigate }) => {
                 <div className="lg:col-span-2 space-y-6">
                     <div className="bg-blue-900/50 p-6 rounded-xl border border-blue-800 shadow-lg">
                         <div className="flex items-start justify-between">
-                            <div className="flex--- START OF FILE pages/ComingSoonPage.tsx ---
+                            <div className="flex items-center gap-4">
+                                <div className="text-sky-400">
+                                    <ProfileIcon />
+                                </div>
+                                <div>
+                                    <h2 className="text-lg font-bold text-white">Profile & Balance</h2>
+                                    <p className="text-sm text-gray-400 truncate">{user.profile.email}</p>
+                                </div>
+                            </div>
+                            <button onClick={() => onNavigate('profile')} className="px-3 py-1.5 text-xs font-semibold text-white bg-gray-700/80 rounded-md hover:bg-gray-600 transition-colors border border-gray-600">
+                                Manage
+                            </button>
+                        </div>
+                        <div className="mt-6 border-t border-blue-800 pt-4">
+                            <p className="text-sm text-gray-400">Available Tokens</p>
+                            <div className="flex items-center gap-4 mt-2">
+                                <p className="text-5xl font-bold text-white">{user.profile.tokens}</p>
+                                <div className="text-sky-400">
+                                  <TokensIcon/>
+                                </div>
+                            </div>
+                            <button
+                                onClick={() => onNavigate('buyTokens')}
+                                className="mt-4 w-full px-6 py-3 text-sm font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors shadow-sm"
+                            >
+                                Buy More Tokens
+                            </button>
+                        </div>
+                    </div>
+                     <RecentSignals onNavigate={onNavigate} />
+                </div>
 
-import React from 'react';
-
-interface ComingSoonPageProps {
-    title: string;
-    description: string;
-}
-
-const ComingSoonPage: React.FC<ComingSoonPageProps> = ({ title, description }) => {
-    return (
-        <div className="max-w-4xl mx-auto text-center py-16 animate-fade-in">
-            <div className="bg-blue-900/50 p-12 rounded-2xl border border-blue-800 shadow-lg">
-                <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-sky-400 mb-4">
-                    {title}
-                </h1>
-                <p className="text-lg text-gray-400 mb-2">
-                    This feature is coming soon!
-                </p>
-                <p className="text-gray-500">
-                    {description}
-                </p>
+                {/* Right Column */}
+                <div className="lg:col-span-3">
+                     <div className="h-[65vh] bg-blue-950/50 rounded-xl border border-blue-800 p-1">
+                        <TradingViewMarketOverviewWidget />
+                    </div>
+                </div>
             </div>
         </div>
     );
 };
 
-export default ComingSoonPage;
+export default DashboardPage;

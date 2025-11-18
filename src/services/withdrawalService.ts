@@ -1,5 +1,5 @@
-import { supabase } from './supabase.ts';
-import { Withdrawal, ReferralWithdrawal } from '../types.ts';
+import { supabase } from './supabase';
+import { Withdrawal, ReferralWithdrawal } from '../types';
 
 interface WithdrawalRequest {
     userId: string;

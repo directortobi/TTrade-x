@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { initializeSupabase, isSupabaseConfigured, supabase } from './services/supabase.ts';
-import { isGeminiConfigured } from './services/geminiService.ts';
-import { MainApp } from './MainApp.tsx';
-import { LoginPage } from './pages/LoginPage.tsx';
-import { SignUpPage } from './pages/SignUpPage.tsx';
-import { authService } from './services/authService.ts';
-import { Credentials } from './types.ts';
-import { ConfigurationErrorPage } from './pages/ConfigurationErrorPage.tsx';
-import { LoadingSpinner } from './components/LoadingSpinner.tsx';
+import { initializeSupabase, isSupabaseConfigured, supabase } from './services/supabase';
+import { isGeminiConfigured } from './services/geminiService';
+import { MainApp } from './MainApp';
+import { LoginPage } from './pages/LoginPage';
+import { SignUpPage } from './pages/SignUpPage';
+import { authService } from './services/authService';
+import { Credentials } from './types';
+import { ConfigurationErrorPage } from './pages/ConfigurationErrorPage';
+import { LoadingSpinner } from './components/LoadingSpinner';
 
 type AuthView = 'login' | 'signup' | 'check_email';
 
@@ -125,7 +125,7 @@ const App: React.FC = () => {
             />
         );
     }
-    
+
     return <MainApp session={session} />;
 };
 
