@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Credentials } from '../types.ts';
-import { LoadingSpinner } from '../components/LoadingSpinner.tsx';
-import { SupabaseLogo } from '../components/icons/SupabaseLogo.tsx';
-import { AppLogo } from '../components/AppLogo.tsx';
+import { Credentials } from '../types';
+import { LoadingSpinner } from '../components/LoadingSpinner';
+import { SupabaseLogo } from '../components/icons/SupabaseLogo';
+import { AppLogo } from '../components/AppLogo';
 
 interface SignUpPageProps {
     onSignUp: (credentials: Credentials) => Promise<void>;

@@ -1,15 +1,15 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
-import { createChart, IChartApi, ISeriesApi, CandlestickData, Time, LineStyle } from 'lightweight-charts';
-import { Asset, AppUser, AnalysisResult, Signal, View } from '../types.ts';
-import { AVAILABLE_ASSETS } from '../constants.ts';
-import { fetchCandlestickData } from '../services/marketDataService.ts';
-import { AssetSelector } from './results/ForexSelector.tsx';
-import { CandlestickSpinner } from './CandlestickSpinner.tsx';
-import { ResultsPage } from '../pages/ResultsPage.tsx';
-import { getTimeframeAnalysis } from '../services/geminiService.ts';
-import { useTokenForAnalysis } from '../services/tokenService.ts';
-import { logService } from '../services/logService.ts';
-import { ChartAnnotationPanel } from './ChartAnnotationPanel.tsx';
+import { createChart, IChartApi, ISeriesApi, Time } from 'lightweight-charts';
+import { Asset, AppUser, AnalysisResult, View } from '../types';
+import { AVAILABLE_ASSETS } from '../constants';
+import { fetchCandlestickData } from '../services/marketDataService';
+import { AssetSelector } from './results/ForexSelector';
+import { CandlestickSpinner } from './CandlestickSpinner';
+import { ResultsPage } from '../pages/ResultsPage';
+import { getTimeframeAnalysis } from '../services/geminiService';
+import { useTokenForAnalysis } from '../services/tokenService';
+import { logService } from '../services/logService';
+import { ChartAnnotationPanel } from './ChartAnnotationPanel';
 
 interface InteractiveChartProps {
     user: AppUser;

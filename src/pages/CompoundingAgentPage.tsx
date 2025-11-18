@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { CompoundingLevel, TradeLog } from '../types.ts';
-import { COMPOUNDING_PLAN } from '../constants.ts';
-import { AgentStatusDisplay } from '../components/chatbot/AgentStatusDisplay.tsx';
-import { CompoundingPlanTable } from '../components/compounding/CompoundingPlanTable.tsx';
-import { TradeLogTable } from '../components/chatbot/TradeLogTable.tsx';
-import { LoadingSpinner } from '../components/LoadingSpinner.tsx';
+import { CompoundingLevel, TradeLog } from '../types';
+import { COMPOUNDING_PLAN } from '../constants';
+import { AgentStatusDisplay } from '../components/chatbot/AgentStatusDisplay';
+import { CompoundingPlanTable } from '../components/compounding/CompoundingPlanTable';
+import { TradeLogTable } from '../components/chatbot/TradeLogTable';
+import { LoadingSpinner } from '../components/LoadingSpinner';
 
 const DERIV_ASSETS = ['Volatility 75 Index', 'Boom 1000 Index', 'EUR/USD', 'GBP/USD'];
 

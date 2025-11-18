@@ -1,7 +1,7 @@
 import { 
     DerivActiveSymbol, DerivBalance, DerivProposal, DerivContractsForSymbol, DerivTick, 
     DerivPortfolio, DerivProfitTableEntry, DerivTradeParams
-} from '../types.ts';
+} from '../types';
 
 type MessageCallback = (data: any) => void;
 type TickHistoryCallback = (history: any[]) => void;
@@ -37,7 +37,7 @@ const derivService = {
         ws.onmessage = (msg) => {
             const data = JSON.parse(msg.data);
             if (data.error) {
-                callbacks?.onError(data.error.message);
+                callbacks?.onError(data.error.message as string);
                 return;
             }
 

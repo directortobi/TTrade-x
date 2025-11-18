@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { AppUser } from '../types.ts';
+import { AppUser } from '../types';
 import { authService } from '../services/authService';
-import { LoadingSpinner } from '../components/LoadingSpinner.tsx';
-import { View } from '../MainApp.tsx';
+import { LoadingSpinner } from '../components/LoadingSpinner';
+import { View } from '../MainApp';
 
 interface ProfilePageProps {
     user: AppUser;

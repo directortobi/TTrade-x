@@ -1,11 +1,12 @@
 import { supabase } from './supabase';
-import { AnalysisLog, AnalysisOutcome, AnalysisResult } from '../types.ts';
+import { AnalysisLog, AnalysisOutcome, AnalysisResult } from '../types';
 
 export const logService = {
     async createLog(result: AnalysisResult, userEmail: string, tokensUsed: number, userId: string): Promise<void> {
         try {
             const { error } = await supabase.from('analysis_logs').insert({
                 user_email: userEmail,
+                user_id: userId,
                 symbol: result.pair,
                 signal: result.signal,
                 entry_price: result.signal !== 'HOLD' ? result.entryPrice : null,

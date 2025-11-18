@@ -154,4 +154,24 @@ const ImageAnalyzer: React.FC<ImageAnalyzerProps> = ({ user, onTokenUsed, onNavi
                         rows={3}
                         value={userAnnotations}
                         onChange={(e) => setUserAnnotations(e.target.value)}
-                        
+                        className="w-full p-3 bg-gray-700/50 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-green-500 focus:border-transparent resize-none"
+                        placeholder="e.g., 'Looking for a reversal at 1.0850...'"
+                    ></textarea>
+                </div>
+
+                <div className="pt-2">
+                    <button
+                        onClick={handleAnalyze}
+                        disabled={!imageData || isLoading}
+                        className="w-full h-14 px-6 text-lg text-white font-semibold bg-green-600 rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition-all duration-300 disabled:bg-gray-600 disabled:cursor-not-allowed flex items-center justify-center"
+                    >
+                        Analyze Image (1 Token)
+                    </button>
+                </div>
+            </div>
+            {error && <div className="mt-4"><ErrorAlert message={error} /></div>}
+        </div>
+    );
+};
+
+export default ImageAnalyzer;

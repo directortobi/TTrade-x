@@ -1,9 +1,9 @@
 import React, { useState, useRef } from 'react';
-import { AppUser, TokenPackage } from '../types.ts';
-import { TOKEN_PACKAGES } from '../constants.ts';
+import { AppUser, TokenPackage } from '../types';
+import { TOKEN_PACKAGES } from '../constants';
 import { createTokenPurchaseRequest } from '../services/tokenService';
-import { LoadingSpinner } from '../components/LoadingSpinner.tsx';
-import { ErrorAlert } from '../components/ErrorAlert.tsx';
+import { LoadingSpinner } from '../components/LoadingSpinner';
+import { ErrorAlert } from '../components/ErrorAlert';
 
 interface BuyTokensPageProps {
     user: AppUser;

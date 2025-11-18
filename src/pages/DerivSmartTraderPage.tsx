@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { derivService } from '../services/derivService';
-import { DerivActiveSymbol, DerivBalance, DerivProposal, DerivContractsForSymbol, DerivTick, DerivPortfolio, DerivProfitTableEntry, DerivTradeParams } from '../types.ts';
-import { LoadingSpinner } from '../components/LoadingSpinner.tsx';
-import { ErrorAlert } from '../components/ErrorAlert.tsx';
+import { DerivActiveSymbol, DerivBalance, DerivProposal, DerivContractsForSymbol, DerivTick, DerivPortfolio, DerivProfitTableEntry, DerivTradeParams } from '../types';
+import { LoadingSpinner } from '../components/LoadingSpinner';
+import { ErrorAlert } from '../components/ErrorAlert';
 
 const DerivSmartTraderPage: React.FC = () => {
     const [apiToken, setApiToken] = useState('');
@@ -148,56 +148,3 @@ const DerivSmartTraderPage: React.FC = () => {
                     </button>
                     <p className="text-xs text-gray-500 mt-4">Your token is stored locally and never sent to our servers.</p>
                 </div>
-            </div>
-        );
-    }
-    
-    const callProposal = proposals['CALL'];
-    const putProposal = proposals['PUT'];
-
-    return (
-        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6 animate-fade-in">
-            {/* Left/Main Column */}
-            <div className="lg:col-span-2 space-y-6">
-                <div className="bg-gray-800/50 p-6 rounded-2xl border border-gray-700">
-                    <div className="flex justify-between items-center mb-4">
-                         <h2 className="text-xl font-bold text-white">Smart Trade Terminal</h2>
-                         <div className="text-right">
-                             <p className="font-bold text-lg text-green-400">${balance?.balance.toFixed(2)}</p>
-                             <p className="text-xs text-gray-500">{balance?.loginid}</p>
-                         </div>
-                    </div>
-                   
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <select value={selectedSymbol} onChange={e => setSelectedSymbol(e.target.value)} className="w-full h-10 pl-3 text-white bg-gray-700 border border-gray-600 rounded-lg">
-                            {activeSymbols.map(s => <option key={s.symbol} value={s.symbol}>{s.display_name}</option>)}
-                        </select>
-                         <select value={tradeParams.contract_type} onChange={e => setTradeParams({...tradeParams, contract_type: e.target.value})} className="w-full h-10 pl-3 text-white bg-gray-700 border border-gray-600 rounded-lg">
-                           {contracts?.available?.map(c => <option key={c.contract_type} value={c.contract_type}>{c.contract_display}</option>)}
-                        </select>
-                         <input type="number" value={tradeParams.stake} onChange={e => setTradeParams({...tradeParams, stake: parseFloat(e.target.value) || 0})} placeholder="Stake" className="w-full h-10 pl-3 text-white bg-gray-700 border border-gray-600 rounded-lg" />
-                         <div className="flex gap-2">
-                            <input type="number" value={tradeParams.duration} onChange={e => setTradeParams({...tradeParams, duration: parseInt(e.target.value) || 0})} placeholder="Duration" className="w-2/3 h-10 pl-3 text-white bg-gray-700 border border-gray-600 rounded-lg" />
-                            <select value={tradeParams.duration_unit} onChange={e => setTradeParams({...tradeParams, duration_unit: e.target.value as 't'|'m'})} className="w-1/3 h-10 pl-2 text-white bg-gray-700 border border-gray-600 rounded-lg">
-                                <option value="t">Ticks</option>
-                                <option value="m">Minutes</option>
-                                <option value="h">Hours</option>
-                                <option value="d">Days</option>
-                            </select>
-                         </div>
-                    </div>
-                    {error && <div className="mt-4"><ErrorAlert message={error} /></div>}
-                     <div className="grid grid-cols-2 gap-4 mt-4">
-                        <button onClick={() => handleBuy(callProposal)} disabled={!callProposal} className="h-20 bg-green-600 text-white font-bold rounded-lg disabled:bg-gray-600/50 flex flex-col items-center justify-center transition-colors">
-                            <span>Higher / Rise</span>
-                            <span className="text-xs font-normal">Payout: ${callProposal?.payout.toFixed(2)}</span>
-                        </button>
-                        <button onClick={() => handleBuy(putProposal)} disabled={!putProposal} className="h-20 bg-red-600 text-white font-bold rounded-lg disabled:bg-gray-600/50 flex flex-col items-center justify-center transition-colors">
-                             <span>Lower / Fall</span>
-                            <span className="text-xs font-normal">Payout: ${putProposal?.payout.toFixed(2)}</span>
-                        </button>
-                    </div>
-                </div>
-                <div className="bg-gray-800/50 p-4 rounded-2xl border border-gray-700">
-                    <h3 className="font-bold text-lg mb-2">Open Positions</h3>
-                    
