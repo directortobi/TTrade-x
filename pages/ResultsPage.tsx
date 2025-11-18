@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
 // FIX: Add .ts extension to import path.
 // FIX: Corrected import paths to be relative.
-import { AnalysisResult, Signal, TrendDirection, UiDerivContractType } from '../types.ts';
+import { AnalysisResult, Signal, TrendDirection, UiDerivContractType } from '../types';
 // FIX: Add .tsx extension to import path.
-import { BuyIcon, SellIcon, HoldIcon } from '../components/icons/SignalIcons.tsx';
+import { BuyIcon, SellIcon, HoldIcon } from '../components/icons/SignalIcons';
 // FIX: Add .tsx extension to import path.
-import { ConfidenceMeter } from '../components/results/ConfidenceMeter.tsx';
+import { ConfidenceMeter } from '../components/results/ConfidenceMeter';
 // FIX: Add .tsx extension to import path.
-import { ReadAloudButton } from '../components/icons/ReadAloudButton.tsx';
-import { useSignal } from '../contexts/SignalContext.tsx';
+import { ReadAloudButton } from '../components/icons/ReadAloudButton';
+import { useSignal } from '../contexts/SignalContext';
 // FIX: Add .tsx extension to import path.
-import { View } from '../MainApp.tsx';
+import { View } from '../MainApp';
 
 interface ResultsPageProps {
     result: AnalysisResult;

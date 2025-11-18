@@ -1,16 +1,16 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 // FIX: Add .ts extension to import path.
-import { CompoundingLevel, TradeLog } from '../types.ts';
+import { CompoundingLevel, TradeLog } from '../types';
 // FIX: Add .ts extension to import path.
-import { COMPOUNDING_PLAN } from '../constants.ts';
+import { COMPOUNDING_PLAN } from '../constants';
 // FIX: Add .tsx extension to import path.
-import { AgentStatusDisplay } from '../components/chatbot/AgentStatusDisplay.tsx';
+import { AgentStatusDisplay } from '../components/chatbot/AgentStatusDisplay';
 // FIX: Add .tsx extension to import path.
-import { CompoundingPlanTable } from '../components/compounding/CompoundingPlanTable.tsx';
+import { CompoundingPlanTable } from '../components/compounding/CompoundingPlanTable';
 // FIX: Add .tsx extension to import path.
-import { TradeLogTable } from '../components/chatbot/TradeLogTable.tsx';
+import { TradeLogTable } from '../components/chatbot/TradeLogTable';
 // FIX: Add .tsx extension to import path.
-import { LoadingSpinner } from '../components/LoadingSpinner.tsx';
+import { LoadingSpinner } from '../components/LoadingSpinner';
 
 const DERIV_ASSETS = ['Volatility 75 Index', 'Boom 1000 Index', 'EUR/USD', 'GBP/USD'];
 

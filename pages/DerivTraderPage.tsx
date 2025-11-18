@@ -59,8 +59,8 @@ const DerivTraderPage: React.FC = () => {
             },
             onProfitTable: (table) => setProfitTable(table),
             // FIX: Handle `unknown` error type by converting it to a string before setting state, and ensure signature matches service contract.
-            onError: (err: string) => {
-                setError(err);
+            onError: (err: unknown) => {
+                setError(String(err));
                 setIsLoading(false);
                 setIsConnected(false);
             },
@@ -179,4 +179,4 @@ const DerivTraderPage: React.FC = () => {
                         <select value={selectedSymbol} onChange={e => setSelectedSymbol(e.target.value)} className="w-full h-10 pl-3 text-white bg-gray-700 border border-gray-600 rounded-lg">
                             {activeSymbols.map(s => <option key={s.symbol} value={s.symbol}>{s.display_name}</option>)}
                         </select>
-                         <select value={tradeParams.contract_type} onChange={
+                         <select value={tradeParams.contract_type} onChange={e => setTradeParams({...tradeParams, contract_type: e.target.value})} className="w-full h-10 pl-3 text-white bg-gray-700 border border-gray-600 rounded
