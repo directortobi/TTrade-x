@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { derivService } from '../services/derivService';
-import { useSignal } from '../contexts/SignalContext';
-import { Signal, DerivActiveSymbol, DerivBalance, DerivProposal, DerivContractsForSymbol, DerivTick, DerivPortfolio, DerivProfitTableEntry, DerivTradeParams, UiDerivContractType } from '../types';
-import { LoadingSpinner } from '../components/LoadingSpinner';
-import { ErrorAlert } from '../components/ErrorAlert';
+import { useSignal } from '../contexts/SignalContext.tsx';
+import { Signal, DerivActiveSymbol, DerivBalance, DerivProposal, DerivContractsForSymbol, DerivTick, DerivPortfolio, DerivProfitTableEntry, DerivTradeParams, UiDerivContractType } from '../types.ts';
+import { LoadingSpinner } from '../components/LoadingSpinner.tsx';
+import { ErrorAlert } from '../components/ErrorAlert.tsx';
 
 const DerivTraderPage: React.FC = () => {
     const [apiToken, setApiToken] = useState('');

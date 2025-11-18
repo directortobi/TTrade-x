@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { AppUser } from '../types';
+import { AppUser } from '../types.ts';
 import { withdrawalService } from '../services/withdrawalService';
-import { LoadingSpinner } from '../components/LoadingSpinner';
-import { ErrorAlert } from '../components/ErrorAlert';
+import { LoadingSpinner } from '../components/LoadingSpinner.tsx';
+import { ErrorAlert } from '../components/ErrorAlert.tsx';
 
 interface WithdrawPageProps {
     user: AppUser;

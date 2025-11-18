@@ -1,5 +1,5 @@
 import React, { createContext, useState, useContext, useCallback } from 'react';
-import { AnalysisResult, UiDerivContractType } from '../types';
+import { AnalysisResult, UiDerivContractType } from '../types.ts';
 
 interface SignalContextState {
     signal: AnalysisResult | null;

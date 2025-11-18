@@ -1,5 +1,5 @@
 import { supabase } from './supabase';
-import { TokenPackage, TokenPurchase } from '../types';
+import { TokenPackage, TokenPurchase } from '../types.ts';
 
 interface PurchaseRequest {
     userId: string;

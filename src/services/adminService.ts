@@ -1,5 +1,5 @@
 import { supabase } from './supabase';
-import { PurchaseWithEmail, WithdrawalWithEmail, ReferralWithdrawalWithEmail } from '../types';
+import { PurchaseWithEmail, WithdrawalWithEmail, ReferralWithdrawalWithEmail } from '../types.ts';
 
 /**
  * A service for handling all administrative actions.

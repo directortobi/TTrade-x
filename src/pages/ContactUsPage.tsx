@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { AppUser } from '../types';
-import { LoadingSpinner } from '../components/LoadingSpinner';
+import { AppUser } from '../types.ts';
+import { LoadingSpinner } from '../components/LoadingSpinner.tsx';
 
 interface ContactUsPageProps {
     user: AppUser;

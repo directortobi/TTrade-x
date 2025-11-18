@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { AppUser, AnalysisLog, Signal, AnalysisOutcome } from '../types';
+import { AppUser, AnalysisLog, Signal, AnalysisOutcome } from '../types.ts';
 import { logService } from '../services/logService';
-import { LoadingSpinner } from '../components/LoadingSpinner';
-import { ErrorAlert } from '../components/ErrorAlert';
-import { TableSkeleton } from '../components/skeletons/TableSkeleton';
+import { LoadingSpinner } from '../components/LoadingSpinner.tsx';
+import { ErrorAlert } from '../components/ErrorAlert.tsx';
+import { TableSkeleton } from '../components/skeletons/TableSkeleton.tsx';
 
 interface HistoryPageProps {
     user: AppUser;

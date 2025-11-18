@@ -1,5 +1,5 @@
 import { supabase } from './supabase';
-import { ReferralEarningWithEmail, ReferredUser } from '../types';
+import { ReferralEarningWithEmail, ReferredUser } from '../types.ts';
 
 interface ReferralStats {
     totalReferrals: number;

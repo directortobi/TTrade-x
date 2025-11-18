@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { AppUser, ReferredUser, ReferralEarningWithEmail, EarningStatus } from '../types';
+import { AppUser, ReferredUser, ReferralEarningWithEmail, EarningStatus } from '../types.ts';
 import { referralService } from '../services/referralService';
-import { LoadingSpinner } from '../components/LoadingSpinner';
-import { ErrorAlert } from '../components/ErrorAlert';
-import { StatCardSkeleton } from '../components/skeletons/StatCardSkeleton';
-import { TableSkeleton } from '../components/skeletons/TableSkeleton';
+import { LoadingSpinner } from '../components/LoadingSpinner.tsx';
+import { ErrorAlert } from '../components/ErrorAlert.tsx';
+import { StatCardSkeleton } from '../components/skeletons/StatCardSkeleton.tsx';
+import { TableSkeleton } from '../components/skeletons/TableSkeleton.tsx';
 
 interface ReferralPageProps {
     user: AppUser;

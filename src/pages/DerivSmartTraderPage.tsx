@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { derivService } from '../services/derivService';
-import { DerivActiveSymbol, DerivBalance, DerivProposal, DerivContractsForSymbol, DerivTick, DerivPortfolio, DerivProfitTableEntry, DerivTradeParams } from '../types';
-import { LoadingSpinner } from '../components/LoadingSpinner';
-import { ErrorAlert } from '../components/ErrorAlert';
+import { DerivActiveSymbol, DerivBalance, DerivProposal, DerivContractsForSymbol, DerivTick, DerivPortfolio, DerivProfitTableEntry, DerivTradeParams } from '../types.ts';
+import { LoadingSpinner } from '../components/LoadingSpinner.tsx';
+import { ErrorAlert } from '../components/ErrorAlert.tsx';
 
 const DerivSmartTraderPage: React.FC = () => {
     const [apiToken, setApiToken] = useState('');
@@ -200,55 +200,4 @@ const DerivSmartTraderPage: React.FC = () => {
                 </div>
                 <div className="bg-gray-800/50 p-4 rounded-2xl border border-gray-700">
                     <h3 className="font-bold text-lg mb-2">Open Positions</h3>
-                    <div className="overflow-x-auto max-h-64">
-                         <table className="w-full text-sm">
-                             <thead className="sticky top-0 bg-gray-800/50"><tr className="text-left text-gray-400"><th className="p-2">Contract</th><th className="p-2">Buy Price</th><th className="p-2">Current Price</th><th className="p-2">Profit/Loss</th><th className="p-2"></th></tr></thead>
-                             <tbody>
-                                {portfolio?.contracts.map(c => (
-                                    <tr key={c.contract_id} className="border-t border-gray-700">
-                                        <td className="p-2">{c.longcode}</td>
-                                        <td className="p-2">${c.buy_price.toFixed(2)}</td>
-                                        <td className="p-2">${c.bid_price.toFixed(2)}</td>
-                                        <td className={`p-2 font-semibold ${c.profit > 0 ? 'text-green-400' : 'text-red-400'}`}>{c.profit > 0 ? '+':''}${c.profit.toFixed(2)}</td>
-                                        <td className="p-2 text-right"><button onClick={() => handleSell(c.contract_id)} disabled={!c.is_valid_to_sell} className="px-2 py-1 text-xs bg-gray-600 rounded hover:bg-gray-500 disabled:opacity-50">Sell</button></td>
-                                    </tr>
-                                ))}
-                                {(!portfolio || portfolio.contracts.length === 0) && <tr><td colSpan={5} className="text-center p-4 text-gray-500">No open positions.</td></tr>}
-                             </tbody>
-                         </table>
-                    </div>
-                </div>
-            </div>
-            {/* Right Column */}
-            <div className="lg:col-span-1 space-y-6">
-                 <div className="bg-gray-800/50 p-4 rounded-xl border border-gray-700 text-center">
-                    <p className="text-sm text-gray-400">{selectedSymbol}</p>
-                    <p className={`text-4xl font-mono font-bold transition-colors ${tick && tick.quote > (tick.bid || 0) ? 'text-green-400' : 'text-red-400'}`}>{tick?.quote}</p>
-                </div>
-                <div className="bg-gray-800/50 p-4 rounded-2xl border border-gray-700">
-                    <h3 className="font-bold text-lg mb-2">Recent Trades</h3>
-                    <div className="overflow-y-auto max-h-96">
-                        <table className="w-full text-sm">
-                             <tbody>
-                                {profitTable.map(t => (
-                                     <tr key={t.contract_id} className="border-b border-gray-700 last:border-0">
-                                        <td className="p-2">
-                                            <p className="font-medium">{t.shortcode.split('_')[0]}</p>
-                                            <p className="text-xs text-gray-500">{new Date(t.sell_time * 1000).toLocaleTimeString()}</p>
-                                        </td>
-                                        <td className={`p-2 text-right font-semibold ${t.profit_loss > 0 ? 'text-green-400' : 'text-red-400'}`}>
-                                            {t.profit_loss > 0 ? '+':''}${t.profit_loss.toFixed(2)}
-                                        </td>
-                                     </tr>
-                                ))}
-                                 {profitTable.length === 0 && <tr><td colSpan={2} className="text-center p-4 text-gray-500">No recent trade history.</td></tr>}
-                             </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
-};
-
-export default DerivSmartTraderPage;
+                    

@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { AppUser, TokenPurchase, TokenPurchaseStatus } from '../types';
+import { AppUser, TokenPurchase, TokenPurchaseStatus } from '../types.ts';
 import { getPurchaseHistory } from '../services/tokenService';
-import { ErrorAlert } from '../components/ErrorAlert';
-import { View } from '../MainApp';
-import { TableSkeleton } from '../components/skeletons/TableSkeleton';
+import { ErrorAlert } from '../components/ErrorAlert.tsx';
+import { View } from '../MainApp.tsx';
+import { TableSkeleton } from '../components/skeletons/TableSkeleton.tsx';
 
 interface PurchaseHistoryPageProps {
     user: AppUser;

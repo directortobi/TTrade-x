@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { AnalysisResult, Signal, TrendDirection, UiDerivContractType } from '../types';
-import { BuyIcon, SellIcon, HoldIcon } from '../components/icons/SignalIcons';
-import { ConfidenceMeter } from '../components/results/ConfidenceMeter';
-import { ReadAloudButton } from '../components/icons/ReadAloudButton';
-import { useSignal } from '../contexts/SignalContext';
-import { View } from '../MainApp';
+import { AnalysisResult, Signal, TrendDirection, UiDerivContractType } from '../types.ts';
+import { BuyIcon, SellIcon, HoldIcon } from '../components/icons/SignalIcons.tsx';
+import { ConfidenceMeter } from '../components/results/ConfidenceMeter.tsx';
+import { ReadAloudButton } from '../components/icons/ReadAloudButton.tsx';
+import { useSignal } from '../contexts/SignalContext.tsx';
+import { View } from '../MainApp.tsx';
 
 interface ResultsPageProps {
     result: AnalysisResult;

@@ -1,5 +1,5 @@
 import { supabase } from './supabase';
-import { AnalysisLog, AnalysisOutcome, AnalysisResult } from '../types';
+import { AnalysisLog, AnalysisOutcome, AnalysisResult } from '../types.ts';
 
 export const logService = {
     async createLog(result: AnalysisResult, userEmail: string, tokensUsed: number, userId: string): Promise<void> {

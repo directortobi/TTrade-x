@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { adminService } from '../services/adminService';
-import { PurchaseWithEmail, WithdrawalWithEmail, ReferralWithdrawalWithEmail } from '../types';
-import { LoadingSpinner } from '../components/LoadingSpinner';
-import { ErrorAlert } from '../components/ErrorAlert';
-import { TableSkeleton } from '../components/skeletons/TableSkeleton';
+import { PurchaseWithEmail, WithdrawalWithEmail, ReferralWithdrawalWithEmail } from '../types.ts';
+import { LoadingSpinner } from '../components/LoadingSpinner.tsx';
+import { ErrorAlert } from '../components/ErrorAlert.tsx';
+import { TableSkeleton } from '../components/skeletons/TableSkeleton.tsx';
 
 
 const AdminPage: React.FC = () => {
