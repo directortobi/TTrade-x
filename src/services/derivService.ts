@@ -1,3 +1,4 @@
+
 import { 
     DerivActiveSymbol, DerivBalance, DerivProposal, DerivContractsForSymbol, DerivTick, 
     DerivPortfolio, DerivProfitTableEntry, DerivTradeParams
@@ -37,7 +38,7 @@ const derivService = {
         ws.onmessage = (msg) => {
             const data = JSON.parse(msg.data);
             if (data.error) {
-                callbacks?.onError(data.error.message as string);
+                callbacks?.onError((data as any).error.message);
                 return;
             }
 

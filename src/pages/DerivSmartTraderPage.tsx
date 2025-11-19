@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { derivService } from '../services/derivService';
 import { DerivActiveSymbol, DerivBalance, DerivProposal, DerivContractsForSymbol, DerivTick, DerivPortfolio, DerivProfitTableEntry, DerivTradeParams } from '../types';
@@ -148,3 +149,46 @@ const DerivSmartTraderPage: React.FC = () => {
                     </button>
                     <p className="text-xs text-gray-500 mt-4">Your token is stored locally and never sent to our servers.</p>
                 </div>
+            </div>
+        );
+    }
+
+    return (
+         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6 animate-fade-in">
+            {/* ... Same layout as DerivTraderPage but for smart trading ... */}
+             <div className="lg:col-span-3 space-y-6">
+                 <div className="bg-gray-800/50 p-6 rounded-2xl border border-gray-700">
+                    <div className="flex justify-between items-center mb-4">
+                         <h2 className="text-xl font-bold text-white">Smart Trader Terminal</h2>
+                         <div className="text-right">
+                             <p className="font-bold text-lg text-green-400">${balance?.balance.toFixed(2)}</p>
+                             <p className="text-xs text-gray-500">{balance?.loginid}</p>
+                         </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="space-y-4">
+                            <label className="text-sm text-gray-400">Asset</label>
+                            <select value={selectedSymbol} onChange={e => setSelectedSymbol(e.target.value)} className="w-full h-12 pl-3 text-white bg-gray-700 border border-gray-600 rounded-lg">
+                                {activeSymbols.map(s => <option key={s.symbol} value={s.symbol}>{s.display_name}</option>)}
+                            </select>
+                        </div>
+                        <div className="space-y-4">
+                             <label className="text-sm text-gray-400">Contract Type</label>
+                             <select value={tradeParams.contract_type} onChange={e => setTradeParams({...tradeParams, contract_type: e.target.value})} className="w-full h-12 pl-3 text-white bg-gray-700 border border-gray-600 rounded-lg">
+                               {contracts?.available?.map(c => <option key={c.contract_type} value={c.contract_type}>{c.contract_display}</option>)}
+                            </select>
+                        </div>
+                        <div className="space-y-4">
+                            <label className="text-sm text-gray-400">Stake</label>
+                            <input type="number" value={tradeParams.stake} onChange={e => setTradeParams({...tradeParams, stake: parseFloat(e.target.value) || 0})} placeholder="Stake" className="w-full h-12 pl-3 text-white bg-gray-700 border border-gray-600 rounded-lg" />
+                        </div>
+                    </div>
+                     {error && <div className="mt-4"><ErrorAlert message={error} /></div>}
+                 </div>
+            </div>
+        </div>
+    );
+};
+
+export default DerivSmartTraderPage;

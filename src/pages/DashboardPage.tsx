@@ -1,6 +1,6 @@
+
 import React from 'react';
-import { AppUser } from '../types';
-import { View } from '../MainApp';
+import { AppUser, View } from '../types';
 import TradingViewMarketOverviewWidget from '../components/TradingViewMarketOverviewWidget';
 import RecentSignals from '../components/dashboard/RecentSignals';
 
@@ -57,19 +57,6 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ user, onNavigate }) => {
                             </button>
                         </div>
                     </div>
-
-                    {/* Help Card */}
-                    <div className="bg-gray-800/50 p-6 rounded-xl border border-gray-700">
-                        <h3 className="text-lg font-bold text-white mb-2">Need Help?</h3>
-                        <p className="text-sm text-gray-400 mb-4">Learn how to use Trade X features effectively.</p>
-                        <button 
-                            onClick={() => onNavigate('instructions')} 
-                            className="w-full py-2 text-sm font-semibold text-cyan-400 bg-cyan-900/20 rounded-lg hover:bg-cyan-900/40 transition-colors border border-cyan-800"
-                        >
-                            View Instructions
-                        </button>
-                    </div>
-
                      <RecentSignals onNavigate={onNavigate} />
                 </div>
 

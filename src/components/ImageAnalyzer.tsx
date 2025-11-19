@@ -1,9 +1,10 @@
+
 import React, { useState, useRef, useCallback } from 'react';
-import { AnalysisResult, ImageData as ImageData_ } from '../types';
+import { AnalysisResult, ImageData as ImageData_, View } from '../types';
 import { getSignalFromImage } from '../services/geminiService';
 import { useTokenForAnalysis } from '../services/tokenService';
 import { logService } from '../services/logService';
-import { AppUser, Signal, View } from '../types';
+import { AppUser, Signal } from '../types';
 import { ResultsPage } from '../pages/ResultsPage';
 import { ErrorAlert } from './ErrorAlert';
 import { CandlestickSpinner } from './CandlestickSpinner';

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { derivService } from '../services/derivService';
 import { useSignal } from '../contexts/SignalContext';
@@ -153,8 +154,8 @@ const DerivTraderPage: React.FC = () => {
     }
     
     // Use type guard and optional chaining to safely find proposals.
-    const callProposal = Object.values(proposals).find((p): p is DerivProposal => !!p && p.contract_type === 'CALL');
-    const putProposal = Object.values(proposals).find((p): p is DerivProposal => !!p && p.contract_type === 'PUT');
+    const callProposal = Object.values(proposals).find((p): p is DerivProposal => p !== null && p !== undefined && p.contract_type === 'CALL');
+    const putProposal = Object.values(proposals).find((p): p is DerivProposal => p !== null && p !== undefined && p.contract_type === 'PUT');
 
     return (
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6 animate-fade-in">

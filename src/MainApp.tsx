@@ -1,8 +1,9 @@
+
 import React, { useState, useEffect, useCallback } from 'react';
 import type { Session } from '@supabase/supabase-js';
 import { supabase } from './services/supabase';
 import { profileService } from './services/profileService';
-import { AppUser, Profile } from './types';
+import { AppUser, Profile, View } from './types';
 import { Header } from './components/Header';
 import { LoadingSpinner } from './components/LoadingSpinner';
 import { ErrorAlert } from './components/ErrorAlert';
@@ -30,7 +31,6 @@ const DerivSmartTraderPage = React.lazy(() => import('./pages/DerivSmartTraderPa
 const CompoundingAgentPage = React.lazy(() => import('./pages/CompoundingAgentPage'));
 const InstructionsPage = React.lazy(() => import('./pages/InstructionsPage'));
 
-export type View = 'dashboard' | 'market_analyst' | 'image_analyst' | 'chart' | 'history' | 'profile' | 'buyTokens' | 'purchaseHistory' | 'admin' | 'referrals' | 'withdraw' | 'withdrawalHistory' | 'about' | 'contact' | 'disclaimer' | 'derivTrader' | 'derivSmartTrader' | 'compoundingAgent' | 'instructions';
 
 const DEFAULT_PROFILE: Profile = {
     id: '',

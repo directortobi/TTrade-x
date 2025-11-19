@@ -1,3 +1,4 @@
+
 import { supabase } from './supabase';
 import { TokenPackage, TokenPurchase } from '../types';
 
@@ -7,7 +8,7 @@ interface PurchaseRequest {
     proofFile: File;
 }
 
-export const createTokenPurchaseRequest = async ({ userId, pkg, proofFile }: PurchaseRequest): Promise<void> => {
+export const createTokenPurchaseRequest = async ({ userId, pkg, proofFile }: PurchaseRequest): Promise<void> {
     // 1. Upload the file to Supabase Storage
     const fileExt = proofFile.name.split('.').pop();
     const fileName = `${Math.random()}.${fileExt}`;

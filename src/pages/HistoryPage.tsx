@@ -1,9 +1,9 @@
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { AppUser, AnalysisLog, Signal, AnalysisOutcome } from '../types';
 import { logService } from '../services/logService';
 import { LoadingSpinner } from '../components/LoadingSpinner';
 import { ErrorAlert } from '../components/ErrorAlert';
-import { TableSkeleton } from '../components/skeletons/TableSkeleton';
 
 interface HistoryPageProps {
     user: AppUser;
@@ -78,7 +78,7 @@ const HistoryPage: React.FC<HistoryPageProps> = ({ user }) => {
 
     const renderContent = () => {
         if (isLoading) {
-            return <TableSkeleton cols={10} />;
+            return <div className="flex justify-center items-center h-64"><LoadingSpinner /></div>;
         }
         if (logs.length === 0 && !error) {
             return <p className="text-center text-gray-400 py-16">You have no analysis history yet. Perform an analysis to get started!</p>;

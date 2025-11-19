@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { CompoundingLevel, TradeLog } from '../types';
 import { COMPOUNDING_PLAN } from '../constants';

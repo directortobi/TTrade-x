@@ -1,8 +1,8 @@
+
 import React, { useState, useEffect, useCallback } from 'react';
-import { AppUser, TokenPurchase, TokenPurchaseStatus } from '../types';
+import { AppUser, TokenPurchase, TokenPurchaseStatus, View } from '../types';
 import { getPurchaseHistory } from '../services/tokenService';
 import { ErrorAlert } from '../components/ErrorAlert';
-import { View } from '../MainApp';
 import { TableSkeleton } from '../components/skeletons/TableSkeleton';
 
 interface PurchaseHistoryPageProps {

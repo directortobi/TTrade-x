@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { AppUser, ReferredUser, ReferralEarningWithEmail, EarningStatus } from '../types';
 import { referralService } from '../services/referralService';
