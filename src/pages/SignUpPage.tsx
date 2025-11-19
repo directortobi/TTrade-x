@@ -10,6 +10,7 @@ interface SignUpPageProps {
     onNavigateToLogin: () => void;
     error: string | null;
     isLoading: boolean;
+    successMessage?: string | null;
 }
 
 export const SignUpPage: React.FC<SignUpPageProps> = ({ onSignUp, onNavigateToLogin, error, isLoading }) => {

@@ -38,7 +38,7 @@ const derivService = {
         ws.onmessage = (msg) => {
             const data = JSON.parse(msg.data);
             if (data.error) {
-                callbacks?.onError((data as any).error.message);
+                callbacks?.onError(data.error.message);
                 return;
             }
 

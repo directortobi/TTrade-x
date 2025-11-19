@@ -5,7 +5,7 @@ import { DerivActiveSymbol, DerivBalance, DerivProposal, DerivContractsForSymbol
 import { LoadingSpinner } from '../components/LoadingSpinner';
 import { ErrorAlert } from '../components/ErrorAlert';
 
-const DerivSmartTraderPage: React.FC = () => {
+const DerivSmartTraderPage = () => {
     const [apiToken, setApiToken] = useState('');
     const [isConnected, setIsConnected] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
