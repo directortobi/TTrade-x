@@ -72,3 +72,21 @@ To access the Admin Dashboard (`/admin` route), you must set the `is_admin` flag
 5.  Click **Save**.
 
 You can now access the Admin Dashboard in the app.
+
+## 5. Deployment to Netlify
+
+To deploy this application to Netlify:
+
+1.  **Push to Git:** Ensure your project is pushed to a GitHub, GitLab, or Bitbucket repository.
+2.  **Create Site:** Log in to Netlify, click "Add new site," and select "Import an existing project".
+3.  **Connect Repo:** Select your Git repository.
+4.  **Build Settings:**
+    *   **Build Command:** `npm run build`
+    *   **Publish Directory:** `dist`
+5.  **Environment Variables:** Click "Show advanced" or go to Site Settings > Environment Variables after creation. Add the exact keys and values from your local `.env` file:
+    *   `VITE_SUPABASE_URL`
+    *   `VITE_SUPABASE_ANON_KEY`
+    *   `VITE_API_KEY`
+6.  **Deploy:** Click "Deploy Site".
+
+**Note:** A `public/_redirects` file has been added to the project to ensure routing works correctly (preventing 404 errors on page refresh).
