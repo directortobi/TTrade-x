@@ -249,5 +249,3 @@ const DerivSmartTraderPage: React.FC = () => {
         </div>
     );
 };
-
-export default DerivSmartTraderPage;

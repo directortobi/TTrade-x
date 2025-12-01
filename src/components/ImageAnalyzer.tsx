@@ -139,40 +139,4 @@ const ImageAnalyzer: React.FC<ImageAnalyzerProps> = ({ user, onTokenUsed, onNavi
                         <img src={imagePreview} alt="Chart preview" className="max-h-80 mx-auto rounded-lg object-contain" />
                     ) : (
                         <div className="flex flex-col items-center justify-center text-gray-400">
-                             <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}><path strokeLinecap="round" strokeLinejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-                            <p className="font-semibold">Click to upload or drag & drop</p>
-                            <p className="text-sm">PNG, JPG, GIF, or WEBP (Max 4MB)</p>
-                        </div>
-                    )}
-                </div>
-                
-                <div>
-                    <label htmlFor="annotations" className="block text-sm font-medium text-gray-400 mb-2">
-                        Your Notes & Analysis (Optional)
-                    </label>
-                    <textarea
-                        id="annotations"
-                        rows={3}
-                        value={userAnnotations}
-                        onChange={(e) => setUserAnnotations(e.target.value)}
-                        className="w-full p-3 bg-gray-700/50 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-green-500 focus:border-transparent resize-none"
-                        placeholder="e.g., 'Looking for a reversal at 1.0850...'"
-                    ></textarea>
-                </div>
-
-                <div className="pt-2">
-                    <button
-                        onClick={handleAnalyze}
-                        disabled={!imageData || isLoading}
-                        className="w-full h-14 px-6 text-lg text-white font-semibold bg-green-600 rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition-all duration-300 disabled:bg-gray-600 disabled:cursor-not-allowed flex items-center justify-center"
-                    >
-                        Analyze Image (1 Token)
-                    </button>
-                </div>
-            </div>
-            {error && <div className="mt-4"><ErrorAlert message={error} /></div>}
-        </div>
-    );
-};
-
-export default ImageAnalyzer;
+                             <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}><path strokeLinecap="round" strokeLinejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a

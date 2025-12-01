@@ -240,5 +240,3 @@ const ReferralPage: React.FC<ReferralPageProps> = ({ user }) => {
         </div>
     );
 };
-
-export default ReferralPage;

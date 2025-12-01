@@ -118,5 +118,3 @@ const WithdrawPage: React.FC<WithdrawPageProps> = ({ user, onWithdrawSuccess }) 
         </div>
     );
 };
-
-export default WithdrawPage;

@@ -70,5 +70,3 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ user, onNavigate }) => {
         </div>
     );
 };
-
-export default DashboardPage;

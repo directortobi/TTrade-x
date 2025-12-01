@@ -167,5 +167,3 @@ const HistoryPage: React.FC<HistoryPageProps> = ({ user }) => {
         </div>
     );
 };
-
-export default HistoryPage;

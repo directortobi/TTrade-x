@@ -10,16 +10,18 @@ interface WithdrawalRequest {
 
 export const withdrawalService = {
     async createWithdrawalRequest({ userId, tokens, address }: WithdrawalRequest): Promise<void> {
-        // Calls the secure database function to atomically check balance, deduct tokens, and create record.
-        const { error } = await supabase.rpc('request_token_withdrawal', {
-            p_user_id: userId,
-            p_amount: tokens,
-            p_address: address
-        });
+        const { error } = await supabase
+            .from('withdrawals')
+            .insert({
+                user_id: userId,
+                tokens_to_withdraw: tokens,
+                wallet_address: address,
+                status: 'pending'
+            });
         
         if (error) {
             console.error('Error creating withdrawal request:', error);
-            throw new Error(error.message || 'Failed to submit your withdrawal request. Please try again.');
+            throw new Error('Failed to submit your withdrawal request. Please try again.');
         }
     },
 
