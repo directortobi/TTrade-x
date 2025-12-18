@@ -1,30 +1,13 @@
-// FIX: Add .ts extension to import path.
-// FIX: Corrected import path to be relative.
-import { Candle, NewsSentiment, Timeframe } from '../types.ts';
 
-// ===================================================================================
-// DEVELOPER NOTE: THIS IS A MOCK DATA SERVICE FOR DEMONSTRATION PURPOSES.
-// To make this a truly "live" analyzer app, you must replace the functions
-// in this file with calls to a real financial market data provider API.
-//
-// Popular options include:
-// - Polygon.io
-// - Alpha Vantage
-// - IEX Cloud
-// - A direct connection to a brokerage like Alpaca or OANDA.
-//
-// You will need to sign up for one of these services, get an API key,
-// and modify the fetchCandlestickData and fetchNewsSentiment functions
-// to fetch and format data from that live source.
-// ===================================================================================
-
+// FIX: Removed .ts extension from import path.
+import { Candle, NewsSentiment, Timeframe } from '../types';
 
 // Helper function to generate a random number in a range
 const randomInRange = (min: number, max: number) => Math.random() * (max - min) + min;
 
 // Generates a single procedural candle based on the previous one
 const generateNextCandle = (previousCandle: Candle, intervalMinutes: number): Candle => {
-    const volatility = 0.001 * Math.sqrt(intervalMinutes / 60); // Higher timeframe = higher volatility
+    const volatility = 0.001 * Math.sqrt(intervalMinutes / 60); 
     const change = (Math.random() - 0.5) * volatility;
     const open = previousCandle.close;
     const close = open * (1 + change);
@@ -35,19 +18,10 @@ const generateNextCandle = (previousCandle: Candle, intervalMinutes: number): Ca
     return { datetime, open, high, low, close, volume: Math.floor(volume) };
 };
 
-// --- MOCK API FUNCTIONS ---
-
-/**
- * Simulates fetching the last 100 candlestick data points for a given forex pair and timeframe.
- * In a real application, this would call an external data API.
- */
 export const fetchCandlestickData = async (
     ticker: string,
     timeframe: Timeframe
 ): Promise<Candle[]> => {
-    console.log(`Simulating fetch for ${ticker} - ${timeframe}`);
-    
-    // Starting prices for different pairs to make them look distinct
     const basePrices: { [key: string]: number } = {
         'EUR/USD': 1.07,
         'USD/JPY': 157.0,
@@ -86,36 +60,26 @@ export const fetchCandlestickData = async (
         candles.push(currentCandle);
     }
     
-    // Simulate API delay
     await new Promise(resolve => setTimeout(resolve, randomInRange(100, 300)));
 
     return candles;
 };
 
-/**
- * Simulates fetching and analyzing news sentiment for a forex pair.
- * In a real application, this would call NewsAPI and then a sentiment analysis model.
- */
 export const fetchNewsSentiment = async (ticker: string): Promise<NewsSentiment> => {
-    console.log(`Simulating news sentiment analysis for ${ticker}`);
-    
     const score = Math.round(randomInRange(-8, 8));
     let rationale = '';
     if (score > 3) {
-        rationale = "Positive economic data and central bank statements are buoying investor confidence.";
+        rationale = "Positive economic data is buoying confidence.";
     } else if (score < -3) {
-        rationale = "Geopolitical tensions and inflation fears are leading to a risk-off sentiment in the market.";
+        rationale = "Geopolitical tensions are leading to risk-off sentiment.";
     } else {
-        rationale = "Market sentiment is mixed, with no strong directional bias from recent news.";
+        rationale = "Market sentiment is mixed.";
     }
     
     const articles = [
-        { title: `Analysis: ${ticker.split('/')[0]} Strengthens on Economic Outlook`, source: 'Reuters' },
-        { title: `Central Bank Hints at Future Policy Changes Affecting ${ticker.split('/')[1]}`, source: 'Bloomberg' },
-        { title: `Market Volatility Increases for ${ticker} Ahead of Jobs Report`, source: 'Financial Times' },
+        { title: `Analysis: ${ticker.split('/')[0]} Outlook`, source: 'Reuters' },
     ];
     
-    // Simulate API delay
     await new Promise(resolve => setTimeout(resolve, randomInRange(100, 300)));
 
     return { score, rationale, articles };

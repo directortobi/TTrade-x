@@ -1,5 +1,6 @@
-// FIX: Add .ts extension to import path.
-import { User, Credentials } from '../types.ts';
+
+// FIX: Removed .ts extension from import path.
+import { User, Credentials } from '../types';
 import { supabase } from './supabase';
 
 export const authService = {
@@ -13,19 +14,13 @@ export const authService = {
         });
 
         if (error) {
-            // If there's an error from Supabase (e.g., user already exists), throw it.
             throw new Error(error.message);
         }
 
-        // When signup is successful (even with email confirmation), `data.user` should exist.
-        // If it doesn't, it's an unexpected state.
         if (!data.user) {
             throw new Error('An unexpected error occurred during signup. Please try again.');
         }
 
-        // The user object is returned. The App component will handle showing
-        // the "check your email" message, and the onAuthStateChange listener
-        // will handle the user state once they are logged in.
         return { id: data.user.id, email: data.user.email! };
     },
 

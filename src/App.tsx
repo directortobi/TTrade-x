@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { initializeSupabase, isSupabaseConfigured, supabase } from './services/supabase';
 import { isGeminiConfigured } from './services/geminiService';
@@ -22,51 +23,62 @@ const App: React.FC = () => {
 
     useEffect(() => {
         const init = async () => {
-            await initializeSupabase();
-            if (!isSupabaseConfigured) {
-                setConfigError('Supabase');
-            } else if (!isGeminiConfigured) {
-                setConfigError('Gemini');
-            } else {
-                const { data: { session } } = await supabase.auth.getSession();
-                setSession(session);
+            try {
+                await initializeSupabase();
+                
+                if (!isSupabaseConfigured) {
+                    setConfigError('Supabase');
+                    setIsLoading(false);
+                    return;
+                }
 
+                if (!isGeminiConfigured) {
+                    setConfigError('Gemini');
+                    setIsLoading(false);
+                    return;
+                }
+
+                // Get initial session
+                const { data: { session: initialSession } } = await supabase.auth.getSession();
+                setSession(initialSession);
+
+                // Listen for auth changes
                 const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
                     setSession(session);
                     if (_event === 'SIGNED_IN') {
-                        setAuthView('login'); // Reset view after successful login/signup
+                        setAuthView('login');
+                        setAuthError(null);
+                    }
+                    if (_event === 'SIGNED_OUT') {
+                        setSession(null);
+                        setAuthView('login');
                     }
                 });
                 
-                 // Check for referral code in URL on initial load
+                // Referral logic
                 const params = new URLSearchParams(window.location.search);
                 const refCode = params.get('ref');
                 if (refCode) {
                     sessionStorage.setItem('referralCode', refCode);
-                    // Optional: Clean the URL
                     window.history.replaceState({}, document.title, window.location.pathname);
                 }
 
-
                 setIsLoading(false);
                 return () => subscription.unsubscribe();
-            }
-            // Add a fallback for when initialization fails but doesn't set a config error
-            // This can happen if the async init itself has an unhandled rejection
-            if (isLoading) {
-                 setIsLoading(false);
+
+            } catch (err) {
+                console.error("App Initialization Error:", err);
+                setIsLoading(false);
             }
         };
         init();
-    }, [isLoading]);
+    }, []);
 
     const handleLogin = async (credentials: Credentials) => {
         setIsAuthLoading(true);
         setAuthError(null);
-        setSuccessMessage(null);
         try {
             await authService.login(credentials);
-            // onAuthStateChange will handle setting the session
         } catch (error) {
             setAuthError((error as Error).message);
         } finally {
@@ -79,7 +91,7 @@ const App: React.FC = () => {
         setAuthError(null);
         try {
             await authService.signup(credentials, sessionStorage.getItem('referralCode'));
-            setSuccessMessage("Sign up successful! Please check your email to verify your account.");
+            setSuccessMessage("Sign up successful! Please check your email to verify your account before logging in.");
             setAuthView('check_email');
         } catch (error) {
             setAuthError((error as Error).message);
@@ -93,18 +105,31 @@ const App: React.FC = () => {
     }
 
     if (isLoading) {
-        return <div className="min-h-screen flex items-center justify-center"><LoadingSpinner /></div>;
+        return (
+            <div className="min-h-screen bg-gray-900 flex flex-col items-center justify-center">
+                <LoadingSpinner />
+                <p className="text-gray-500 mt-4 font-medium animate-pulse">Initializing Trade X...</p>
+            </div>
+        );
     }
 
     if (!session) {
          if (authView === 'check_email') {
             return (
-                <div className="min-h-screen flex flex-col justify-center items-center p-4 text-center">
-                    <h1 className="text-2xl font-bold text-white mb-4">Check Your Email</h1>
-                    <p className="text-gray-300 max-w-md mb-6">{successMessage}</p>
-                    <button onClick={() => setAuthView('login')} className="font-medium text-teal-400 hover:text-teal-300">
-                        Back to Login
-                    </button>
+                <div className="min-h-screen bg-gray-900 flex flex-col justify-center items-center p-4 text-center">
+                    <div className="bg-gray-800 p-8 rounded-2xl border border-blue-500/30 shadow-2xl max-w-md">
+                        <div className="w-16 h-16 bg-blue-500/10 rounded-full flex items-center justify-center mx-auto mb-6 text-blue-400">
+                             <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                        </div>
+                        <h1 className="text-2xl font-bold text-white mb-4">Check Your Email</h1>
+                        <p className="text-gray-400 mb-8">{successMessage}</p>
+                        <button 
+                            onClick={() => setAuthView('login')} 
+                            className="w-full py-3 px-4 bg-gray-700 hover:bg-gray-600 text-white rounded-xl transition-colors font-semibold"
+                        >
+                            Back to Login
+                        </button>
+                    </div>
                 </div>
             );
         }

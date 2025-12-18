@@ -1,12 +1,12 @@
+
 import React, { useState, useEffect, useCallback } from 'react';
-import { adminService } from '../services/adminService.ts';
-// FIX: Add .ts extension to import path.
-import { PurchaseWithEmail, WithdrawalWithEmail, ReferralWithdrawalWithEmail } from '../types.ts';
-// FIX: Add .tsx extension to import path.
-import { LoadingSpinner } from '../components/LoadingSpinner.tsx';
-// FIX: Add .tsx extension to import path.
-import { ErrorAlert } from '../components/ErrorAlert.tsx';
-import { TableSkeleton } from '../components/skeletons/TableSkeleton.tsx';
+import { adminService } from '../services/adminService';
+// FIX: Removed .ts extension.
+import { PurchaseWithEmail, WithdrawalWithEmail, ReferralWithdrawalWithEmail } from '../types';
+// FIX: Removed extensions from imports.
+import { LoadingSpinner } from '../components/LoadingSpinner';
+import { ErrorAlert } from '../components/ErrorAlert';
+import { TableSkeleton } from '../components/skeletons/TableSkeleton';
 
 
 const AdminPage: React.FC = () => {

@@ -1,7 +1,9 @@
+
+// FIX: Removed .ts extension.
 import { 
     DerivActiveSymbol, DerivBalance, DerivProposal, DerivContractsForSymbol, DerivTick, 
     DerivPortfolio, DerivProfitTableEntry, DerivTradeParams
-} from '../types.ts';
+} from '../types';
 
 type MessageCallback = (data: any) => void;
 type TickHistoryCallback = (history: any[]) => void;

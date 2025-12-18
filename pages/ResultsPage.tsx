@@ -1,16 +1,11 @@
+
 import React, { useState } from 'react';
-// FIX: Add .ts extension to import path.
-// FIX: Corrected import paths to be relative.
-import { AnalysisResult, Signal, TrendDirection, UiDerivContractType } from '../types.ts';
-// FIX: Add .tsx extension to import path.
-import { BuyIcon, SellIcon, HoldIcon } from '../components/icons/SignalIcons.tsx';
-// FIX: Add .tsx extension to import path.
-import { ConfidenceMeter } from '../components/results/ConfidenceMeter.tsx';
-// FIX: Add .tsx extension to import path.
-import { ReadAloudButton } from '../components/icons/ReadAloudButton.tsx';
-import { useSignal } from '../contexts/SignalContext.tsx';
-// FIX: Add .tsx extension to import path.
-import { View } from '../MainApp.tsx';
+// FIX: Removed extensions from import paths.
+import { AnalysisResult, Signal, TrendDirection, UiDerivContractType, View } from '../types';
+import { BuyIcon, SellIcon, HoldIcon } from '../components/icons/SignalIcons';
+import { ConfidenceMeter } from '../components/results/ConfidenceMeter';
+import { ReadAloudButton } from '../components/icons/ReadAloudButton';
+import { useSignal } from '../contexts/SignalContext';
 
 interface ResultsPageProps {
     result: AnalysisResult;
@@ -111,11 +106,11 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({ result, onGoBack, onNa
     };
 
     const generateSummaryText = () => {
-        const intro = `AI analysis for ${pair} indicates a ${signal} signal with ${confidenceLevel} percent confidence. The current market trend is identified as ${trend}.`;
+        const intro = `AI analysis for ${pair} indicates a ${signal} signal with ${confidenceLevel} percent confidence.`;
         if (isTradeSignal) {
-            return `${intro} Suggested entry price is ${entryPrice.toFixed(5)}. Key support is at ${support.toFixed(5)} and resistance is at ${resistance.toFixed(5)}. Take profit is set at ${takeProfit.toFixed(5)}, and stop loss at ${stopLoss.toFixed(5)}.`;
+            return `${intro} Suggested entry price is ${entryPrice.toFixed(5)}.`;
         }
-        return `${intro} Key support is at ${support.toFixed(5)} and resistance is at ${resistance.toFixed(5)}. No immediate trade is advised.`;
+        return `${intro} No immediate trade is advised.`;
     };
 
     const summaryText = generateSummaryText();
@@ -139,15 +134,9 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({ result, onGoBack, onNa
                 <div className="p-4 space-y-3">
                      <button onClick={() => handleTradeSignal('multiplier')} className="w-full text-left p-4 bg-gray-700/50 hover:bg-gray-700 rounded-lg transition-colors">
                         <p className="font-semibold text-cyan-400">Multiplier</p>
-                        <p className="text-xs text-gray-400">Trade with leverage, Take Profit, and Stop Loss.</p>
                     </button>
                     <button onClick={() => handleTradeSignal('higher_lower')} className="w-full text-left p-4 bg-gray-700/50 hover:bg-gray-700 rounded-lg transition-colors">
                         <p className="font-semibold text-cyan-400">Higher / Lower</p>
-                        <p className="text-xs text-gray-400">Predict if the exit spot is higher or lower than a barrier.</p>
-                    </button>
-                    <button onClick={() => handleTradeSignal('reset')} className="w-full text-left p-4 bg-gray-700/50 hover:bg-gray-700 rounded-lg transition-colors">
-                        <p className="font-semibold text-cyan-400">Reset Call / Reset Put</p>
-                        <p className="text-xs text-gray-400">Win if the exit spot is higher/lower than the entry spot.</p>
                     </button>
                 </div>
                 <div className="p-4 border-t border-gray-700 text-right">
@@ -175,66 +164,23 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({ result, onGoBack, onNa
                 </div>
                 <div className="col-span-1 md:col-span-2 grid grid-cols-2 gap-4">
                     <MetricCard title="Risk/Reward Ratio" value={isTradeSignal ? riskRewardRatio : 'N/A'} />
-                    <MetricCard title="Pips" value={isTradeSignal ? `+${pips.takeProfit}` : 'N/A'} subValue="Take Profit" className="text-green-400" />
                     <MetricCard title="Entry Price" value={isTradeSignal ? entryPrice.toFixed(5) : 'N/A'} />
-                    <MetricCard title="Pips" value={isTradeSignal ? `-${pips.stopLoss}` : 'N/A'} subValue="Stop Loss" className="text-red-400" />
                 </div>
             </div>
 
             <div className="bg-gray-800/70 p-6 rounded-lg border border-gray-700">
                 <h3 className="text-lg font-semibold text-cyan-400 mb-4">Technical Breakdown</h3>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    <TechnicalCard 
-                        title="Trend"
-                        value={<span className={trendInfo.color}>{trend}</span>}
-                        icon={trendInfo.icon}
-                    />
-                    <TechnicalCard 
-                        title="Support"
-                        value={support.toFixed(5)}
-                        icon={<SupportIcon />}
-                    />
-                    <TechnicalCard 
-                        title="Resistance"
-                        value={resistance.toFixed(5)}
-                        icon={<ResistanceIcon />}
-                    />
-                    <TechnicalCard 
-                        title="RSI"
-                        value={String(indicators.rsi.value.toFixed(1))}
-                        subValue={indicators.rsi.interpretation}
-                        icon={<RsiIcon />}
-                    />
-                    <TechnicalCard 
-                        title="MACD"
-                        value={indicators.macd.signal.replace(' Crossover', '')}
-                        subValue="Signal"
-                        icon={<MacdIcon />}
-                    />
+                    <TechnicalCard title="Trend" value={<span className={trendInfo.color}>{trend}</span>} icon={trendInfo.icon} />
+                    <TechnicalCard title="Support" value={support.toFixed(5)} icon={<SupportIcon />} />
+                    <TechnicalCard title="Resistance" value={resistance.toFixed(5)} icon={<ResistanceIcon />} />
+                    <TechnicalCard title="RSI" value={String(indicators.rsi.value.toFixed(1))} subValue={indicators.rsi.interpretation} icon={<RsiIcon />} />
                 </div>
             </div>
             
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                 <MetricCard title="Take Profit Level" value={isTradeSignal ? takeProfit.toFixed(5) : 'N/A'} className="!text-green-400" />
-                 <MetricCard title="Stop Loss Level" value={isTradeSignal ? stopLoss.toFixed(5) : 'N/A'} className="!text-red-400" />
-            </div>
-
              <div className="bg-gray-800/70 p-6 rounded-lg border border-gray-700 space-y-4">
                 <h3 className="text-xl font-semibold text-cyan-400">AI Rationale Breakdown</h3>
                 <div className="space-y-4">
-                    <RationaleItem icon={<div className={trendInfo.color}>{trendInfo.icon}</div>}>
-                        <p dangerouslySetInnerHTML={{ __html: `<strong>Trend:</strong> The analysis indicates a clear <strong>${trend}</strong> market trend. The general direction of price action supports this momentum.` }} />
-                    </RationaleItem>
-                    <RationaleItem icon={<KeyLevelsIcon />}>
-                        <p dangerouslySetInnerHTML={{ __html: `<strong>Support & Resistance:</strong> Key levels have been identified. Immediate support is at <strong>${support.toFixed(5)}</strong>, with resistance at <strong>${resistance.toFixed(5)}</strong>. These levels are critical for defining trade boundaries.` }} />
-                    </RationaleItem>
-                    <RationaleItem icon={<RsiIcon />}>
-                        <p dangerouslySetInnerHTML={{ __html: `<strong>RSI Analysis:</strong> The Relative Strength Index (RSI) is at <strong>${indicators.rsi.value.toFixed(1)}</strong>, which suggests the market is in a <strong>${indicators.rsi.interpretation}</strong> state.` }} />
-                    </RationaleItem>
-                    <RationaleItem icon={<MacdIcon />}>
-                        <p dangerouslySetInnerHTML={{ __html: `<strong>MACD Analysis:</strong> The MACD indicator is showing a <strong>${indicators.macd.signal}</strong>, confirming momentum in the direction of the trend.` }} />
-                    </RationaleItem>
-                    <div className="border-t border-gray-700 !my-6"></div>
                     <RationaleItem icon={<RationaleIcon />}>
                         <div>
                             <p className="font-semibold text-gray-200 mb-2">Full AI Commentary</p>
@@ -245,18 +191,12 @@ export const ResultsPage: React.FC<ResultsPageProps> = ({ result, onGoBack, onNa
             </div>
 
             <div className="mt-8 flex justify-center items-center gap-4">
-                <button
-                    onClick={onGoBack}
-                    className="h-12 px-8 text-lg text-white font-semibold bg-gray-600 rounded-lg hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition-all duration-300"
-                >
+                <button onClick={onGoBack} className="h-12 px-8 text-lg text-white font-semibold bg-gray-600 rounded-lg hover:bg-gray-700 transition-all duration-300">
                     Analyze Another
                 </button>
                 {isTradeSignal && (
-                     <button
-                        onClick={() => setIsModalOpen(true)}
-                        className="h-12 px-8 text-lg text-white font-semibold bg-green-600 rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition-all duration-300 animate-pulse"
-                    >
-                        Trade this Signal on Deriv
+                     <button onClick={() => setIsModalOpen(true)} className="h-12 px-8 text-lg text-white font-semibold bg-green-600 rounded-lg hover:bg-green-700 transition-all duration-300 animate-pulse">
+                        Trade Signal
                     </button>
                 )}
             </div>

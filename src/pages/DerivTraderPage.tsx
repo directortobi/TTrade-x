@@ -55,7 +55,8 @@ const DerivTraderPage: React.FC = () => {
                 derivService.getProfitTable();
             },
             onProfitTable: (table) => setProfitTable(table),
-            onError: (err: any) => {
+            // FIX: Safely handle error of type unknown by converting to string.
+            onError: (err: unknown) => {
                 setError(typeof err === 'string' ? err : JSON.stringify(err));
                 setIsLoading(false);
                 setIsConnected(false);

@@ -1,6 +1,7 @@
+
 import { supabase } from './supabase';
-// FIX: Add .ts extension to import path.
-import { Notification } from '../types.ts';
+// FIX: Removed .ts extension.
+import { Notification } from '../types';
 
 export const notificationService = {
     async getNotifications(): Promise<Notification[]> {

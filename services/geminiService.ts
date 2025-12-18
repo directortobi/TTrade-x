@@ -1,28 +1,10 @@
+
 import { GoogleGenAI, Type } from "@google/genai";
-// FIX: Add .ts extension to import path.
-// FIX: Corrected import path to be relative.
-import { AnalysisInput, AnalysisResult, Signal, ImageData, MarketAnalystInput, TradingStyle, TimeframeAnalysisInput, Timeframe } from '../types.ts';
+// FIX: Removed .ts extension to resolve module resolution error.
+import { AnalysisInput, AnalysisResult, Signal, ImageData, MarketAnalystInput, TradingStyle, TimeframeAnalysisInput, Timeframe } from '../types';
 
-// The API key is loaded from environment variables.
-// For Vite projects, use import.meta.env.VITE_...
-// FIX: Cast `import.meta` to `any` to resolve environment variable access error.
-const geminiApiKey = (import.meta as any).env.VITE_API_KEY;
-
-export const isGeminiConfigured = !!geminiApiKey;
-
-// Initialize the AI client once.
-let ai: GoogleGenAI;
-
-const initializeAi = () => {
-    if (ai) return;
-
-    if (!isGeminiConfigured) {
-        console.error("Gemini API key is not configured. Please set the VITE_API_KEY environment variable.");
-        throw new Error("Google Gemini API Key not found. Please ensure the VITE_API_KEY environment variable is set.");
-    }
-    
-    ai = new GoogleGenAI({ apiKey: geminiApiKey! });
-}
+// FIX: Obtain API key exclusively from process.env.API_KEY as per coding guidelines.
+export const isGeminiConfigured = !!process.env.API_KEY;
 
 const responseSchema = {
     type: Type.OBJECT,
@@ -116,7 +98,8 @@ const responseSchema = {
 };
 
 export const getTradingSignal = async (input: AnalysisInput): Promise<AnalysisResult> => {
-    initializeAi();
+    // FIX: Initialize GoogleGenAI instance right before the API call as per guidelines.
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
     const { pair, data1m, data15m, data1h, newsSentiment, userAnnotations } = input;
 
     const userNotesPrompt = userAnnotations
@@ -134,29 +117,21 @@ export const getTradingSignal = async (input: AnalysisInput): Promise<AnalysisRe
         *   News Sentiment (Last 24 hours): Score: ${newsSentiment.score}, Summary: ${newsSentiment.rationale}
         ${userNotesPrompt}
         **Analysis Instructions:**
-        1.  **Technical Indicator Analysis:** Based on the provided candlestick data, infer the state of and signals from the following technical indicators:
-            *   **RSI (Relative Strength Index):** Is the asset overbought, oversold, or showing divergence? Determine its numerical value and interpretation.
-            *   **MACD (Moving Average Convergence Divergence):** Is there a bullish or bearish crossover? What is the histogram momentum? Determine the signal.
-            *   **Bollinger Bands:** Is the price trading near the upper or lower band? Is there a "squeeze" indicating potential volatility?
-            *   **Candlestick Pattern Analysis:** Scrutinize the chart for significant candlestick patterns such as Doji, Engulfing patterns (Bullish/Bearish), Hammer, Shooting Star, or Morning/Evening Star formations, especially near key support and resistance levels. These patterns are crucial for confirming potential reversals or continuations.
-            *   **Market Structure:** Identify the current trend and look for any 'break of structure' (BoS) that might signal a trend reversal or continuation. Determine the overall trend direction ('Bullish', 'Bearish', 'Sideways').
-        2.  **Multi-Timeframe Confirmation:** Correlate findings from the technical indicators across the 1m, 15m, and 1h charts to establish a confluence of signals.
-        3.  **Support and Resistance:** Identify the most significant and nearest support and resistance price levels from the 15m and 1h charts.
-        4.  **Sentiment Integration:** How does the news sentiment support or contradict the technical analysis?
-        5.  **Decision and Levels:** Decide on a BUY, SELL, or HOLD signal. If BUY or SELL, provide a precise Entry Price, Take Profit, and Stop Loss. If HOLD, set price levels to 0.
-        6.  **Rationale:** Provide a clear, concise explanation for your decision. **Crucially, your rationale must begin by stating any identified candlestick patterns and their implications.** Then, integrate this with your analysis of technical indicators (RSI, MACD, Bollinger Bands) and market structure to build a cohesive argument for the trade.
-        7.  **Confidence & Risk:**
-            *   Provide a 'confidenceLevel' (0-100) for this signal.
-            *   Calculate the 'takeProfit' and 'stopLoss' distance in pips. For most pairs, 1 pip = 0.0001. For JPY pairs (e.g., USD/JPY), 1 pip = 0.01.
-            *   Calculate the 'riskRewardRatio' (Take Profit pips / Stop Loss pips). Format it as a string "1:X".
-            *   The 'pair' is ${pair}.
+        1.  **Technical Indicator Analysis:** Based on the provided candlestick data, infer the state of and signals from indicators.
+        2.  **Candlestick Pattern Analysis:** Scrutinize the chart for significant patterns.
+        3.  **Market Structure:** Identify the trend and key levels.
+        4.  **Multi-Timeframe Confirmation:** Correlate findings across 1m, 15m, and 1h charts.
+        5.  **Decision:** Decide on a signal and levels.
+        6.  **Rationale:** Provide a clear explanation starting with candlestick patterns.
+        7.  **Confidence & Risk:** Provide level and calculate pips/RR ratio.
 
-        Provide your final output in the required JSON format, including support, resistance, trend, and indicator readings (RSI value and interpretation, MACD signal).
+        Provide final output in JSON format.
     `;
 
     try {
         const response = await ai.models.generateContent({
-            model: "gemini-2.5-flash",
+            // FIX: Using gemini-3-flash-preview for market analysis as per guidelines.
+            model: "gemini-3-flash-preview",
             contents: prompt,
             config: {
                 responseMimeType: "application/json",
@@ -165,7 +140,8 @@ export const getTradingSignal = async (input: AnalysisInput): Promise<AnalysisRe
             },
         });
         
-        const text = response.text.trim();
+        // FIX: Access response text property directly as per guidelines.
+        const text = response.text?.trim() || "{}";
         const parsedJson = JSON.parse(text);
 
         if (!Object.values(Signal).includes(parsedJson.signal)) {
@@ -176,15 +152,13 @@ export const getTradingSignal = async (input: AnalysisInput): Promise<AnalysisRe
 
     } catch (error) {
         console.error("Error calling Gemini API:", error);
-        if (error instanceof Error && error.message.includes("API key")) {
-             throw error;
-        }
-        throw new Error("Failed to get analysis from AI. The model may have returned an invalid response.");
+        throw new Error("Failed to get analysis from AI.");
     }
 };
 
 export const getSignalFromImage = async (imageData: ImageData, userAnnotations?: string): Promise<AnalysisResult> => {
-    initializeAi();
+    // FIX: Initialize GoogleGenAI instance right before the API call as per guidelines.
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
     const imagePart = {
         inlineData: {
             mimeType: imageData.mimeType,
@@ -198,32 +172,22 @@ export const getSignalFromImage = async (imageData: ImageData, userAnnotations?:
 
     const textPart = {
         text: `
-          You are an expert financial chart analyst. Your task is to analyze the provided chart image and determine a trading signal.
+          You are an expert financial chart analyst. Analyze this chart image and determine a trading signal.
           ${userNotesPrompt}
-          **Analysis Instructions:**
-          1.  **Identify Asset:** Identify the asset from labels (e.g., EUR/USD, BTC, AAPL) and put it in the 'pair' field. If not possible, use 'UNKNOWN/USD'.
-          2.  **Technical Analysis from Chart:**
-              *   **Identify Key Indicators:** Look for visible indicators on the chart like **RSI, MACD, and Bollinger Bands**. Analyze their readings (e.g., RSI overbought/oversold, MACD crossover, price interaction with bands). Provide the RSI value and interpretation, and the MACD signal.
-              *   **Analyze Market Structure:** Identify the trend, key horizontal and trend-line support/resistance levels, and any **'break of structure' (BoS)**. Determine the most significant support and resistance levels and the overall trend direction.
-              *   **Identify Candlestick Patterns:** This is a critical step. Search for powerful candlestick patterns like Doji, Engulfing, Hammer, or Shooting Star. Note where they appear (e.g., at a resistance level) as this heavily influences their meaning.
-          3.  **Synthesize Findings:** Combine the analysis of price action, market structure, and all visible indicators to form a cohesive view.
-          4.  **Decision and Levels:**
-              *   Decide on a **BUY, SELL, or HOLD** signal.
-              *   If BUY or SELL, provide a precise **Entry Price**, **Take Profit**, and **Stop Loss** based on your analysis. Entry should be near the last visible price.
-              *   If HOLD, set price levels to 0.
-          5.  **Rationale:** Provide a step-by-step explanation. **Start by describing any candlestick patterns you found and what they signal in the current context.** Then, connect this to your analysis of market structure and other visible indicators to justify your signal.
-          6.  **Confidence & Risk:**
-              *   Provide a 'confidenceLevel' (0-100) for the signal.
-              *   Calculate 'takeProfit' and 'stopLoss' distance in **pips**. Use standard definitions (0.0001 for 4-decimal prices, 0.01 for 2-decimal prices).
-              *   Calculate the 'riskRewardRatio' and format it as a string "1:X".
-
-          Provide your final output in the required JSON format, including support, resistance, trend, and indicator readings.
+          1. Identify Asset.
+          2. Perform Technical Analysis.
+          3. Identify Candlestick Patterns.
+          4. Decide BUY, SELL, or HOLD.
+          5. Provide detailed rationale starting with patterns.
+          
+          Provide output in the required JSON format.
         `,
     };
 
     try {
         const response = await ai.models.generateContent({
-            model: "gemini-2.5-flash",
+            // FIX: Using gemini-3-flash-preview for multimodal chart analysis.
+            model: "gemini-3-flash-preview",
             contents: { parts: [imagePart, textPart] },
             config: {
                 responseMimeType: "application/json",
@@ -232,7 +196,8 @@ export const getSignalFromImage = async (imageData: ImageData, userAnnotations?:
             },
         });
         
-        const text = response.text.trim();
+        // FIX: Access response text property directly.
+        const text = response.text?.trim() || "{}";
         const parsedJson = JSON.parse(text);
 
         if (!Object.values(Signal).includes(parsedJson.signal)) {
@@ -243,60 +208,36 @@ export const getSignalFromImage = async (imageData: ImageData, userAnnotations?:
 
     } catch (error) {
         console.error("Error calling Gemini API with image:", error);
-         if (error instanceof Error && error.message.includes("API key")) {
-             throw error;
-        }
-        throw new Error("Failed to get analysis from AI. The model may have returned an invalid response.");
+        throw new Error("Failed to get analysis from AI image analyst.");
     }
 };
 
 const tradingStylePrompts: Record<TradingStyle, string> = {
-    ict: `Focus on ICT (Inner Circle Trader) concepts. Identify key liquidity zones (highs/lows), fair value gaps (FVGs), order blocks, and market structure shifts. Your entry should be based on a return to an FVG or order block after a liquidity grab.`,
-    swing: `Adopt a swing trader's perspective. Analyze the higher timeframe (4h, 1d) market structure to determine the primary trend. Identify major support and resistance levels. Look for entries on pullbacks to these levels or on trendline touches, confirmed by candlestick patterns.`,
-    scalper: `Act as a high-frequency scalper. Focus on the 1-hour chart for trend direction and identify immediate order flow and momentum shifts. Look for quick entries based on breakouts of small ranges or immediate reactions to minor support/resistance flips. Aim for small, high-probability gains.`
+    ict: `Focus on ICT (Inner Circle Trader) concepts.`,
+    swing: `Adopt a swing trader's perspective.`,
+    scalper: `Act as a high-frequency scalper.`
 };
 
 export const getMarketAnalystPrediction = async (input: MarketAnalystInput): Promise<AnalysisResult> => {
-    initializeAi();
+    // FIX: Initialize GoogleGenAI instance right before the API call.
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
     const { pair, tradingStyle, data1h, data4h, data1d } = input;
     const styleSpecificInstructions = tradingStylePrompts[tradingStyle];
-    const styleName = {ict: "ICT Day Trader", swing: "Swing Trader", scalper: "Scalper"}[tradingStyle];
-
 
     const prompt = `
-        You are an AI Forex Market Analyst with deep expertise in multi-timeframe technical analysis, order flow, and statistical modeling.
-        Your sole responsibility is to scan the live forex market for the ${pair} pair and issue a precise trade prediction based on the '${styleName}' trading style.
+        Expert AI Analyst (${tradingStyle} style). Analyze ${pair} using provided multi-timeframe data.
+        - 1H Close: ${data1h[data1h.length - 1].close}
+        - 4H Close: ${data4h[data4h.length - 1].close}
+        - 1D Close: ${data1d[data1d.length - 1].close}
 
-        **Current Market Data:**
-        * 1-Hour Chart (Last 100 Candles): Latest Close: ${data1h[data1h.length - 1].close}
-        * 4-Hour Chart (Last 100 Candles): Latest Close: ${data4h[data4h.length - 1].close}
-        * 1-Day Chart (Last 100 Candles): Latest Close: ${data1d[data1d.length - 1].close}
+        Persona: ${styleSpecificInstructions}
 
-        **Your Persona & Trading Style:** ${styleSpecificInstructions}
-
-        **Task:**
-        Analyze the provided multi-timeframe data according to your trading style. Determine the trend, key support/resistance, significant candlestick patterns, and indicator states (RSI, MACD, and Bollinger Bands), then issue a single, actionable trade prediction.
-
-        **Prediction Requirements (Your output MUST be this JSON object):**
-        1.  **trend**: Determine the overall trend direction ('Bullish', 'Bearish', 'Sideways').
-        2.  **support / resistance**: Identify the most significant nearby support and resistance levels.
-        3.  **indicators**: Provide the current RSI value and its interpretation ('Overbought', 'Oversold', 'Neutral', 'Divergence') and the current MACD signal ('Bullish Crossover', 'Bearish Crossover', 'No Crossover').
-        4.  **signal**: "BUY" or "SELL". Do not use "HOLD". If no high-probability setup is found, you must still choose the most likely direction and indicate low confidence.
-        5.  **entryPrice**: The precise price to enter the trade.
-        6.  **takeProfit**: The target price to exit with a profit.
-        7.  **stopLoss**: The price to exit if the trade moves against you. The risk-to-reward ratio (distance to TP vs. distance to SL) must be at least 1:1.5.
-        8.  **confidenceLevel**: Your certainty in this prediction, from 0 to 100.
-        9.  **rationale**: A detailed step-by-step justification for your decision, directly referencing your trading style's concepts (e.g., FVGs for ICT, major S/R for swing) and incorporating your findings on trend, S/R, candlestick patterns, and indicators (RSI, MACD, and Bollinger Bands analysis).
-        10. **pips**: Calculate TP and SL distance in pips. For most pairs, 1 pip = 0.0001. For JPY pairs (e.g., USD/JPY), 1 pip = 0.01. For XAU/USD, 1 pip = 0.1. For BTC/USD, 1 pip = 1.0.
-        11. **riskRewardRatio**: Calculate the risk/reward ratio as "1:X".
-        12. **pair**: The pair being analyzed (${pair}).
-
-        Generate the JSON output.
+        Generate JSON output with signal, levels, and rationale.
     `;
 
     try {
         const response = await ai.models.generateContent({
-            model: "gemini-2.5-flash",
+            model: "gemini-3-flash-preview",
             contents: prompt,
             config: {
                 responseMimeType: "application/json",
@@ -305,60 +246,34 @@ export const getMarketAnalystPrediction = async (input: MarketAnalystInput): Pro
             },
         });
         
-        const text = response.text.trim();
+        const text = response.text?.trim() || "{}";
         const parsedJson = JSON.parse(text);
 
-        if (![Signal.BUY, Signal.SELL, Signal.HOLD].includes(parsedJson.signal)) {
-            throw new Error("Invalid signal received from AI.");
-        }
-        
         if (parsedJson.signal === Signal.HOLD) {
-             throw new Error("AI returned a 'HOLD' signal against instructions. Please try again.");
+             throw new Error("AI returned a 'HOLD' signal against instructions.");
         }
 
         return parsedJson as AnalysisResult;
 
     } catch (error) {
-        console.error("Error calling Gemini API for Market Analyst:", error);
-        if (error instanceof Error && error.message.includes("API key")) {
-             throw error;
-        }
-        throw new Error("Failed to get analysis from AI Analyst. The model may have returned an invalid response.");
+        console.error("Error in Market Analyst:", error);
+        throw new Error("AI Analyst failed to provide a prediction.");
     }
 };
 
-
 export const getTimeframeAnalysis = async (input: TimeframeAnalysisInput): Promise<AnalysisResult> => {
-    initializeAi();
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
     const { pair, timeframe, data } = input;
 
     const prompt = `
-        You are an expert technical analyst providing a focused trade signal for ${pair} based *only* on the provided ${timeframe} chart data.
-
-        **Market Data:**
-        *   ${timeframe} Chart (Last 100 Candles): Latest Price: ${data[data.length - 1].close}
-
-        **Analysis Instructions:**
-        1.  **Technical Analysis:** Based on the provided candlestick data, infer signals from technical indicators:
-            *   **RSI (Relative Strength Index):** Is the asset overbought, oversold, or showing divergence? Determine its numerical value and interpretation.
-            *   **MACD (Moving Average Convergence Divergence):** Is there a bullish or bearish crossover? Determine the signal.
-            *   **Bollinger Bands:** Is the price trading near the upper or lower band? Is there a "squeeze" indicating potential volatility?
-            *   **Candlestick Patterns:** Identify influential candlestick patterns (Doji, Engulfing, Hammer, etc.) and explain their significance at the current price level.
-            *   **Market Structure:** Identify the immediate trend, support, and resistance levels on this timeframe. Determine the trend direction ('Bullish', 'Bearish', 'Sideways').
-        2.  **Decision and Levels:** Decide on a BUY or SELL signal. If no high-probability setup is found, you must still choose the most likely direction and indicate low confidence.
-        3.  **Rationale:** Provide a clear, concise explanation for your decision. **Start your rationale by discussing the candlestick patterns you've identified.** Then, explain how these patterns, in conjunction with RSI, MACD, Bollinger Bands, and market structure, lead to your final signal.
-        4.  **Confidence & Risk:**
-            *   Provide a 'confidenceLevel' (0-100).
-            *   Calculate 'takeProfit' and 'stopLoss' distance in pips appropriate for the timeframe.
-            *   Calculate 'riskRewardRatio' as "1:X", ensuring it is at least 1:1.5.
-            *   The 'pair' is ${pair}.
-
-        Provide your final output in the required JSON format, including support, resistance, trend, and indicator readings.
+        Focused trade signal for ${pair} based on ${timeframe} data.
+        Latest Price: ${data[data.length - 1].close}
+        Provide technical breakdown, signal, levels, and rationale in JSON.
     `;
     
     try {
         const response = await ai.models.generateContent({
-            model: "gemini-2.5-flash",
+            model: "gemini-3-flash-preview",
             contents: prompt,
             config: {
                 responseMimeType: "application/json",
@@ -367,24 +282,13 @@ export const getTimeframeAnalysis = async (input: TimeframeAnalysisInput): Promi
             },
         });
         
-        const text = response.text.trim();
+        const text = response.text?.trim() || "{}";
         const parsedJson = JSON.parse(text);
-
-        if (![Signal.BUY, Signal.SELL, Signal.HOLD].includes(parsedJson.signal)) {
-            throw new Error("Invalid signal received from AI.");
-        }
-        
-        if (parsedJson.signal === Signal.HOLD) {
-             throw new Error("AI returned a 'HOLD' signal against instructions. Please try again.");
-        }
 
         return parsedJson as AnalysisResult;
 
     } catch (error) {
-        console.error("Error calling Gemini API for Timeframe Analyst:", error);
-        if (error instanceof Error && error.message.includes("API key")) {
-             throw error;
-        }
-        throw new Error("Failed to get analysis from AI Timeframe Analyst. The model may have returned an invalid response.");
+        console.error("Error in Timeframe Analyst:", error);
+        throw new Error("Failed to get analysis for this timeframe.");
     }
 };

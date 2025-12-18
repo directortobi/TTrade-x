@@ -1,12 +1,10 @@
+
 import React, { useState, useEffect } from 'react';
-// FIX: Add .ts extension to import path.
-import { Credentials } from '../types.ts';
-// FIX: Add .tsx extension to import path.
-import { LoadingSpinner } from '../components/LoadingSpinner.tsx';
-// FIX: Add .tsx extension to import path.
-import { SupabaseLogo } from '../components/icons/SupabaseLogo.tsx';
-// FIX: Add .tsx extension to import path.
-import { AppLogo } from '../components/AppLogo.tsx';
+// FIX: Removed extensions from import paths.
+import { Credentials } from '../types';
+import { LoadingSpinner } from '../components/LoadingSpinner';
+import { SupabaseLogo } from '../components/icons/SupabaseLogo';
+import { AppLogo } from '../components/AppLogo';
 
 interface SignUpPageProps {
     onSignUp: (credentials: Credentials) => Promise<void>;
@@ -63,21 +61,13 @@ export const SignUpPage: React.FC<SignUpPageProps> = ({ onSignUp, onNavigateToLo
                                 required
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
-                                className="mt-1 block w-full h-12 px-3 text-white bg-gray-700/50 border border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-green-500 focus:border-green-500"
+                                className="mt-1 block w-full h-12 px-3 text-white bg-gray-700/50 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-green-500 sm:text-sm"
                             />
                         </div>
                         {referralCode && (
                             <div>
-                                <label htmlFor="referral" className="block text-sm font-medium text-gray-400">
-                                    Referred by
-                                </label>
-                                <input
-                                    id="referral"
-                                    type="text"
-                                    disabled
-                                    value={referralCode}
-                                    className="mt-1 block w-full h-12 px-3 text-gray-300 bg-gray-800/50 border border-gray-600 rounded-md shadow-sm cursor-not-allowed"
-                                />
+                                <label className="block text-sm font-medium text-gray-400">Referred by</label>
+                                <input disabled value={referralCode} className="mt-1 block w-full h-12 px-3 text-gray-300 bg-gray-800/50 border border-gray-600 rounded-md cursor-not-allowed" />
                             </div>
                         )}
                          <div>
@@ -88,7 +78,7 @@ export const SignUpPage: React.FC<SignUpPageProps> = ({ onSignUp, onNavigateToLo
                                 required
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
-                                className="mt-1 block w-full h-12 px-3 text-white bg-gray-700/50 border border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-green-500 focus:border-green-500"
+                                className="mt-1 block w-full h-12 px-3 text-white bg-gray-700/50 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-green-500 sm:text-sm"
                             />
                         </div>
                          <div>
@@ -99,7 +89,7 @@ export const SignUpPage: React.FC<SignUpPageProps> = ({ onSignUp, onNavigateToLo
                                 required
                                 value={confirmPassword}
                                 onChange={(e) => setConfirmPassword(e.target.value)}
-                                className="mt-1 block w-full h-12 px-3 text-white bg-gray-700/50 border border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-green-500 focus:border-green-500"
+                                className="mt-1 block w-full h-12 px-3 text-white bg-gray-700/50 border border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-green-500 sm:text-sm"
                             />
                         </div>
 
@@ -107,20 +97,14 @@ export const SignUpPage: React.FC<SignUpPageProps> = ({ onSignUp, onNavigateToLo
                         {error && !passwordError && <p className="text-sm text-red-400">{error}</p>}
                         
                         <div className="pt-2">
-                            <button
-                                type="submit"
-                                disabled={isLoading}
-                                className="w-full h-12 flex justify-center items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-lg font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-emerald-950 focus:ring-green-500 disabled:bg-gray-600"
-                            >
+                            <button type="submit" disabled={isLoading} className="w-full h-12 flex justify-center items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-lg font-medium text-white bg-green-600 hover:bg-green-700 disabled:bg-gray-600">
                                 {isLoading ? <LoadingSpinner /> : 'Create Account'}
                             </button>
                         </div>
                     </form>
                     <p className="mt-6 text-center text-sm text-gray-400">
                         Already have an account?{' '}
-                        <button onClick={onNavigateToLogin} className="font-medium text-teal-400 hover:text-teal-300 focus:outline-none">
-                            Log in
-                        </button>
+                        <button onClick={onNavigateToLogin} className="font-medium text-teal-400 hover:text-teal-300 focus:outline-none">Log in</button>
                     </p>
                     <div className="mt-8 border-t border-gray-700 pt-4 flex items-center justify-center gap-2">
                         <span className="text-xs text-gray-500">Secure authentication by</span>

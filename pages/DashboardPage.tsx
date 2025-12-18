@@ -1,12 +1,10 @@
+
 import React from 'react';
-// FIX: Add .ts extension to import path.
-import { AppUser } from '../types.ts';
-// FIX: Add .tsx extension to import path.
-import { View } from '../MainApp.tsx';
-// FIX: Add .tsx extension to import path.
-import TradingViewMarketOverviewWidget from '../components/TradingViewMarketOverviewWidget.tsx';
-// FIX: Add .tsx extension to import path.
-import RecentSignals from '../components/dashboard/RecentSignals.tsx';
+// FIX: Removed .ts extension.
+import { AppUser, View } from '../types';
+// FIX: Removed extensions from import paths.
+import TradingViewMarketOverviewWidget from '../components/TradingViewMarketOverviewWidget';
+import RecentSignals from '../components/dashboard/RecentSignals';
 
 interface DashboardPageProps {
     user: AppUser;

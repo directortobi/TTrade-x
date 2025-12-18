@@ -1,5 +1,7 @@
+
 import React, { createContext, useState, useContext, useCallback } from 'react';
-import { AnalysisResult, UiDerivContractType } from '../types.ts';
+// FIX: Removed .ts extension.
+import { AnalysisResult, UiDerivContractType } from '../types';
 
 interface SignalContextState {
     signal: AnalysisResult | null;

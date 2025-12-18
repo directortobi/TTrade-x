@@ -1,16 +1,12 @@
+
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-// FIX: Add .ts extension to import path.
-import { CompoundingLevel, TradeLog } from '../types.ts';
-// FIX: Add .ts extension to import path.
-import { COMPOUNDING_PLAN } from '../constants.ts';
-// FIX: Add .tsx extension to import path.
-import { AgentStatusDisplay } from '../components/chatbot/AgentStatusDisplay.tsx';
-// FIX: Add .tsx extension to import path.
-import { CompoundingPlanTable } from '../components/compounding/CompoundingPlanTable.tsx';
-// FIX: Add .tsx extension to import path.
-import { TradeLogTable } from '../components/chatbot/TradeLogTable.tsx';
-// FIX: Add .tsx extension to import path.
-import { LoadingSpinner } from '../components/LoadingSpinner.tsx';
+// FIX: Removed extensions from import paths.
+import { CompoundingLevel, TradeLog } from '../types';
+import { COMPOUNDING_PLAN } from '../constants';
+import { AgentStatusDisplay } from '../components/chatbot/AgentStatusDisplay';
+import { CompoundingPlanTable } from '../components/compounding/CompoundingPlanTable';
+import { TradeLogTable } from '../components/chatbot/TradeLogTable';
+import { LoadingSpinner } from '../components/LoadingSpinner';
 
 const DERIV_ASSETS = ['Volatility 75 Index', 'Boom 1000 Index', 'EUR/USD', 'GBP/USD'];
 
@@ -49,13 +45,10 @@ const CompoundingAgentPage: React.FC = () => {
         setStatus('Scanning');
         setCurrentPnl(0);
 
-        // Simulate scanning for a trade
         agentLogicTimeoutRef.current = window.setTimeout(() => {
             setStatus('In Trade');
-
-            // Simulate trade execution and outcome
             agentLogicTimeoutRef.current = window.setTimeout(() => {
-                const isWin = Math.random() > 0.3; // 70% win rate for demo
+                const isWin = Math.random() > 0.3;
                 const tradeResult: TradeLog = {
                     timestamp: new Date().toISOString(),
                     level: currentLevel,
@@ -74,19 +67,17 @@ const CompoundingAgentPage: React.FC = () => {
                         stopAgent('Completed');
                     } else {
                         setCurrentLevel(prev => prev + 1);
-                        // Loop for next level will be triggered by useEffect
                     }
                 } else {
                     stopAgent('Paused - SL Hit');
                 }
-            }, 5000); // 5 seconds for trade duration
-        }, 3000); // 3 seconds to find a trade
+            }, 5000);
+        }, 3000);
 
     }, [isRunning, currentLevel, currentBalance, selectedAsset, levelData, stopAgent]);
 
-    // Effect to control the agent's main loop
     useEffect(() => {
-        if (isRunning && (status === 'Idle' || status === 'Scanning' || (status !== 'In Trade' && status !== 'Paused - SL Hit' && status !== 'Completed'))) {
+        if (isRunning && (status === 'Idle' || status === 'Scanning')) {
              if (currentLevel <= COMPOUNDING_PLAN.length) {
                 runAgentLogic();
              } else {
@@ -100,23 +91,6 @@ const CompoundingAgentPage: React.FC = () => {
         };
     }, [isRunning, currentLevel, status, runAgentLogic, stopAgent]);
 
-    // Effect to simulate live P/L update
-    useEffect(() => {
-        let pnlInterval: number | null = null;
-        if (status === 'In Trade' && levelData) {
-            const target = levelData.profitTarget;
-            pnlInterval = window.setInterval(() => {
-                setCurrentPnl(p => p + target * 0.05 * (Math.random()));
-            }, 250);
-        } else {
-            setCurrentPnl(0);
-        }
-        return () => {
-            if (pnlInterval) clearInterval(pnlInterval);
-        };
-    }, [status, levelData]);
-
-
     const handleStartStop = () => {
         if (isRunning) {
             stopAgent('Idle');
@@ -125,12 +99,8 @@ const CompoundingAgentPage: React.FC = () => {
                 alert('Please enter a Deriv API Token.');
                 return;
             }
-             if (status === 'Paused - SL Hit' || status === 'Completed') {
-                alert(`Agent is ${status}. Please reset to start again.`);
-                return;
-            }
             setIsRunning(true);
-            setStatus('Idle'); // Will kick off the useEffect loop
+            setStatus('Idle');
         }
     };
     
@@ -144,84 +114,23 @@ const CompoundingAgentPage: React.FC = () => {
 
     return (
         <div className="max-w-7xl mx-auto animate-fade-in space-y-6">
-            <div>
-                <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-indigo-400">
-                    Autonomous Compounding Agent
-                </h1>
-                <p className="text-gray-400 mt-1">AI-powered trading agent to execute the 30-level compounding strategy via Deriv API.</p>
-            </div>
-
+            <h1 className="text-3xl font-bold text-white">Autonomous Compounding Agent</h1>
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Control Panel & Status */}
                 <div className="lg:col-span-1 bg-gray-800/50 p-6 rounded-2xl border border-gray-700 space-y-6">
-                    <div>
-                        <label htmlFor="api-token" className="block text-sm font-medium text-gray-400 mb-2">Deriv API Token (Stored locally)</label>
-                        <input
-                            type="password"
-                            id="api-token"
-                            value={apiToken}
-                            onChange={(e) => setApiToken(e.target.value)}
-                            placeholder="Enter your secure token"
-                            disabled={isRunning}
-                            className="w-full h-12 pl-3 pr-10 text-base text-white bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50"
-                        />
-                    </div>
-                    <div>
-                        <label htmlFor="asset-selector" className="block text-sm font-medium text-gray-400 mb-2">Trading Asset</label>
-                        <select
-                            id="asset-selector"
-                            value={selectedAsset}
-                            onChange={(e) => setSelectedAsset(e.target.value)}
-                            disabled={isRunning}
-                            className="w-full h-12 pl-3 pr-10 text-base text-white bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 appearance-none disabled:opacity-50"
-                        >
-                            {DERIV_ASSETS.map(asset => <option key={asset} value={asset}>{asset}</option>)}
-                        </select>
-                    </div>
-
+                    <input type="password" value={apiToken} onChange={(e) => setApiToken(e.target.value)} placeholder="Deriv API Token" disabled={isRunning} className="w-full h-12 px-3 bg-gray-700 text-white rounded-lg" />
                     <div className="flex gap-4">
-                        <button
-                            onClick={handleStartStop}
-                            disabled={!apiToken || status === 'Completed'}
-                            className={`w-full h-14 text-lg font-semibold rounded-lg transition-all flex items-center justify-center
-                                ${isRunning ? 'bg-red-600 hover:bg-red-700 text-white' : 'bg-green-600 hover:bg-green-700 text-white'}
-                                disabled:bg-gray-600 disabled:cursor-not-allowed`}
-                        >
+                        <button onClick={handleStartStop} disabled={!apiToken || status === 'Completed'} className={`w-full h-14 font-semibold rounded-lg ${isRunning ? 'bg-red-600' : 'bg-green-600'} text-white`}>
                             {isRunning ? (status === 'In Trade' || status === 'Scanning' ? <LoadingSpinner /> : 'Stop Agent') : 'Start Agent'}
                         </button>
-                        <button
-                          onClick={handleReset}
-                          disabled={isRunning}
-                          className="w-full h-14 text-lg font-semibold rounded-lg bg-gray-600 hover:bg-gray-500 text-white transition-colors disabled:bg-gray-700 disabled:text-gray-400 disabled:cursor-not-allowed"
-                        >
-                          Reset
-                        </button>
                     </div>
-                     <AgentStatusDisplay 
-                        status={status}
-                        level={currentLevel}
-                        balance={currentBalance}
-                        pnl={currentPnl}
-                        levelData={levelData}
-                     />
+                     <AgentStatusDisplay status={status} level={currentLevel} balance={currentBalance} pnl={currentPnl} levelData={levelData} />
                 </div>
-
-                {/* Main Content Area */}
                 <div className="lg:col-span-2 bg-gray-800/50 p-6 rounded-2xl border border-gray-700">
                     <div className="flex border-b border-gray-700 mb-4">
-                        <button onClick={() => setActiveTab('plan')} className={`px-4 py-2 font-medium text-sm transition-colors ${activeTab === 'plan' ? 'text-indigo-400 border-b-2 border-indigo-400' : 'text-gray-400 hover:text-white'}`}>
-                            Compounding Plan
-                        </button>
-                        <button onClick={() => setActiveTab('logs')} className={`px-4 py-2 font-medium text-sm transition-colors ${activeTab === 'logs' ? 'text-indigo-400 border-b-2 border-indigo-400' : 'text-gray-400 hover:text-white'}`}>
-                            Trade Logs
-                        </button>
+                        <button onClick={() => setActiveTab('plan')} className={`px-4 py-2 text-sm ${activeTab === 'plan' ? 'text-indigo-400 border-b-2 border-indigo-400' : 'text-gray-400'}`}>Plan</button>
+                        <button onClick={() => setActiveTab('logs')} className={`px-4 py-2 text-sm ${activeTab === 'logs' ? 'text-indigo-400 border-b-2 border-indigo-400' : 'text-gray-400'}`}>Logs</button>
                     </div>
-
-                    {activeTab === 'plan' ? (
-                        <CompoundingPlanTable plan={COMPOUNDING_PLAN} currentLevel={currentLevel} />
-                    ) : (
-                        <TradeLogTable logs={logs} />
-                    )}
+                    {activeTab === 'plan' ? <CompoundingPlanTable plan={COMPOUNDING_PLAN} currentLevel={currentLevel} /> : <TradeLogTable logs={logs} />}
                 </div>
             </div>
         </div>

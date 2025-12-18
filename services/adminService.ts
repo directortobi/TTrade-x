@@ -1,6 +1,7 @@
+
 import { supabase } from './supabase';
-// FIX: Add .ts extension to import path.
-import { PurchaseWithEmail, WithdrawalWithEmail, ReferralWithdrawalWithEmail } from '../types.ts';
+// FIX: Removed .ts extension to resolve module resolution error.
+import { PurchaseWithEmail, WithdrawalWithEmail, ReferralWithdrawalWithEmail } from '../types';
 
 /**
  * A service for handling all administrative actions.
