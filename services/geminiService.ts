@@ -1,20 +1,10 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { AnalysisInput, AnalysisResult, Signal, ImageData, MarketAnalystInput, TradingStyle, TimeframeAnalysisInput } from '../types';
 
-/**
- * Check if Gemini is configured.
- * Per instructions: The API key must be obtained exclusively from the environment variable process.env.API_KEY.
- */
 export const isGeminiConfigured = !!(typeof process !== 'undefined' && process.env?.API_KEY);
 
 const getAi = () => {
-    const apiKey = typeof process !== 'undefined' ? process.env?.API_KEY : undefined;
-                   
-    if (!apiKey) {
-        throw new Error("Gemini API Key is not configured. Please set API_KEY in your environment variables.");
-    }
-    // Per instructions: Always use new GoogleGenAI({ apiKey: process.env.API_KEY });
-    return new GoogleGenAI({ apiKey });
+    return new GoogleGenAI({ apiKey: process.env.API_KEY });
 };
 
 const responseSchema = {

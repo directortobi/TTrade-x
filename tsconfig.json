@@ -24,7 +24,28 @@
       "*": ["./*"]
     }
   },
-  "include": ["**/*.ts", "**/*.tsx", "vite-env.d.ts"],
-  "exclude": ["node_modules", "dist", "src", "pages/src"],
-  "references": [{ "path": "./tsconfig.node.json" }]
+  "include": [
+    "index.tsx",
+    "App.tsx",
+    "MainApp.tsx",
+    "types.ts",
+    "constants.ts",
+    "components/**/*.ts",
+    "components/**/*.tsx",
+    "services/**/*.ts",
+    "pages/**/*.ts",
+    "pages/**/*.tsx",
+    "contexts/**/*.ts",
+    "contexts/**/*.tsx",
+    "hooks/**/*.ts",
+    "vite-env.d.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "src",
+    "pages/src",
+    "vite.config.ts",
+    "vite.config.d.ts"
+  ]
 }

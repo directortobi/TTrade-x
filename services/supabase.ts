@@ -16,8 +16,8 @@ const getEnvVar = (name: string): string | null => {
     return null;
 };
 
-const supabaseUrl = getEnvVar('VITE_SUPABASE_URL') || getEnvVar('SUPABASE_URL') || 'https://ripmsswicdbflbkqfpbu.supabase.co/';
-const supabaseAnonKey = getEnvVar('VITE_SUPABASE_ANON_KEY') || getEnvVar('SUPABASE_ANON_KEY') || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJpcG1zc3dpY2RiZmxia3FmcGJ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYwMTg1MzcsImV4cCI6MjA4MTU5NDUzN30.4_voAjcOXEYMU73G3uZe0B8hQgp721tUDAL9PgrAvTE';
+const supabaseUrl = getEnvVar('VITE_SUPABASE_URL') || 'https://ripmsswicdbflbkqfpbu.supabase.co/';
+const supabaseAnonKey = getEnvVar('VITE_SUPABASE_ANON_KEY') || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJpcG1zc3dpY2RiZmxia3FmcGJ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYwMTg1MzcsImV4cCI6MjA4MTU5NDUzN30.4_voAjcOXEYMU73G3uZe0B8hQgp721tUDAL9PgrAvTE';
 
 export let supabase: SupabaseClient = createClient(supabaseUrl, supabaseAnonKey);
 export let isSupabaseConfigured = !!(supabaseUrl && supabaseAnonKey);
