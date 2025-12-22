@@ -8,13 +8,11 @@ import { AnalysisInput, AnalysisResult, Signal, ImageData, MarketAnalystInput, T
 export const isGeminiConfigured = !!(typeof process !== 'undefined' && process.env?.API_KEY);
 
 const getAi = () => {
-    const apiKey = typeof process !== 'undefined' ? process.env?.API_KEY : undefined;
-                   
-    if (!apiKey) {
+    if (!isGeminiConfigured) {
         throw new Error("Gemini API Key is not configured. Please set API_KEY in your environment variables.");
     }
     // Per instructions: Always use new GoogleGenAI({ apiKey: process.env.API_KEY });
-    return new GoogleGenAI({ apiKey });
+    return new GoogleGenAI({ apiKey: process.env.API_KEY });
 };
 
 const responseSchema = {

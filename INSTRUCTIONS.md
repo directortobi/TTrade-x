@@ -4,7 +4,13 @@
 On your deployment platform (Netlify, Vercel, etc.), add these Environment Variables:
 - `VITE_SUPABASE_URL`: Your project URL from Supabase Settings > API.
 - `VITE_SUPABASE_ANON_KEY`: Your Anon/Public key from Supabase.
-- `VITE_API_KEY`: Your Google Gemini API Key.
+- `API_KEY`: Your Google Gemini API Key. (Required for AI Analysis).
+
+### Netlify Specific Steps:
+1. Go to **Site configuration** > **Environment variables**.
+2. Click **Add a variable** > **Add a single variable**.
+3. Create entries for `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, and `API_KEY`.
+4. **Redeploy Site**: Go to the **Deploys** tab, click **Trigger deploy**, and choose **Clear cache and deploy site**.
 
 ## 2. Database Schema (Supabase)
 Run the following SQL in your Supabase SQL Editor to create the necessary tables and triggers:
