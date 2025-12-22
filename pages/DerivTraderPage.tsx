@@ -1,9 +1,7 @@
-
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-// FIX: Removed extensions from import paths.
 import { derivService } from '../services/derivService';
 import { useSignal } from '../contexts/SignalContext';
-import { Signal, DerivActiveSymbol, DerivBalance, DerivProposal, DerivContractsForSymbol, DerivTick, DerivPortfolio, DerivProfitTableEntry, DerivTradeParams, UiDerivContractType } from '../types';
+import { Signal, DerivActiveSymbol, DerivBalance, DerivProposal, DerivContractsForSymbol, DerivTick, DerivPortfolio, DerivProfitTableEntry, DerivTradeParams } from '../types';
 import { LoadingSpinner } from '../components/LoadingSpinner';
 import { ErrorAlert } from '../components/ErrorAlert';
 
@@ -29,29 +27,40 @@ const DerivTraderPage: React.FC = () => {
     });
     
     const { signal, contractType, clearSignal } = useSignal();
-    const proposalSubIds = useRef<{ [key: string]: string }>({});
 
     const handleConnect = useCallback(() => {
-        if (!apiToken) { setError("No token."); return; }
+        if (!apiToken) {
+            setError("Please enter a valid Deriv API Token.");
+            return;
+        }
         setIsLoading(true);
+        setError(null);
         derivService.connect(apiToken, {
-            onOpen: () => { setIsConnected(true); setIsLoading(false); },
+            onOpen: () => {
+                setIsConnected(true);
+                setIsLoading(false);
+            },
             onBalance: setBalance,
             onActiveSymbols: (symbols) => setActiveSymbols(symbols.filter(s => s.market === 'synthetic_index')),
             onContractsFor: setContracts,
             onTick: setTick,
             onProposal: (p: DerivProposal) => setProposals(prev => ({...prev, [p.longcode]: p})),
             onPortfolio: setPortfolio,
-            onTransaction: () => { derivService.getPortfolio(); derivService.getProfitTable(); },
+            onTransaction: () => {
+                derivService.getPortfolio();
+                derivService.getProfitTable();
+            },
             onProfitTable: setProfitTable,
-            // FIX: Typed err as any to handle various error sources safely.
-            onError: (err: any) => {
-                setError(typeof err === 'string' ? err : JSON.stringify(err));
+            onError: (err: unknown) => {
+                const message = typeof err === 'string' ? err : (err instanceof Error ? err.message : String(err));
+                setError(message);
                 setIsLoading(false);
                 setIsConnected(false);
             },
-            onOpen: () => { setIsConnected(true); setIsLoading(false); },
-            onClose: () => { setIsConnected(false); setBalance(null); }
+            onClose: () => {
+                setIsConnected(false);
+                setBalance(null);
+            }
         });
     }, [apiToken]);
 
@@ -68,28 +77,38 @@ const DerivTraderPage: React.FC = () => {
         if (proposal) derivService.buyContract(proposal.id, proposal.ask_price);
     };
 
-    // FIX: Using type guard and explicit cast to resolve 'unknown' property access errors.
-    const callProposal = Object.values(proposals).find((p): p is DerivProposal => !!p && (p as any).contract_type === 'CALL');
-    const putProposal = Object.values(proposals).find((p): p is DerivProposal => !!p && (p as any).contract_type === 'PUT');
-
     if (!isConnected) {
         return (
-            <div className="max-w-md mx-auto p-4">
-                <input type="password" value={apiToken} onChange={e => setApiToken(e.target.value)} placeholder="API Token" className="w-full h-12 bg-gray-700 text-white rounded-lg mb-4" />
-                <button onClick={handleConnect} disabled={isLoading} className="w-full h-12 bg-blue-600 text-white rounded-lg">
-                    {isLoading ? <LoadingSpinner /> : 'Connect'}
+            <div className="max-w-md mx-auto text-center p-8 bg-gray-800 rounded-2xl border border-gray-700">
+                <h1 className="text-2xl font-bold text-white mb-6">Connect to Deriv</h1>
+                {error && <div className="mb-4"><ErrorAlert message={error} /></div>}
+                <input
+                    type="password"
+                    value={apiToken}
+                    onChange={e => setApiToken(e.target.value)}
+                    placeholder="Enter Deriv API Token"
+                    className="w-full h-12 px-3 text-white bg-gray-700 border border-gray-600 rounded-md mb-4"
+                />
+                <button onClick={handleConnect} disabled={isLoading} className="w-full h-12 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 disabled:bg-gray-600">
+                    {isLoading ? <LoadingSpinner /> : 'Connect Terminal'}
                 </button>
             </div>
         );
     }
 
+    const callProposal = Object.values(proposals).find((p): p is DerivProposal => p?.contract_type === 'CALL');
+    const putProposal = Object.values(proposals).find((p): p is DerivProposal => p?.contract_type === 'PUT');
+
     return (
-        <div className="max-w-7xl mx-auto space-y-6">
-            <div className="bg-gray-800 p-6 rounded-2xl border border-gray-700">
-                <h2 className="text-white font-bold">Balance: ${balance?.balance.toFixed(2)}</h2>
-                <div className="grid grid-cols-2 gap-4 mt-4">
-                    <button onClick={() => handleBuy(callProposal)} disabled={!callProposal} className="h-20 bg-green-600 text-white font-bold rounded-lg">Rise</button>
-                    <button onClick={() => handleBuy(putProposal)} disabled={!putProposal} className="h-20 bg-red-600 text-white font-bold rounded-lg">Fall</button>
+        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6 animate-fade-in">
+             <div className="lg:col-span-2 bg-gray-800/50 p-6 rounded-2xl border border-gray-700">
+                <div className="flex justify-between items-center mb-6">
+                     <h2 className="text-xl font-bold text-white">Deriv Terminal</h2>
+                     <p className="font-bold text-lg text-green-400">${balance?.balance.toFixed(2)}</p>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                    <button onClick={() => handleBuy(callProposal)} disabled={!callProposal} className="h-24 bg-green-600 text-white font-bold rounded-xl hover:bg-green-700 disabled:opacity-50">Rise</button>
+                    <button onClick={() => handleBuy(putProposal)} disabled={!putProposal} className="h-24 bg-red-600 text-white font-bold rounded-xl hover:bg-red-700 disabled:opacity-50">Fall</button>
                 </div>
             </div>
         </div>

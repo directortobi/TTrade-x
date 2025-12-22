@@ -1,5 +1,5 @@
 
-/// <reference types="vite/client" />
+// FIX: Removed problematic triple-slash reference to vite/client that was causing type definition lookup failures.
 
 interface ImportMetaEnv {
   readonly VITE_SUPABASE_URL: string
@@ -10,3 +10,6 @@ interface ImportMetaEnv {
 interface ImportMeta {
   readonly env: ImportMetaEnv
 }
+
+// Ensure module resolution for vite/client types if the reference fails
+declare module 'vite/client';

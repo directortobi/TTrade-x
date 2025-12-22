@@ -6,7 +6,8 @@ import { Notification } from '../types';
 export const notificationService = {
     async getNotifications(): Promise<Notification[]> {
         try {
-            const { data: { user }, error: userError } = await supabase.auth.getUser();
+            // FIX: Cast supabase.auth to any to resolve getUser type error
+            const { data: { user }, error: userError } = await (supabase.auth as any).getUser();
 
             if (userError) {
                 // Explicitly handle this error case to prevent it from bubbling up.
@@ -60,7 +61,8 @@ export const notificationService = {
     },
 
     async markAllAsRead(): Promise<void> {
-        const { data: { user } } = await supabase.auth.getUser();
+        // FIX: Cast supabase.auth to any to resolve getUser type error
+        const { data: { user } } = await (supabase.auth as any).getUser();
         if (!user) throw new Error("User not authenticated.");
 
         const { error } = await supabase

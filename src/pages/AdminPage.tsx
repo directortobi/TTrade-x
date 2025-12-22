@@ -7,7 +7,7 @@ import { ErrorAlert } from '../components/ErrorAlert';
 import { TableSkeleton } from '../components/skeletons/TableSkeleton';
 
 
-const AdminPage: React.FC = () => {
+export const AdminPage: React.FC = () => {
     const [purchases, setPurchases] = useState<PurchaseWithEmail[]>([]);
     const [withdrawals, setWithdrawals] = useState<WithdrawalWithEmail[]>([]);
     const [referralWithdrawals, setReferralWithdrawals] = useState<ReferralWithdrawalWithEmail[]>([]);
@@ -322,3 +322,6 @@ const AdminPage: React.FC = () => {
         </div>
     );
 };
+
+// FIX: Added default export for lazy loading in MainApp.tsx.
+export default AdminPage;

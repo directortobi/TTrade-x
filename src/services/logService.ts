@@ -35,7 +35,8 @@ export const logService = {
     },
     
     async getLogs(): Promise<AnalysisLog[]> {
-        const { data: { user } } = await supabase.auth.getUser();
+        // FIX: Cast supabase.auth to any to resolve getUser type error
+        const { data: { user } } = await (supabase.auth as any).getUser();
         if (!user) {
             console.log("No user session found, cannot fetch logs.");
             return [];

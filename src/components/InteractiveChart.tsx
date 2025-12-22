@@ -1,6 +1,7 @@
 
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { createChart, IChartApi, ISeriesApi, Time } from 'lightweight-charts';
+// FIX: Imported missing types for prop definitions
 import { Asset, AppUser, AnalysisResult, View } from '../types';
 import { AVAILABLE_ASSETS } from '../constants';
 import { fetchCandlestickData } from '../services/marketDataService';
@@ -12,6 +13,7 @@ import { useTokenForAnalysis } from '../services/tokenService';
 import { logService } from '../services/logService';
 import { ChartAnnotationPanel } from './ChartAnnotationPanel';
 
+// FIX: Added onNavigate to props interface to resolve prop mismatch error in MainApp
 interface InteractiveChartProps {
     user: AppUser;
     onTokenUsed: (newBalance: number) => void;
@@ -30,7 +32,7 @@ const InteractiveChart: React.FC<InteractiveChartProps> = ({ user, onTokenUsed, 
     
     const [userNotes, setUserNotes] = useState('');
 
-    const timeframe = '15min'; // Hardcoded for this component
+    const timeframe = '15min';
 
     const handleAnalysis = useCallback(async () => {
         if (user.profile.tokens < 1) {
@@ -43,12 +45,10 @@ const InteractiveChart: React.FC<InteractiveChartProps> = ({ user, onTokenUsed, 
         try {
             const data = await fetchCandlestickData(selectedAsset.ticker, timeframe);
             
-            // The AI gets the raw data and user notes, but no pre-drawn indicators.
             const result = await getTimeframeAnalysis({
                 pair: selectedAsset.ticker,
                 timeframe: timeframe,
                 data: data,
-                // userAnnotations: userNotes, // This feature could be added here
             });
             
             const tokensUsed = result.confidenceLevel > 50 ? 1 : 0;
@@ -177,4 +177,5 @@ const InteractiveChart: React.FC<InteractiveChartProps> = ({ user, onTokenUsed, 
     );
 };
 
+// FIX: Exported default for proper React.lazy module resolution
 export default InteractiveChart;

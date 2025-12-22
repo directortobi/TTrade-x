@@ -37,7 +37,7 @@ const OutcomeSelector: React.FC<{ logId: number; onUpdate: (id: number, outcome:
 );
 
 
-const HistoryPage: React.FC<HistoryPageProps> = ({ user }) => {
+export const HistoryPage: React.FC<HistoryPageProps> = ({ user }) => {
     const [logs, setLogs] = useState<AnalysisLog[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -167,3 +167,6 @@ const HistoryPage: React.FC<HistoryPageProps> = ({ user }) => {
         </div>
     );
 };
+
+// FIX: Added default export for React.lazy support in MainApp.tsx.
+export default HistoryPage;

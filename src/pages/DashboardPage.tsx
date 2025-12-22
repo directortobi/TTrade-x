@@ -70,3 +70,6 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ user, onNavigate }) => {
         </div>
     );
 };
+
+// FIX: Added default export for React.lazy support in MainApp.tsx.
+export default DashboardPage;

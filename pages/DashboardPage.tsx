@@ -1,8 +1,6 @@
 
 import React from 'react';
-// FIX: Removed .ts extension.
 import { AppUser, View } from '../types';
-// FIX: Removed extensions from import paths.
 import TradingViewMarketOverviewWidget from '../components/TradingViewMarketOverviewWidget';
 import RecentSignals from '../components/dashboard/RecentSignals';
 
@@ -73,4 +71,5 @@ const DashboardPage: React.FC<DashboardPageProps> = ({ user, onNavigate }) => {
     );
 };
 
+// FIX: Added default export for lazy loading.
 export default DashboardPage;

@@ -1,9 +1,11 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Credentials } from '../types';
 import { LoadingSpinner } from '../components/LoadingSpinner';
 import { SupabaseLogo } from '../components/icons/SupabaseLogo';
 import { AppLogo } from '../components/AppLogo';
+import { isSupabaseConfigured } from '../services/supabase';
+import { isGeminiConfigured } from '../services/geminiService';
 
 interface LoginPageProps {
     onLogin: (credentials: Credentials) => Promise<void>;
@@ -85,9 +87,25 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLogin, onNavigateToSignU
                             Sign up
                         </button>
                     </p>
-                    <div className="mt-8 border-t border-gray-700 pt-4 flex items-center justify-center gap-2">
-                        <span className="text-xs text-gray-500">Secure authentication by</span>
-                        <SupabaseLogo />
+
+                    <div className="mt-8 border-t border-gray-700 pt-6 flex flex-col gap-4">
+                        <div className="flex items-center justify-between text-[10px] uppercase tracking-widest text-gray-500 font-bold">
+                            <span>System Status</span>
+                            <div className="flex gap-3">
+                                <span className="flex items-center gap-1">
+                                    <div className={`w-1.5 h-1.5 rounded-full ${isSupabaseConfigured ? 'bg-green-500' : 'bg-red-500'}`}></div>
+                                    Supabase
+                                </span>
+                                <span className="flex items-center gap-1">
+                                    <div className={`w-1.5 h-1.5 rounded-full ${isGeminiConfigured ? 'bg-green-500' : 'bg-red-500'}`}></div>
+                                    Gemini AI
+                                </span>
+                            </div>
+                        </div>
+                        <div className="flex items-center justify-center gap-2">
+                            <span className="text-xs text-gray-500">Secure authentication by</span>
+                            <SupabaseLogo />
+                        </div>
                     </div>
                 </div>
             </div>

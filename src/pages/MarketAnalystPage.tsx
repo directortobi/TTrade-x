@@ -45,137 +45,64 @@ const MarketAnalystPage: React.FC<MarketAnalystPageProps> = ({ user, onTokenUsed
 
         setIsLoading(true);
         setError(null);
-        setResult(null);
-
         try {
             let analysis: AnalysisResult;
-
             if (mode === 'expert') {
-                // Fetch multi-timeframe data
-                const [data1h, data4h, data1d] = await Promise.all([
+                const [d1h, d4h, d1d] = await Promise.all([
                     fetchCandlestickData(selectedAsset.ticker, '1hour'),
                     fetchCandlestickData(selectedAsset.ticker, '4hour'),
                     fetchCandlestickData(selectedAsset.ticker, '1day'),
                 ]);
-
-                analysis = await getMarketAnalystPrediction({
-                    pair: selectedAsset.ticker,
-                    tradingStyle,
-                    data1h,
-                    data4h,
-                    data1d
-                });
+                analysis = await getMarketAnalystPrediction({ pair: selectedAsset.ticker, tradingStyle, data1h: d1h, data4h: d4h, data1d: d1d });
             } else {
-                // Fetch single timeframe data
                 const data = await fetchCandlestickData(selectedAsset.ticker, mode);
-                analysis = await getTimeframeAnalysis({
-                    pair: selectedAsset.ticker,
-                    timeframe: mode,
-                    data
-                });
+                analysis = await getTimeframeAnalysis({ pair: selectedAsset.ticker, timeframe: mode, data });
             }
 
             const tokensUsed = analysis.confidenceLevel > 50 ? 1 : 0;
             await logService.createLog(analysis, user.auth.email!, tokensUsed, user.auth.id);
-
             if (tokensUsed > 0) {
                 const newBalance = await useTokenForAnalysis(user.profile.tokens);
                 onTokenUsed(newBalance);
             }
-
             setResult(analysis);
-
         } catch (err: any) {
-            setError(err.message || "Analysis failed. Please try again.");
+            setError(err.message || "Analysis failed.");
         } finally {
             setIsLoading(false);
         }
     }, [user, selectedAsset, mode, tradingStyle, onTokenUsed]);
 
-    if (isLoading) {
-        return (
-            <div className="max-w-3xl mx-auto flex flex-col items-center justify-center text-center pt-16">
-                <CandlestickSpinner />
-                <p className="text-xl text-gray-300 mt-6 animate-pulse font-semibold">Analyzing market data...</p>
-                <p className="text-gray-500 mt-2">Consulting AI models and processing price action.</p>
-            </div>
-        );
-    }
-
-    if (result) {
-        return <ResultsPage result={result} onGoBack={() => setResult(null)} onNavigate={onNavigate} />;
-    }
+    if (isLoading) return <div className="max-w-3xl mx-auto flex flex-col items-center justify-center p-16"><CandlestickSpinner /><p className="mt-4 text-gray-400">Consulting AI Market Analyst...</p></div>;
+    if (result) return <ResultsPage result={result} onGoBack={() => setResult(null)} onNavigate={onNavigate} />;
 
     return (
-        <div className="max-w-4xl mx-auto animate-fade-in space-y-8">
-             <div className="text-center">
-                <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">
-                    Market Analyst
-                </h1>
-                <p className="text-gray-400 mt-2">Select an asset and analysis mode to generate AI-powered trading signals.</p>
+        <div className="max-w-4xl mx-auto space-y-8 animate-fade-in">
+            <div className="text-center">
+                <h1 className="text-3xl font-bold text-white">AI Market Analyst</h1>
+                <p className="text-gray-400 mt-2">Get high-probability signals based on multi-timeframe price action.</p>
             </div>
-
             {error && <ErrorAlert message={error} />}
-
-            <div className="bg-gray-800/50 p-6 sm:p-8 rounded-2xl shadow-2xl border border-gray-700 space-y-8">
-                {/* Asset Selection */}
+            <div className="bg-gray-800/50 p-8 rounded-2xl border border-gray-700 space-y-8">
                 <div>
-                    <label className="block text-sm font-medium text-gray-400 mb-3">Select Asset Pair</label>
+                    <label className="block text-sm font-medium text-gray-400 mb-3">Asset Pair</label>
                     <AssetSelector assets={AVAILABLE_ASSETS} selectedAsset={selectedAsset} onSelectAsset={setSelectedAsset} />
                 </div>
-
-                {/* Mode Selection */}
-                <div>
-                    <label className="block text-sm font-medium text-gray-400 mb-3">Analysis Mode</label>
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                        {MODES.map((m) => (
-                            <button
-                                key={m.id}
-                                onClick={() => setMode(m.id)}
-                                className={`px-4 py-3 rounded-lg text-sm font-medium transition-all ${
-                                    mode === m.id
-                                        ? 'bg-blue-600 text-white shadow-lg shadow-blue-900/50'
-                                        : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                                }`}
-                            >
-                                {m.name}
-                            </button>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    {MODES.map(m => (
+                        <button key={m.id} onClick={() => setMode(m.id)} className={`px-4 py-2 rounded-lg transition-all ${mode === m.id ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30' : 'bg-gray-700 text-gray-400 hover:bg-gray-600'}`}>{m.name}</button>
+                    ))}
+                </div>
+                {mode === 'expert' && (
+                    <div className="flex gap-4">
+                        {TRADING_STYLES.map(style => (
+                            <button key={style.id} onClick={() => setTradingStyle(style.id as TradingStyle)} className={`flex-1 px-4 py-2 rounded-lg border ${tradingStyle === style.id ? 'border-blue-500 bg-blue-500/10 text-blue-400' : 'border-gray-600 text-gray-400'}`}>{style.name}</button>
                         ))}
                     </div>
-                </div>
-
-                {/* Trading Style (Only for Expert Mode) */}
-                {mode === 'expert' && (
-                    <div className="animate-fade-in">
-                         <label className="block text-sm font-medium text-gray-400 mb-3">Trading Persona</label>
-                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                            {TRADING_STYLES.map((style) => (
-                                <button
-                                    key={style.id}
-                                    onClick={() => setTradingStyle(style.id as TradingStyle)}
-                                    className={`px-4 py-3 rounded-lg text-sm font-medium transition-all border ${
-                                        tradingStyle === style.id
-                                            ? 'bg-purple-600 border-purple-500 text-white shadow-lg shadow-purple-900/50'
-                                            : 'bg-gray-700 border-gray-600 text-gray-300 hover:bg-gray-600'
-                                    }`}
-                                >
-                                    {style.name}
-                                </button>
-                            ))}
-                         </div>
-                    </div>
                 )}
-
-                <div className="pt-4 border-t border-gray-700">
-                    <button
-                        onClick={handleAnalyze}
-                        className="w-full h-14 text-lg font-bold text-white bg-gradient-to-r from-blue-600 to-cyan-600 rounded-xl hover:from-blue-500 hover:to-cyan-500 shadow-lg shadow-blue-900/50 transition-all transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 focus:ring-offset-gray-900"
-                    >
-                        Analyze Market (1 Token)
-                    </button>
-                    <p className="text-center text-xs text-gray-500 mt-3">
-                        Token is only deducted if AI confidence > 50%.
-                    </p>
+                <div className="pt-6 border-t border-gray-700">
+                    <button onClick={handleAnalyze} className="w-full h-14 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl transition-all shadow-xl shadow-blue-900/40">Analyze Market (1 Token)</button>
+                    <p className="text-center text-xs text-gray-500 mt-4">Token only deducted if confidence level is above 50%.</p>
                 </div>
             </div>
         </div>

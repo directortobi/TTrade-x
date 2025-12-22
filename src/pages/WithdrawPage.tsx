@@ -10,7 +10,7 @@ interface WithdrawPageProps {
     onWithdrawSuccess: () => void;
 }
 
-const WithdrawPage: React.FC<WithdrawPageProps> = ({ user, onWithdrawSuccess }) => {
+export const WithdrawPage: React.FC<WithdrawPageProps> = ({ user, onWithdrawSuccess }) => {
     const [amount, setAmount] = useState('');
     const [walletAddress, setWalletAddress] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -118,3 +118,6 @@ const WithdrawPage: React.FC<WithdrawPageProps> = ({ user, onWithdrawSuccess }) 
         </div>
     );
 };
+
+// FIX: Added default export for React.lazy support in MainApp.tsx.
+export default WithdrawPage;

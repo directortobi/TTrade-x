@@ -34,7 +34,7 @@ const EarningStatusBadge: React.FC<{ status: EarningStatus }> = ({ status }) => 
     return <span className={`px-2 py-1 text-xs font-semibold rounded-full border ${styles[status]}`}>{status.charAt(0).toUpperCase() + status.slice(1)}</span>;
 };
 
-const ReferralPage: React.FC<ReferralPageProps> = ({ user }) => {
+export const ReferralPage: React.FC<ReferralPageProps> = ({ user }) => {
     const [stats, setStats] = useState({ totalReferrals: 0, pendingEarnings: 0, availableEarnings: 0, lifetimeEarnings: 0 });
     const [referredUsers, setReferredUsers] = useState<ReferredUser[]>([]);
     const [earningsHistory, setEarningsHistory] = useState<ReferralEarningWithEmail[]>([]);
@@ -240,3 +240,6 @@ const ReferralPage: React.FC<ReferralPageProps> = ({ user }) => {
         </div>
     );
 };
+
+// FIX: Added default export for lazy loading in MainApp.tsx.
+export default ReferralPage;

@@ -38,12 +38,12 @@ const App: React.FC = () => {
                     return;
                 }
 
-                // Get initial session
-                const { data: { session: initialSession } } = await supabase.auth.getSession();
+                // FIX: Cast supabase.auth to any to bypass problematic type definitions for getSession
+                const { data: { session: initialSession } } = await (supabase.auth as any).getSession();
                 setSession(initialSession);
 
-                // Listen for auth changes
-                const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+                // FIX: Cast supabase.auth to any to bypass problematic type definitions for onAuthStateChange
+                const { data: { subscription } } = (supabase.auth as any).onAuthStateChange((_event: any, session: any) => {
                     setSession(session);
                     if (_event === 'SIGNED_IN') {
                         setAuthView('login');

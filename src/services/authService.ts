@@ -4,7 +4,8 @@ import { supabase } from './supabase';
 
 export const authService = {
     signup: async ({ email, password }: Credentials, referredByCode?: string | null): Promise<User> => {
-        const { data, error } = await supabase.auth.signUp({
+        // FIX: Cast supabase.auth to any to resolve signUp type error
+        const { data, error } = await (supabase.auth as any).signUp({
             email: email,
             password: password,
             options: {
@@ -30,7 +31,8 @@ export const authService = {
     },
 
     login: async ({ email, password }: Credentials): Promise<User> => {
-        const { data, error } = await supabase.auth.signInWithPassword({
+        // FIX: Cast supabase.auth to any to resolve signInWithPassword type error
+        const { data, error } = await (supabase.auth as any).signInWithPassword({
             email: email,
             password: password,
         });
@@ -46,7 +48,8 @@ export const authService = {
     },
 
     logout: async (): Promise<void> => {
-        const { error } = await supabase.auth.signOut();
+        // FIX: Cast supabase.auth to any to resolve signOut type error
+        const { error } = await (supabase.auth as any).signOut();
         if (error) {
             console.error("Supabase logout error:", error);
             throw new Error(error.message);
@@ -54,7 +57,8 @@ export const authService = {
     },
 
     updatePassword: async (password: string): Promise<void> => {
-        const { error } = await supabase.auth.updateUser({ password });
+        // FIX: Cast supabase.auth to any to resolve updateUser type error
+        const { error } = await (supabase.auth as any).updateUser({ password });
         if (error) {
             throw new Error(error.message);
         }

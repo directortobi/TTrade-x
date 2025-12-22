@@ -1,6 +1,4 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
-import type { Session } from '@supabase/supabase-js';
 import { supabase } from './services/supabase';
 import { profileService } from './services/profileService';
 import { AppUser, Profile, View } from './types';
@@ -8,9 +6,10 @@ import { Header } from './components/Header';
 import { LoadingSpinner } from './components/LoadingSpinner';
 import { ErrorAlert } from './components/ErrorAlert';
 import { notificationService } from './services/notificationService';
+// Standardize relative paths to fix module resolution errors
 import { DashboardSkeleton } from './components/skeletons/DashboardSkeleton';
 
-// Lazy load pages for better initial performance
+// Lazy load pages using standard relative paths
 const DashboardPage = React.lazy(() => import('./pages/DashboardPage'));
 const MarketAnalystPage = React.lazy(() => import('./pages/MarketAnalystPage'));
 const ImageAnalyzer = React.lazy(() => import('./components/ImageAnalyzer'));
@@ -41,8 +40,7 @@ const DEFAULT_PROFILE: Profile = {
     referred_by: null,
 };
 
-
-export const MainApp: React.FC<{ session: Session }> = ({ session }) => {
+export const MainApp: React.FC<{ session: any }> = ({ session }) => {
     const [user, setUser] = useState<AppUser | null>(null);
     const [isUserLoading, setIsUserLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -50,9 +48,8 @@ export const MainApp: React.FC<{ session: Session }> = ({ session }) => {
     const [unreadNotifications, setUnreadNotifications] = useState(0);
 
     const fetchUserAndProfile = useCallback(async () => {
-        if (!session.user) {
+        if (!session?.user) {
             setIsUserLoading(false);
-            setError("No user session found.");
             return;
         }
 
@@ -70,7 +67,7 @@ export const MainApp: React.FC<{ session: Session }> = ({ session }) => {
         } finally {
             setIsUserLoading(false);
         }
-    }, [session.user]);
+    }, [session]);
 
     useEffect(() => {
         fetchUserAndProfile();
@@ -83,12 +80,11 @@ export const MainApp: React.FC<{ session: Session }> = ({ session }) => {
     };
 
     const handleLogout = async () => {
-        await supabase.auth.signOut();
-        // The onAuthStateChange listener in App.tsx will handle the session change.
+        await (supabase.auth as any).signOut();
     };
 
     const renderView = () => {
-        if (!user) return null; // Should be covered by loading/error state
+        if (!user) return null;
         
         const pageProps = { user, onNavigate: setView };
 
@@ -100,15 +96,15 @@ export const MainApp: React.FC<{ session: Session }> = ({ session }) => {
             case 'image_analyst':
                  return <ImageAnalyzer {...pageProps} onTokenUsed={handleTokenUpdate} onNavigate={setView}/>;
             case 'chart':
-                return <InteractiveChart {...pageProps} onTokenUsed={handleTokenUpdate} />;
+                return <InteractiveChart {...pageProps} onTokenUsed={handleTokenUpdate} onNavigate={setView} />;
             case 'history':
                 return <HistoryPage {...pageProps} />;
             case 'profile':
-                return <ProfilePage {...pageProps} onLogout={handleLogout} />;
+                return <ProfilePage {...pageProps} onLogout={handleLogout} onNavigate={setView} />;
             case 'buyTokens':
                 return <BuyTokensPage {...pageProps} onPurchaseSuccess={fetchUserAndProfile} />;
             case 'purchaseHistory':
-                return <PurchaseHistoryPage {...pageProps} />;
+                return <PurchaseHistoryPage {...pageProps} onNavigate={setView} />;
              case 'admin':
                 return user.profile.is_admin ? <AdminPage /> : <ErrorAlert message="You are not authorized to view this page." />;
             case 'referrals':
@@ -138,7 +134,7 @@ export const MainApp: React.FC<{ session: Session }> = ({ session }) => {
     
     const onNotificationsViewed = () => {
         setUnreadNotifications(0);
-        fetchUserAndProfile(); // Re-fetch to get latest counts if some are marked read individually
+        fetchUserAndProfile();
     }
 
 

@@ -1,10 +1,9 @@
 
 import React, { useState, useRef, useCallback } from 'react';
-import { AnalysisResult, ImageData as ImageData_, View } from '../types';
+import { AnalysisResult, ImageData as ImageData_, View, AppUser, Signal } from '../types';
 import { getSignalFromImage } from '../services/geminiService';
 import { useTokenForAnalysis } from '../services/tokenService';
 import { logService } from '../services/logService';
-import { AppUser, Signal } from '../types';
 import { ResultsPage } from '../pages/ResultsPage';
 import { ErrorAlert } from './ErrorAlert';
 import { CandlestickSpinner } from './CandlestickSpinner';
@@ -27,7 +26,7 @@ const ImageAnalyzer: React.FC<ImageAnalyzerProps> = ({ user, onTokenUsed, onNavi
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         if (file) {
-            if (file.size > 4 * 1024 * 1024) { // 4MB limit for Gemini
+            if (file.size > 4 * 1024 * 1024) {
                 setError("Image size cannot exceed 4MB.");
                 return;
             }
@@ -52,7 +51,7 @@ const ImageAnalyzer: React.FC<ImageAnalyzerProps> = ({ user, onTokenUsed, onNavi
             return;
         }
          if (user.profile.tokens < 1) {
-            setError("You have 0 tokens. Please buy more to perform a new analysis.");
+            setError("You have 0 tokens. Please buy more to perform an analysis.");
             return;
         }
 
@@ -68,46 +67,31 @@ const ImageAnalyzer: React.FC<ImageAnalyzerProps> = ({ user, onTokenUsed, onNavi
                 const newBalance = await useTokenForAnalysis(user.profile.tokens);
                 onTokenUsed(newBalance);
             } else {
-                const originalRationale = result.rationale;
-                const originalSignal = result.signal;
                 result.signal = Signal.HOLD;
-                result.entryPrice = 0;
-                result.takeProfit = 0;
-                result.stopLoss = 0;
-                result.pips = { takeProfit: 0, stopLoss: 0 };
-                result.riskRewardRatio = 'N/A';
-                result.rationale = `AI Confidence (${result.confidenceLevel}%) is at or below the 50% threshold. Signal converted to HOLD (no token charged).\nIt is advisable to wait for a clearer market setup.\n\n--- Original AI Rationale (Signal: ${originalSignal}) ---\n${originalRationale}`;
+                result.rationale = `Confidence too low (${result.confidenceLevel}%). Signal converted to HOLD. (No token deducted). \n\n ${result.rationale}`;
             }
 
             setAnalysisResult(result);
-
-        } catch (err: unknown) {
-            if (err instanceof Error) {
-                setError(`Analysis failed: ${err.message}`);
-            } else {
-                setError("An unknown error occurred during analysis.");
-            }
+        } catch (err: any) {
+            setError(err.message || "Analysis failed.");
         } finally {
             setIsLoading(false);
         }
     }, [imageData, userAnnotations, user, onTokenUsed]);
 
-    const handleReset = useCallback(() => {
+    const handleReset = () => {
         setAnalysisResult(null);
         setImageData(null);
         setImagePreview(null);
         setUserAnnotations('');
-        if (fileInputRef.current) {
-            fileInputRef.current.value = '';
-        }
-    }, []);
+        if (fileInputRef.current) fileInputRef.current.value = '';
+    };
 
     if (isLoading) {
         return (
              <div className="max-w-3xl mx-auto flex flex-col items-center justify-center text-center pt-16">
                 <CandlestickSpinner />
-                <p className="text-xl text-gray-300 mt-6 animate-pulse font-semibold">Analyzing your chart image...</p>
-                <p className="text-gray-500 mt-2">This may take a few moments.</p>
+                <p className="text-xl text-gray-300 mt-6 animate-pulse font-semibold">Analyzing chart screenshot...</p>
             </div>
         );
     }
@@ -118,25 +102,46 @@ const ImageAnalyzer: React.FC<ImageAnalyzerProps> = ({ user, onTokenUsed, onNavi
 
     return (
         <div className="max-w-3xl mx-auto animate-fade-in">
-             <div className="bg-gray-800/50 backdrop-blur-sm p-6 sm:p-8 rounded-2xl shadow-2xl border border-gray-700 space-y-6">
+             <div className="bg-gray-800/50 backdrop-blur-sm p-8 rounded-2xl border border-gray-700 space-y-6 shadow-2xl">
                 <div>
-                    <h2 className="text-2xl font-bold text-white mb-1 bg-clip-text text-transparent bg-gradient-to-r from-green-400 to-teal-300">Chart Image Analyzer</h2>
-                    <p className="text-gray-400">Upload a screenshot of any trading chart for an instant AI-powered analysis.</p>
+                    <h2 className="text-2xl font-bold text-white bg-clip-text text-transparent bg-gradient-to-r from-green-400 to-teal-300">Image Analyst</h2>
+                    <p className="text-gray-400">Upload a screenshot of your chart for instant AI feedback.</p>
                 </div>
                 
                 <div 
-                    className="relative border-2 border-dashed border-gray-600 rounded-xl p-6 text-center cursor-pointer hover:border-green-500 hover:bg-gray-800/60 transition-colors"
+                    className="relative border-2 border-dashed border-gray-600 rounded-xl p-8 text-center cursor-pointer hover:border-green-500 hover:bg-gray-800/60 transition-all"
                     onClick={() => fileInputRef.current?.click()}
                 >
-                    <input
-                        ref={fileInputRef}
-                        type="file"
-                        className="hidden"
-                        accept="image/png, image/jpeg, image/gif, image/webp"
-                        onChange={handleFileChange}
-                    />
+                    <input ref={fileInputRef} type="file" className="hidden" accept="image/*" onChange={handleFileChange} />
                     {imagePreview ? (
-                        <img src={imagePreview} alt="Chart preview" className="max-h-80 mx-auto rounded-lg object-contain" />
+                        <img src={imagePreview} alt="Preview" className="max-h-80 mx-auto rounded-lg shadow-xl" />
                     ) : (
-                        <div className="flex flex-col items-center justify-center text-gray-400">
-                             <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}><path strokeLinecap="round" strokeLinejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a
+                        <div className="flex flex-col items-center justify-center text-gray-500 space-y-4">
+                             <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                             <p className="text-lg">Click to select or drag & drop</p>
+                        </div>
+                    )}
+                </div>
+
+                <textarea
+                    value={userAnnotations}
+                    onChange={(e) => setUserAnnotations(e.target.value)}
+                    placeholder="Ask specific questions about this setup (Optional)..."
+                    className="w-full h-24 p-4 bg-gray-700/50 border border-gray-600 rounded-xl text-white focus:ring-2 focus:ring-green-500 outline-none"
+                />
+
+                {error && <ErrorAlert message={error} />}
+
+                <button
+                    onClick={handleAnalyze}
+                    disabled={!imageData || isLoading}
+                    className="w-full h-14 bg-gradient-to-r from-green-600 to-teal-600 text-white font-bold rounded-xl shadow-lg hover:brightness-110 transition-all disabled:opacity-50"
+                >
+                    Analyze Screenshot (1 Token)
+                </button>
+            </div>
+        </div>
+    );
+};
+
+export default ImageAnalyzer;

@@ -1,10 +1,6 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
-import type { Session } from '@supabase/supabase-js';
-// FIX: Removed .ts extension.
 import { supabase } from './services/supabase';
 import { profileService } from './services/profileService';
-// FIX: Removed extensions from all local imports.
 import { AppUser, Profile, View } from './types';
 import { Header } from './components/Header';
 import { LoadingSpinner } from './components/LoadingSpinner';
@@ -12,8 +8,7 @@ import { ErrorAlert } from './components/ErrorAlert';
 import { notificationService } from './services/notificationService';
 import { DashboardSkeleton } from './components/skeletons/DashboardSkeleton';
 
-// Lazy load pages
-// FIX: Removed extensions from dynamic imports.
+// Lazy load pages for better initial performance
 const DashboardPage = React.lazy(() => import('./pages/DashboardPage'));
 const MarketAnalystPage = React.lazy(() => import('./pages/MarketAnalystPage'));
 const ImageAnalyzer = React.lazy(() => import('./components/ImageAnalyzer'));
@@ -32,6 +27,7 @@ const LegalDisclaimerPage = React.lazy(() => import('./pages/LegalDisclaimerPage
 const DerivTraderPage = React.lazy(() => import('./pages/DerivTraderPage'));
 const DerivSmartTraderPage = React.lazy(() => import('./pages/DerivSmartTraderPage'));
 const CompoundingAgentPage = React.lazy(() => import('./pages/CompoundingAgentPage'));
+const InstructionsPage = React.lazy(() => import('./pages/InstructionsPage'));
 
 const DEFAULT_PROFILE: Profile = {
     id: '',
@@ -42,8 +38,7 @@ const DEFAULT_PROFILE: Profile = {
     referred_by: null,
 };
 
-
-export const MainApp: React.FC<{ session: Session }> = ({ session }) => {
+export const MainApp: React.FC<{ session: any }> = ({ session }) => {
     const [user, setUser] = useState<AppUser | null>(null);
     const [isUserLoading, setIsUserLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -51,9 +46,8 @@ export const MainApp: React.FC<{ session: Session }> = ({ session }) => {
     const [unreadNotifications, setUnreadNotifications] = useState(0);
 
     const fetchUserAndProfile = useCallback(async () => {
-        if (!session.user) {
+        if (!session?.user) {
             setIsUserLoading(false);
-            setError("No user session found.");
             return;
         }
 
@@ -67,11 +61,11 @@ export const MainApp: React.FC<{ session: Session }> = ({ session }) => {
                 profile: profileData ? { ...profileData, email: session.user.email! } : { ...DEFAULT_PROFILE, id: session.user.id, email: session.user.email! },
             });
         } catch (err) {
-            setError(err instanceof Error ? err.message : "An unknown error occurred.");
+            setError(err instanceof Error ? err.message : "An unknown error occurred while fetching user profile.");
         } finally {
             setIsUserLoading(false);
         }
-    }, [session.user]);
+    }, [session]);
 
     useEffect(() => {
         fetchUserAndProfile();
@@ -84,7 +78,9 @@ export const MainApp: React.FC<{ session: Session }> = ({ session }) => {
     };
 
     const handleLogout = async () => {
-        await supabase.auth.signOut();
+        if (supabase) {
+            await (supabase.auth as any).signOut();
+        }
     };
 
     const renderView = () => {
@@ -93,25 +89,46 @@ export const MainApp: React.FC<{ session: Session }> = ({ session }) => {
         const pageProps = { user, onNavigate: setView };
 
         switch (view) {
-            case 'dashboard': return <DashboardPage {...pageProps} />;
-            case 'market_analyst': return <MarketAnalystPage user={user} onTokenUsed={handleTokenUpdate} onNavigate={setView} />;
-            case 'image_analyst': return <ImageAnalyzer {...pageProps} onTokenUsed={handleTokenUpdate} onNavigate={setView}/>;
-            case 'chart': return <InteractiveChart {...pageProps} onTokenUsed={handleTokenUpdate} onNavigate={setView} />;
-            case 'history': return <HistoryPage {...pageProps} />;
-            case 'profile': return <ProfilePage {...pageProps} onLogout={handleLogout} />;
-            case 'buyTokens': return <BuyTokensPage {...pageProps} onPurchaseSuccess={fetchUserAndProfile} />;
-            case 'purchaseHistory': return <PurchaseHistoryPage {...pageProps} />;
-            case 'admin': return user.profile.is_admin ? <AdminPage /> : <ErrorAlert message="Unauthorized" />;
-            case 'referrals': return <ReferralPage {...pageProps} />;
-            case 'withdraw': return <WithdrawPage {...pageProps} onWithdrawSuccess={fetchUserAndProfile} />;
-            case 'withdrawalHistory': return <WithdrawalHistoryPage {...pageProps} />;
-            case 'about': return <AboutUsPage />;
-            case 'contact': return <ContactUsPage {...pageProps} />;
-            case 'disclaimer': return <LegalDisclaimerPage />;
-            case 'derivTrader': return <DerivTraderPage />;
-            case 'derivSmartTrader': return <DerivSmartTraderPage />;
-            case 'compoundingAgent': return <CompoundingAgentPage />;
-            default: return <DashboardPage {...pageProps} />;
+            case 'dashboard':
+                return <DashboardPage {...pageProps} />;
+            case 'market_analyst':
+                return <MarketAnalystPage user={user} onTokenUsed={handleTokenUpdate} onNavigate={setView} />;
+            case 'image_analyst':
+                 return <ImageAnalyzer {...pageProps} onTokenUsed={handleTokenUpdate} onNavigate={setView}/>;
+            case 'chart':
+                return <InteractiveChart {...pageProps} onTokenUsed={handleTokenUpdate} onNavigate={setView} />;
+            case 'history':
+                return <HistoryPage {...pageProps} />;
+            case 'profile':
+                return <ProfilePage {...pageProps} onLogout={handleLogout} onNavigate={setView} />;
+            case 'buyTokens':
+                return <BuyTokensPage {...pageProps} onPurchaseSuccess={fetchUserAndProfile} />;
+            case 'purchaseHistory':
+                return <PurchaseHistoryPage {...pageProps} onNavigate={setView} />;
+             case 'admin':
+                return user.profile.is_admin ? <AdminPage /> : <ErrorAlert message="You are not authorized to view this page." />;
+            case 'referrals':
+                return <ReferralPage {...pageProps} />;
+            case 'withdraw':
+                return <WithdrawPage {...pageProps} onWithdrawSuccess={fetchUserAndProfile} />;
+            case 'withdrawalHistory':
+                return <WithdrawalHistoryPage {...pageProps} />;
+            case 'about':
+                return <AboutUsPage />;
+            case 'contact':
+                return <ContactUsPage {...pageProps} />;
+            case 'disclaimer':
+                return <LegalDisclaimerPage />;
+            case 'derivTrader':
+                return <DerivTraderPage />;
+            case 'derivSmartTrader':
+                return <DerivSmartTraderPage />;
+             case 'compoundingAgent':
+                return <CompoundingAgentPage />;
+            case 'instructions':
+                return <InstructionsPage onNavigate={setView} />;
+            default:
+                return <DashboardPage {...pageProps} />;
         }
     };
     
@@ -119,7 +136,6 @@ export const MainApp: React.FC<{ session: Session }> = ({ session }) => {
         setUnreadNotifications(0);
         fetchUserAndProfile();
     }
-
 
     return (
         <div className="min-h-screen bg-gray-900 text-gray-100 flex flex-col">
