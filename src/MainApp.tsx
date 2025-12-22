@@ -6,10 +6,9 @@ import { Header } from './components/Header';
 import { LoadingSpinner } from './components/LoadingSpinner';
 import { ErrorAlert } from './components/ErrorAlert';
 import { notificationService } from './services/notificationService';
-// Standardize relative paths to fix module resolution errors
 import { DashboardSkeleton } from './components/skeletons/DashboardSkeleton';
 
-// Lazy load pages using standard relative paths
+// Lazy load pages for better initial performance
 const DashboardPage = React.lazy(() => import('./pages/DashboardPage'));
 const MarketAnalystPage = React.lazy(() => import('./pages/MarketAnalystPage'));
 const ImageAnalyzer = React.lazy(() => import('./components/ImageAnalyzer'));
@@ -29,7 +28,6 @@ const DerivTraderPage = React.lazy(() => import('./pages/DerivTraderPage'));
 const DerivSmartTraderPage = React.lazy(() => import('./pages/DerivSmartTraderPage'));
 const CompoundingAgentPage = React.lazy(() => import('./pages/CompoundingAgentPage'));
 const InstructionsPage = React.lazy(() => import('./pages/InstructionsPage'));
-
 
 const DEFAULT_PROFILE: Profile = {
     id: '',
@@ -80,7 +78,9 @@ export const MainApp: React.FC<{ session: any }> = ({ session }) => {
     };
 
     const handleLogout = async () => {
-        await (supabase.auth as any).signOut();
+        if (supabase) {
+            await (supabase.auth as any).signOut();
+        }
     };
 
     const renderView = () => {
@@ -136,7 +136,6 @@ export const MainApp: React.FC<{ session: any }> = ({ session }) => {
         setUnreadNotifications(0);
         fetchUserAndProfile();
     }
-
 
     return (
         <div className="min-h-screen bg-gray-900 text-gray-100 flex flex-col">

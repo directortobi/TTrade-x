@@ -1,6 +1,9 @@
 import { createClient } from '@supabase/supabase-js';
 import type { SupabaseClient } from '@supabase/supabase-js';
 
+/**
+ * Access environment variables with multi-source fallback.
+ */
 const getEnvVar = (name: string): string | null => {
     if (typeof process !== 'undefined' && process.env?.[name]) {
         return process.env[name] as string;
@@ -10,31 +13,82 @@ const getEnvVar = (name: string): string | null => {
         // @ts-ignore
         return import.meta.env[name] as string;
     }
+    if (typeof window !== 'undefined' && (window as any)._env_?.[name]) {
+        return (window as any)._env_[name];
+    }
     return null;
 };
 
-const supabaseUrl = getEnvVar('VITE_SUPABASE_URL') || getEnvVar('SUPABASE_URL');
-const supabaseAnonKey = getEnvVar('VITE_SUPABASE_ANON_KEY') || getEnvVar('SUPABASE_ANON_KEY');
+// --- CONFIGURATION START (FILLED IN WITH YOUR CREDENTIALS) ---
+
+export const supabaseUrl =
+    getEnvVar('VITE_SUPABASE_URL') ||
+    getEnvVar('SUPABASE_URL') ||
+    'https://ripmsswicdbflbkqfpbu.supabase.co/';
+
+export const supabaseAnonKey =
+    getEnvVar('VITE_SUPABASE_ANON_KEY') ||
+    getEnvVar('SUPABASE_ANON_KEY') ||
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJpcG1zc3dpY2RiZmxia3FmcGJ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYwMTg1MzcsImV4cCI6MjA4MTU5NDUzN30.4_voAjcOXEYMU73G3uZe0B8hQgp721tUDAL9PgrAvTE';
+
+// ➤ Your Google Gemini API Key
+export const googleGeminiApiKey =
+    getEnvVar('VITE_GEMINI_API_KEY') ||
+    getEnvVar('GEMINI_API_KEY') ||
+    'AIzaSyA-ravoZOLOrZ0xuxX0XgokGhHveFfJvnc';
+
+// --- CONFIGURATION END ---
 
 export let supabase: SupabaseClient;
 export let isSupabaseConfigured = !!(supabaseUrl && supabaseAnonKey);
 
+/**
+ * Initializes the Supabase client and verifies connectivity.
+ */
 export const initializeSupabase = async (): Promise<void> => {
     if (isSupabaseConfigured && supabase) return;
 
     if (!supabaseUrl || !supabaseAnonKey) {
-        console.error('Supabase configuration is missing. Ensure VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY are set in your environment variables.');
+        console.error('Supabase configuration is missing. Paste your URL and Key.');
         isSupabaseConfigured = false;
         return;
     }
 
     try {
         supabase = createClient(supabaseUrl, supabaseAnonKey);
-        // FIX: Cast supabase.auth to any to resolve getSession type error
-        await (supabase.auth as any).getSession();
+
+        const { error } = await (supabase.auth as any).getSession();
+        if (error) {
+            console.warn('Supabase initialization warning:', error.message);
+        }
+
         isSupabaseConfigured = true;
+        console.log('✅ Supabase initialized successfully');
     } catch (error) {
-        console.error('❌ Failed to initialize Supabase client:', error);
+        console.error('❌ Failed to initialize Supabase:', error);
         isSupabaseConfigured = false;
+    }
+};
+
+/**
+ * Gemini API basic request wrapper
+ */
+export const callGemini = async (prompt: string) => {
+    try {
+        const res = await fetch(
+            `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${googleGeminiApiKey}`,
+            {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    contents: [{ parts: [{ text: prompt }] }]
+                })
+            }
+        );
+
+        return await res.json();
+    } catch (err) {
+        console.error('Gemini API Error:', err);
+        return null;
     }
 };

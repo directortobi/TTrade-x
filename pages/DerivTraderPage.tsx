@@ -96,8 +96,10 @@ const DerivTraderPage: React.FC = () => {
         );
     }
 
-    const callProposal = Object.values(proposals).find((p): p is DerivProposal => p?.contract_type === 'CALL');
-    const putProposal = Object.values(proposals).find((p): p is DerivProposal => p?.contract_type === 'PUT');
+    // FIX: Added explicit type to parameter 'p' in find() to resolve 'unknown' type error when accessing contract_type.
+    const callProposal = Object.values(proposals).find((p: any): p is DerivProposal => p?.contract_type === 'CALL');
+    // FIX: Added explicit type to parameter 'p' in find() to resolve 'unknown' type error when accessing contract_type.
+    const putProposal = Object.values(proposals).find((p: any): p is DerivProposal => p?.contract_type === 'PUT');
 
     return (
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6 animate-fade-in">
