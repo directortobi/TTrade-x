@@ -1,27 +1,23 @@
-
 import React, { useEffect, useRef, useState, useCallback } from 'react';
-import { createChart, IChartApi, ISeriesApi, Time } from 'lightweight-charts';
-// FIX: Imported missing types and interfaces for proper TypeScript validation
+import { createChart, IChartApi, ISeriesApi, Time, CandlestickData } from 'lightweight-charts';
 import { Asset, AppUser, AnalysisResult, View } from '../types';
 import { AVAILABLE_ASSETS } from '../constants';
 import { fetchCandlestickData } from '../services/marketDataService';
 import { AssetSelector } from './results/ForexSelector';
 import { CandlestickSpinner } from './CandlestickSpinner';
-// FIX: Added required imports for chart analysis and results display
 import { ResultsPage } from '../pages/ResultsPage';
 import { getTimeframeAnalysis } from '../services/geminiService';
 import { useTokenForAnalysis } from '../services/tokenService';
 import { logService } from '../services/logService';
 import { ChartAnnotationPanel } from './ChartAnnotationPanel';
 
-// FIX: Defined InteractiveChartProps to include onNavigate, resolving the prop mismatch in MainApp.tsx
 interface InteractiveChartProps {
     user: AppUser;
     onTokenUsed: (newBalance: number) => void;
     onNavigate: (view: View) => void;
 }
 
-export const InteractiveChart: React.FC<InteractiveChartProps> = ({ user, onTokenUsed, onNavigate }) => {
+const InteractiveChart: React.FC<InteractiveChartProps> = ({ user, onTokenUsed, onNavigate }) => {
     const chartContainerRef = useRef<HTMLDivElement>(null);
     const chartRef = useRef<IChartApi | null>(null);
     const candlestickSeriesRef = useRef<ISeriesApi<'Candlestick'> | null>(null);
@@ -34,7 +30,6 @@ export const InteractiveChart: React.FC<InteractiveChartProps> = ({ user, onToke
 
     const timeframe = '15min';
 
-    // FIX: Implemented handleAnalysis to process the AI analysis request and manage tokens
     const handleAnalysis = useCallback(async () => {
         if (user.profile.tokens < 1) {
             alert("You have 0 tokens. Please buy more to perform an analysis.");
@@ -50,6 +45,7 @@ export const InteractiveChart: React.FC<InteractiveChartProps> = ({ user, onToke
                 pair: selectedAsset.ticker,
                 timeframe: timeframe,
                 data: data,
+                userAnnotations: userNotes
             });
             
             const tokensUsed = result.confidenceLevel > 50 ? 1 : 0;
@@ -62,21 +58,39 @@ export const InteractiveChart: React.FC<InteractiveChartProps> = ({ user, onToke
             
             setAnalysisResult(result);
         } catch (error) {
-            console.error(error);
-            alert("Analysis failed. Please try again.");
+            console.error('Analysis Error:', error);
+            alert("Analysis failed. Please ensure your API key is correct.");
         } finally {
             setIsAnalyzing(false);
         }
-    }, [selectedAsset, user, onTokenUsed, timeframe]);
+    }, [selectedAsset, user, onTokenUsed, timeframe, userNotes]);
 
     useEffect(() => {
         if (!chartContainerRef.current) return;
+
+        // Ensure we clean up any existing chart before re-creating
+        if (chartRef.current) {
+            chartRef.current.remove();
+        }
+
         const chart = createChart(chartContainerRef.current, {
-            layout: { background: { color: '#111827' }, textColor: '#d1d5db' },
-            grid: { vertLines: { color: '#374151' }, horzLines: { color: '#374151' } },
+            layout: {
+                background: { color: '#111827' },
+                textColor: '#d1d5db',
+            },
+            grid: {
+                vertLines: { color: '#374151' },
+                horzLines: { color: '#374151' },
+            },
             width: chartContainerRef.current.clientWidth,
             height: 400,
+            timeScale: {
+                timeVisible: true,
+                secondsVisible: false,
+            }
         });
+
+        // Initialize Series
         const series = chart.addCandlestickSeries({
             upColor: '#22c55e',
             downColor: '#ef4444',
@@ -85,6 +99,7 @@ export const InteractiveChart: React.FC<InteractiveChartProps> = ({ user, onToke
             wickDownColor: '#ef4444',
             wickUpColor: '#22c55e',
         });
+
         chartRef.current = chart;
         candlestickSeriesRef.current = series;
 
@@ -93,32 +108,44 @@ export const InteractiveChart: React.FC<InteractiveChartProps> = ({ user, onToke
                 chartRef.current.applyOptions({ width: chartContainerRef.current.clientWidth });
             }
         };
+
         window.addEventListener('resize', handleResize);
 
         return () => {
             window.removeEventListener('resize', handleResize);
             chart.remove();
+            chartRef.current = null;
+            candlestickSeriesRef.current = null;
         };
     }, []);
 
     useEffect(() => {
         let isMounted = true;
-        setLoading(true);
-
-        fetchCandlestickData(selectedAsset.ticker, timeframe).then(data => {
-            if (isMounted && candlestickSeriesRef.current) {
-                candlestickSeriesRef.current.setData(data.map(c => ({ 
-                    time: new Date(c.datetime).getTime() / 1000 as Time, 
-                    open: c.open, 
-                    high: c.high, 
-                    low: c.low, 
-                    close: c.close 
-                })));
-                chartRef.current?.timeScale().fitContent();
+        const loadChartData = async () => {
+            if (!candlestickSeriesRef.current) return;
+            
+            setLoading(true);
+            try {
+                const data = await fetchCandlestickData(selectedAsset.ticker, timeframe);
+                if (isMounted && candlestickSeriesRef.current) {
+                    const formattedData: CandlestickData<Time>[] = data.map(c => ({
+                        time: (new Date(c.datetime).getTime() / 1000) as Time,
+                        open: c.open,
+                        high: c.high,
+                        low: c.low,
+                        close: c.close
+                    }));
+                    candlestickSeriesRef.current.setData(formattedData);
+                    chartRef.current?.timeScale().fitContent();
+                }
+            } catch (err) {
+                console.error('Market Data Load Error:', err);
+            } finally {
+                if (isMounted) setLoading(false);
             }
-            setLoading(false);
-        });
+        };
 
+        loadChartData();
         return () => { isMounted = false; };
     }, [selectedAsset]);
 
@@ -137,10 +164,14 @@ export const InteractiveChart: React.FC<InteractiveChartProps> = ({ user, onToke
             
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
                 <div className="lg:col-span-3">
-                    <div className="bg-gray-800 p-6 rounded-2xl border border-gray-700">
+                    <div className="bg-gray-800 p-6 rounded-2xl border border-gray-700 shadow-xl">
                         <AssetSelector assets={AVAILABLE_ASSETS} selectedAsset={selectedAsset} onSelectAsset={setSelectedAsset} />
-                        <div ref={chartContainerRef} className="mt-4 relative min-h-[400px]">
-                            {loading && <div className="absolute inset-0 flex items-center justify-center"><CandlestickSpinner /></div>}
+                        <div ref={chartContainerRef} className="mt-6 relative min-h-[400px] rounded-lg overflow-hidden border border-gray-700 bg-gray-900">
+                            {loading && (
+                                <div className="absolute inset-0 z-10 flex items-center justify-center bg-gray-900/80">
+                                    <CandlestickSpinner />
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -158,5 +189,4 @@ export const InteractiveChart: React.FC<InteractiveChartProps> = ({ user, onToke
     );
 };
 
-// FIX: Added default export for proper React.lazy module resolution in MainApp.tsx
 export default InteractiveChart;

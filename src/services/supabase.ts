@@ -19,7 +19,7 @@ const getEnvVar = (name: string): string | null => {
     return null;
 };
 
-// --- CONFIGURATION START (FILLED IN WITH YOUR CREDENTIALS) ---
+// --- CONFIGURATION START ---
 
 export const supabaseUrl =
     getEnvVar('VITE_SUPABASE_URL') ||
@@ -30,12 +30,6 @@ export const supabaseAnonKey =
     getEnvVar('VITE_SUPABASE_ANON_KEY') ||
     getEnvVar('SUPABASE_ANON_KEY') ||
     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJpcG1zc3dpY2RiZmxia3FmcGJ1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjYwMTg1MzcsImV4cCI6MjA4MTU5NDUzN30.4_voAjcOXEYMU73G3uZe0B8hQgp721tUDAL9PgrAvTE';
-
-// ➤ Your Google Gemini API Key
-export const googleGeminiApiKey =
-    getEnvVar('VITE_GEMINI_API_KEY') ||
-    getEnvVar('GEMINI_API_KEY') ||
-    'AIzaSyA-ravoZOLOrZ0xuxX0XgokGhHveFfJvnc';
 
 // --- CONFIGURATION END ---
 
@@ -67,28 +61,5 @@ export const initializeSupabase = async (): Promise<void> => {
     } catch (error) {
         console.error('❌ Failed to initialize Supabase:', error);
         isSupabaseConfigured = false;
-    }
-};
-
-/**
- * Gemini API basic request wrapper
- */
-export const callGemini = async (prompt: string) => {
-    try {
-        const res = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${googleGeminiApiKey}`,
-            {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    contents: [{ parts: [{ text: prompt }] }]
-                })
-            }
-        );
-
-        return await res.json();
-    } catch (err) {
-        console.error('Gemini API Error:', err);
-        return null;
     }
 };

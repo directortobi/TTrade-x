@@ -45,7 +45,6 @@
     "dist",
     "src",
     "pages/src",
-    "vite.config.ts",
-    "vite.config.d.ts"
+    "vite.config.ts"
   ]
 }
