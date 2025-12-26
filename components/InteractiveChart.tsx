@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
-import { createChart, IChartApi, ISeriesApi, Time, CandlestickData } from 'lightweight-charts';
+import { createChart, IChartApi, ISeriesApi, Time, CandlestickData, ColorType } from 'lightweight-charts';
 import { Asset, AppUser, AnalysisResult, View } from '../types';
 import { AVAILABLE_ASSETS } from '../constants';
 import { fetchCandlestickData } from '../services/marketDataService';
@@ -32,15 +32,12 @@ const InteractiveChart: React.FC<InteractiveChartProps> = ({ user, onTokenUsed, 
 
     const handleAnalysis = useCallback(async () => {
         if (user.profile.tokens < 1) {
-            alert("You have 0 tokens. Please buy more to perform an analysis.");
+            alert("Insufficient tokens. Please purchase more to proceed.");
             return;
         }
         setIsAnalyzing(true);
-        setAnalysisResult(null);
-
         try {
             const data = await fetchCandlestickData(selectedAsset.ticker, timeframe);
-            
             const result = await getTimeframeAnalysis({
                 pair: selectedAsset.ticker,
                 timeframe: timeframe,
@@ -58,8 +55,8 @@ const InteractiveChart: React.FC<InteractiveChartProps> = ({ user, onTokenUsed, 
             
             setAnalysisResult(result);
         } catch (error) {
-            console.error('Analysis Error:', error);
-            alert("Analysis failed. Please ensure your API key is correct.");
+            console.error('Analysis error:', error);
+            alert("Analysis failed. Please check your connectivity and try again.");
         } finally {
             setIsAnalyzing(false);
         }
@@ -68,36 +65,35 @@ const InteractiveChart: React.FC<InteractiveChartProps> = ({ user, onTokenUsed, 
     useEffect(() => {
         if (!chartContainerRef.current) return;
 
-        // Ensure we clean up any existing chart before re-creating
-        if (chartRef.current) {
-            chartRef.current.remove();
-        }
-
         const chart = createChart(chartContainerRef.current, {
             layout: {
-                background: { color: '#111827' },
+                background: { type: ColorType.Solid, color: '#000000' },
                 textColor: '#d1d5db',
             },
             grid: {
-                vertLines: { color: '#374151' },
-                horzLines: { color: '#374151' },
+                vertLines: { color: '#111' },
+                horzLines: { color: '#111' },
             },
             width: chartContainerRef.current.clientWidth,
-            height: 400,
+            height: 450,
             timeScale: {
+                borderColor: '#222',
                 timeVisible: true,
                 secondsVisible: false,
+            },
+            rightPriceScale: {
+                borderColor: '#222',
             }
         });
 
-        // Initialize Series
+        // Initialize series immediately to ensure prototype is valid
         const series = chart.addCandlestickSeries({
-            upColor: '#22c55e',
-            downColor: '#ef4444',
-            borderDownColor: '#ef4444',
-            borderUpColor: '#22c55e',
-            wickDownColor: '#ef4444',
-            wickUpColor: '#22c55e',
+            upColor: '#06b6d4',
+            downColor: '#f43f5e',
+            borderDownColor: '#f43f5e',
+            borderUpColor: '#06b6d4',
+            wickDownColor: '#f43f5e',
+            wickUpColor: '#06b6d4',
         });
 
         chartRef.current = chart;
@@ -105,17 +101,20 @@ const InteractiveChart: React.FC<InteractiveChartProps> = ({ user, onTokenUsed, 
 
         const handleResize = () => {
             if (chartContainerRef.current && chartRef.current) {
-                chartRef.current.applyOptions({ width: chartContainerRef.current.clientWidth });
+                chartRef.current.applyOptions({ 
+                    width: chartContainerRef.current.clientWidth 
+                });
             }
         };
 
         window.addEventListener('resize', handleResize);
+        const resizeObserver = new ResizeObserver(handleResize);
+        resizeObserver.observe(chartContainerRef.current);
 
         return () => {
             window.removeEventListener('resize', handleResize);
+            resizeObserver.disconnect();
             chart.remove();
-            chartRef.current = null;
-            candlestickSeriesRef.current = null;
         };
     }, []);
 
@@ -154,22 +153,34 @@ const InteractiveChart: React.FC<InteractiveChartProps> = ({ user, onTokenUsed, 
     }
 
     return (
-        <div className="max-w-7xl mx-auto animate-fade-in space-y-6">
-            <div>
-                <h1 className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-sky-400">
-                    Interactive Chart & Analysis
-                </h1>
-                <p className="text-gray-400 mt-1">Analyze live charts with annotations and get instant AI feedback.</p>
+        <div className="max-w-7xl mx-auto animate-fade-in space-y-8">
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+                <div>
+                    <h1 className="text-4xl font-black text-white tracking-tight">
+                        Interactive <span className="text-cyan-500">Terminal</span>
+                    </h1>
+                    <p className="text-gray-500 mt-2 font-medium">Real-time analysis with direct AI integration.</p>
+                </div>
+                <div className="flex items-center gap-2 px-4 py-2 bg-white/5 rounded-2xl border border-white/5">
+                    <div className="w-2 h-2 rounded-full bg-cyan-500 animate-pulse"></div>
+                    <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">Live Feed</span>
+                </div>
             </div>
             
-            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
                 <div className="lg:col-span-3">
-                    <div className="bg-gray-800 p-6 rounded-2xl border border-gray-700 shadow-xl">
+                    <div className="bg-[#050505] p-6 rounded-[2rem] border border-white/5 shadow-2xl space-y-6">
                         <AssetSelector assets={AVAILABLE_ASSETS} selectedAsset={selectedAsset} onSelectAsset={setSelectedAsset} />
-                        <div ref={chartContainerRef} className="mt-6 relative min-h-[400px] rounded-lg overflow-hidden border border-gray-700 bg-gray-900">
+                        
+                        <div className="relative group">
+                            <div 
+                                ref={chartContainerRef} 
+                                className="w-full h-[450px] rounded-2xl overflow-hidden border border-white/5 bg-black"
+                            />
                             {loading && (
-                                <div className="absolute inset-0 z-10 flex items-center justify-center bg-gray-900/80">
+                                <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-black/80 backdrop-blur-sm">
                                     <CandlestickSpinner />
+                                    <p className="text-xs font-bold text-gray-500 uppercase tracking-[0.2em] mt-4">Syncing Market Data</p>
                                 </div>
                             )}
                         </div>
@@ -177,12 +188,14 @@ const InteractiveChart: React.FC<InteractiveChartProps> = ({ user, onTokenUsed, 
                 </div>
 
                 <div className="lg:col-span-1">
-                    <ChartAnnotationPanel
-                        isAnalyzing={isAnalyzing}
-                        onAnalyze={handleAnalysis}
-                        notes={userNotes}
-                        onNotesChange={setUserNotes}
-                    />
+                    <div className="sticky top-24">
+                        <ChartAnnotationPanel
+                            isAnalyzing={isAnalyzing}
+                            onAnalyze={handleAnalysis}
+                            notes={userNotes}
+                            onNotesChange={setUserNotes}
+                        />
+                    </div>
                 </div>
             </div>
         </div>

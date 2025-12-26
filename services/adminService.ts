@@ -2,27 +2,27 @@ import { supabase } from './supabase';
 import { PurchaseWithEmail, WithdrawalWithEmail, ReferralWithdrawalWithEmail } from '../types';
 
 /**
- * Safely invokes a Supabase function. If it fails with "Failed to fetch" (usually 404 or CORS),
- * it returns a graceful error or empty data for demo purposes.
+ * Robust wrapper for Edge Functions.
+ * Returns empty data or safe errors instead of throwing "Failed to fetch"
+ * if the function doesn't exist yet.
  */
-const safeInvoke = async <T>(functionName: string, body?: object): Promise<T | null> => {
+const safeInvoke = async <T>(name: string, body?: any): Promise<T | null> => {
     try {
-        const { data, error } = await supabase.functions.invoke(functionName, { body });
+        const { data, error } = await supabase.functions.invoke(name, { body });
         if (error) {
-            console.warn(`Edge Function "${functionName}" returned an error:`, error.message);
+            console.warn(`Edge Function ${name} warning:`, error.message);
             return null;
         }
         return data as T;
     } catch (err) {
-        console.error(`CRITICAL: Failed to fetch Edge Function "${functionName}". This usually means the function is not deployed to your Supabase project.`);
+        console.warn(`Edge Function ${name} is not available (failed to fetch). Using fallback data.`);
         return null;
     }
 };
 
 export const adminService = {
     async getPendingPurchases(): Promise<PurchaseWithEmail[]> {
-        const data = await safeInvoke<PurchaseWithEmail[]>('get-pending-purchases');
-        return data || [];
+        return (await safeInvoke<PurchaseWithEmail[]>('get-pending-purchases')) || [];
     },
 
     async approvePurchase(purchaseId: string): Promise<void> {
@@ -34,8 +34,7 @@ export const adminService = {
     },
 
     async getPendingWithdrawals(): Promise<WithdrawalWithEmail[]> {
-        const data = await safeInvoke<WithdrawalWithEmail[]>('get-pending-withdrawals');
-        return data || [];
+        return (await safeInvoke<WithdrawalWithEmail[]>('get-pending-withdrawals')) || [];
     },
     
     async approveWithdrawal(withdrawalId: string): Promise<void> {
@@ -47,15 +46,20 @@ export const adminService = {
     },
 
     async getPendingReferralWithdrawals(): Promise<ReferralWithdrawalWithEmail[]> {
-        const data = await safeInvoke<ReferralWithdrawalWithEmail[]>('get-pending-referral-withdrawals');
-        return data || [];
+        return (await safeInvoke<ReferralWithdrawalWithEmail[]>('get-pending-referral-withdrawals')) || [];
     },
 
     async approveReferralWithdrawal(withdrawalId: string): Promise<void> {
-        await safeInvoke('update-referral-withdrawal', { withdrawal_id: withdrawalId, new_status: 'approved' });
+        await safeInvoke('update-referral-withdrawal', { 
+            withdrawal_id: withdrawalId, 
+            new_status: 'approved' 
+        });
     },
 
     async rejectReferralWithdrawal(withdrawalId: string): Promise<void> {
-        await safeInvoke('update-referral-withdrawal', { withdrawal_id: withdrawalId, new_status: 'rejected' });
+        await safeInvoke('update-referral-withdrawal', { 
+            withdrawal_id: withdrawalId, 
+            new_status: 'rejected' 
+        });
     },
 };

@@ -9,14 +9,16 @@ interface PurchaseRequest {
 
 export const createTokenPurchaseRequest = async ({ userId, pkg, proofFile }: PurchaseRequest): Promise<void> => {
     const fileExt = proofFile.name.split('.').pop();
-    const fileName = `${Math.random()}.${fileExt}`;
+    const fileName = `${crypto.randomUUID()}.${fileExt}`;
     const filePath = `${userId}/${fileName}`;
 
     const { error: uploadError } = await supabase.storage
         .from('payment_proofs')
         .upload(filePath, proofFile);
 
-    if (uploadError) throw new Error('Failed to upload proof. Please ensure "payment_proofs" bucket exists and is public.');
+    if (uploadError) {
+        throw new Error('Storage error: Ensure the "payment_proofs" bucket is created and public.');
+    }
 
     const { data: urlData } = supabase.storage.from('payment_proofs').getPublicUrl(filePath);
 
@@ -33,22 +35,25 @@ export const createTokenPurchaseRequest = async ({ userId, pkg, proofFile }: Pur
 };
 
 export const getPurchaseHistory = async (userId: string): Promise<TokenPurchase[]> => {
-    const { data, error } = await supabase.from('token_purchases').select('*').eq('user_id', userId).order('created_at', { ascending: false });
-    if (error) throw error;
+    const { data, error } = await supabase
+        .from('token_purchases')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false });
+    if (error) return [];
     return data || [];
 };
 
 export const useTokenForAnalysis = async (currentTokens: number): Promise<number> => {
     if (currentTokens < 1) throw new Error("Insufficient tokens.");
     
-    const newBalance = currentTokens - 1;
-    
-    // We attempt to call the Edge Function, but we don't block the UI if it's missing (Failed to fetch)
+    // We try to invoke the backend to sync, but allow local deduction if it fails (Failed to fetch)
     try {
-        await supabase.functions.invoke('use-token');
+        const { error } = await supabase.functions.invoke('use-token');
+        if (error) console.warn("Backend token sync warning:", error.message);
     } catch (err) {
-        console.warn("Failed to fetch 'use-token' Edge Function. Tokens will be deducted locally but may not persist if backend logic is missing.");
+        console.warn("Backend token sync unavailable. Tokens deducted locally.");
     }
     
-    return newBalance;
+    return Math.max(0, currentTokens - 1);
 };

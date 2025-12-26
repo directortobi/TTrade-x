@@ -2,13 +2,13 @@ import { createClient } from '@supabase/supabase-js';
 import type { SupabaseClient } from '@supabase/supabase-js';
 
 const getEnvVar = (name: string): string | null => {
-    if (typeof process !== 'undefined' && process.env?.[name]) {
-        return process.env[name] as string;
-    }
     // @ts-ignore
     if (typeof import.meta !== 'undefined' && import.meta.env?.[name]) {
         // @ts-ignore
         return import.meta.env[name] as string;
+    }
+    if (typeof process !== 'undefined' && process.env?.[name]) {
+        return process.env[name] as string;
     }
     if (typeof window !== 'undefined' && (window as any)._env_?.[name]) {
         return (window as any)._env_[name];
@@ -30,10 +30,12 @@ export const initializeSupabase = async (): Promise<void> => {
 
     try {
         const { error } = await (supabase.auth as any).getSession();
-        if (error) console.warn('Supabase session check:', error.message);
+        if (error) {
+            console.warn('Supabase Session check:', error.message);
+        }
         isSupabaseConfigured = true;
     } catch (error) {
-        console.error('Supabase init error:', error);
+        console.error('Supabase Initialization Error:', error);
         isSupabaseConfigured = false;
     }
 };
